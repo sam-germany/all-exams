@@ -1,0 +1,876 @@
+
+############################################################################################################
+############   These all notes i have make from the test taken on  13-12-2022   ############################
+############################################################################################################
+
+Scale out:    <-- it means add more instances as per the condition applied
+Scale in:     <-- it means delete instances as per the condition applied
+
+
+SKU:  Stock keeping Unit
+
+-----------------------------------------------------------------------------
+NSG (Network security Group):  
+------------------------------
+-) when a default NGS we apply to a Subnet/Virtual-Machine then by-default
+   all  inbound/outbound port/protocol are open at Rule-Priority=65000 & 65001
+
+-) You can assign NSG to the Subnet of the VNet in the same region where NSG is. 
+   If NSG1 is in East US and only VNet3 Subnets are in East US.
+
+
+Virtual Network - Subnet
+-----------------------
+Both "Virtual Network" and "Subnet", NSG, Network-Interface should be in a same region.
+
+The VNet Integration feature has two variations
+---------------------------------------------
+-) Regional virtual network integration: When you connect to virtual networks in the same region, 
+    you must have a dedicated subnet in the virtual network you're integrating with.
+
+-) Gateway-required virtual network integration: When you connect directly to virtual networks in 
+   other regions or to a classic virtual network in the same region, you need an 
+   Azure Virtual Network gateway created in the target virtual network.
+
+Note: If the VNet is in the same region, either create a new subnet or select an empty preexisting subnet.  <-- not understand
+
+
+
+VM (Virtual Machine):  
+---------------------
+when a default rule is applied it means "deny" everything port is blocked, means every port & protocol is blocked
+
+
+
+NIC (Network interface card)
+----------------------------
+You can move a NIC to a different RG or Subscription by selecting (change) next to the RG or Subscription name.
+If you move the NIC to a new Subscription, you must move all resources related to the NIC with it. 
+If the network interface is attached to a virtual machine, for example, you must also move the virtual machine, 
+and other virtual machine-related resources.
+
+e.g: 
+RG-1= West US
+RG-2= East US
+NIC= West US
+
+Note: assume NIC is in RG-1, if we move it to RG-2, that we can do but NIC will still remain in "WEST US" 
+
+-) A public and a private IP address can be assigned to a single network interface. By default a NIC is associated 
+to one IP address. Anyway nothing prevents a NIC to have MORE THAN ONE IP address. So to the VM's NIC, you can 
+associate the public and the private IP at the same time. You are not forced to have one NIC for the 
+public IP and one NIC for the private IP.
+
+Note: we can define "Rule-priority" in a Network-interface  ranges inbetween  100  till  4096 
+
+---------------------------------------------------------------------------------------------------
+Azure AD roles
+--------------
+The Azure AD roles include four roles:
+
+1) Global administrator   – The highest level of access, including the ability to grant administrator access 
+                            to other users and to reset other administrator’s passwords, can create and manage users.
+                            He can  add/modify  new "Security Questions/Security" options to a user account.                               
+2) User administrator     – Can create and manage users and groups, and can reset passwords for users, 
+                            Helpdesk administrators and User administrators.
+                            He can not add/modify  new "Security Questions"/Security options to a user account.
+                            Users with this role can create users, and manage all aspects of users with some restrictions, 
+                            and can update password expiration policies. Additionally, users with this role can create and 
+                            manage all groups. This role also includes the ability to create and manage user views, 
+                            manage support tickets, and monitor service health. User Administrators don't have permission to 
+                            manage some user properties for users in most administrator roles. Admins with this role do not 
+                            have permissions to manage MFA or manage shared mailboxes.
+
+3) Helpdesk administrator – can change the password for users who don’t have an administrator role and 
+                              they can invalidate refresh tokens, which forces users to sign back in again.
+4) Billing Administrator  – can make purchases and manage subscriptions.
+
+
+Note:
+Create "New-Users" <-- only "Global Administrator" who created that tanent in the AD, means user1 create "abc.cloudconnect.onmicrosoft.com"
+                       so "User1" is "Global Administrator" for this tanent, so he can create new users under it
+                    "User Administrator"  can also create new users but first we have to assing this role for the
+                     tanent "abc.cloudconnect.onmicrosoft.com" to "User Administrator" then he can do it. By-default he can not create user
+                     under every tanent
+
+-------------------------------------------------------------------------
+Azure roles (RBAC)
+-----------
+The four fundamental roles are:
+
+1) Owner                     – Full rights to change the resource and to change the access control to grant permissions to other users.
+                               The "Owner Role" lets you manage everthing, including access to resources and creation of resources.
+                               It can deploy VM and manage "Virtual-Networks"
+
+2) Contributor               – Full rights to change the resource, but not able to change the access control.
+                               "change" means here create, update, delete, start, restart and power off.
+                               It can deploy VM and manage "Virtual-Networks"                               
+                             - This role does not allow you to assign roles in Azure RBAC, manage assignments in Azure Blueprints, 
+                               or share image galleries.
+                             - Contributors have permissions to contribute fully to the project code base and work item tracking. 
+                               The main permissions they don't have or those that manage or administer resources.
+
+3) Network Contributer       - This role lets you manage networks, including creating subnets.
+                              -) When we want to give a "User" priveleges to add a backend-pool of VM  or add Heealth-route to a  "Load-Balancer"
+                              then we have to attach this role to the "Resourse-Group", we can not assign this role directly to "Load-Balancer" 
+                              because we need IP of VMs to add in Backend-pool
+
+4) Security Admin            - With this role we can view security policies, view security states, edit security policies, 
+                               view alerts and recommendations, dismiss alerts and recommendations.
+
+5) Reader                     – Read-only access to the resource
+
+6) User Access Administrator  – No access to the resource except the ability to change the access control.
+                                if a User already has "Reader-role" then plus with this role a "User" can assign the "Reader-role" to other users also.
+
+7) Cloud Device Administrator - Users in this role can enable, disable and delete devices in Azure AD and read Windows 10 
+                                BitLocker keys(if present) in the Azure portal. This role does not frant permissions to manage
+                                any other properties on the device.
+
+Virtual MAchine Contributor   - Lets you manage virtual machines, but not access to them, and not the virtual network or storage account 
+                                they're connected to.                               
+          
+Virtual MAchine Administrator Login - View Virtual Machines in the portal and login as administrator.
+
+-----------------------------
+Storage Blob Data Reader 
+or 
+Storage Blob Data Contributor
+and 
+Azure Resource Manager Reader role       <-- a "Global administrator" needs these roles to read a blob in a Storage-Account 
+----------------------------------------------------------
+
+Azure AD Roles                                         Azure Roles(RBAC)
+----------------                                       ------------
+These are used to "control access of AD resources  |   They are used to "control access" to Azure resources
+                                                   |
+AD resources are:                                  |    Azure resources are:
+Users, Groups, Billing, Licensing,                 |    Virutal Machines, Databases, Cloud Storage, Cloud Networking  etc...
+Application Registration ...etc                    |                                   
+---------------------------------------
+
+Note: 
+By default, the "Global Administrator" does not have access to Azure resources.
+"Global Administrator" can gain access to azure resource if granted the "User Access Administrator role(an Azure role)"
+
+----------------------------------------------------------------------------------------------------------
+Logic App (Roles)
+-----------------
+
+DevTest Labs User role 
+----------------------
+it only lets you connect, start, restart, and shutdown virtual machines in your Azure DevTest Labs.
+
+
+Logic App Contributor role 
+-------------------------
+it lets you manage logic app, but not access to them. It provides access to view, create, edit, and update a logic app.
+Grants full access to manage all resources, but does not allow you to assign roles in Azure RBAC, 
+manage assignments in Azure Blueprints, or share image galleries.
+
+
+
+Logic App Operator role 
+-----------------------
+
+---------------------------------------------------------------------------------------------------------
+LRS	(Local redundant storage):  <-- Stores data synchronously three times at one physical location.
+
+ZRS	(Zone redundant storage):   <-- Stores data synchronously three times at three physical locations in the same region.
+                                    Durability 99.999999999%
+
+GRS	(Geo redundant storage):    <--GRS copies your data synchronously three times within a single physical location in the 
+                                      primary region using LRS. It then copies your data asynchronously to a single physical location 
+                                  in the secondary region. Within the secondary region, your data is copied synchronously three times using LRS 
+                         "GRS" --  Only allows to be read in the secondary zone in the even of a failover from the primary to secondary                       
+                      "RA GRS" --  Cross-regional replication with read access to the replica. RA-GRS provides read-only access to the data in 
+                                   the secondary location, in addition to geo-replication across two regions, It is more expensive compared to GRS.
+
+
+
+GZRS (Geo-zone-redundant storage):   <-- Combination of GRS and ZRS. Stores data synchronously three times in 
+                                       three physical locations (zones) in the primary region (ZRS) and additionally 
+                                       asynchronously three times in a single zone in a secondary physical region (GRS).
+
+========================================================================================================
+Azure Storage
+------------
+
+SAS     <-- Shared access signature
+
+Note: every "Storage-Account" has these 3 types, either it is a LRS, ZRS or GRS 
+
+Their are 3 types of "Tier"
+Imp: These below three tier types are only supported by "General Purpose v2"  and "Blob Storage"
+
+a) Hot tier  
+-----------
+An online tier optimized for storing data that is accessed or modified frequently. 
+The hot tier has the highest storage costs, but the lowest access costs.
+
+b) Cool tier
+------------
+An online tier optimized for storing data that is infrequently accessed or modified. 
+Data in the cool tier should be stored for a minimum of 30 days. 
+The cool tier has lower storage costs and higher access costs compared to the hot tier.
+
+c) Archive tier
+---------------
+An offline tier optimized for storing data that is rarely accessed, 
+and that has flexible latency requirements, on the order of hours. 
+Data in the archive tier should be stored for a minimum of 180 days.
+
+--------------------------------------------------------------
+Object Replication (Copy data from  "Storage-account-1"  to "Storage-account-2" )
+------------------
+
+-) Object replication is supported for general-purpose v2 storage accounts, and for premium block blob accounts in preview. 
+   Both the source and destination accounts must be either general-purpose v2 or premium block blob accounts.
+   Object replication supports block blobs only; append blobs and page blobs are not supported.
+-) Blob versioning should be enabled on both the source and destination storage account.
+-) Change feed should be enabled on the source account
+
+
+
+Azure Import/Export service supports:
+Import:   <-- Import supports "Azure Blob storage" and "Azure File storage"
+Export:   <-- Export supports only "Azure Blob storage"
+
+Extra point:  Blob can not be backup with the "Azure Vault service"
+Extra point:  "AzCopy" command can copy data only for "Blobs" and "Files"
+
+==========================================================================================================
+Route table
+-----------
+
+Next hop type: 
+Virtual appliance     <-- it means a "Virtual Machine"
+
+
+--------------------------------------------------------------------------------------------------
+Virtual Machine scale set  (old was "Availability sets"  but new is "Virtual Machine scale sets")
+-------------------------
+
+Orchestration modes
+-------------------
+
+Virtual machine scale sets will support 2 distinct orchestration modes:
+
+1) ScaleSetVM "Virtual machine instances added to the scale set are based on the scale set configuration model. 
+The virtual machine instance lifecycle – creation, update, deletion – is managed by the scale set.
+
+2) VM (virtual machines)" Virtual machines created outside of the scale set can be explicitly added to the scaleset.
+
+Imp:
+-) When you create a VM, you can optionally specify that it is added to a virtual machine scale set. A VM can only be 
+   added to a scale set at time of VM creation. The newly created VM must be in the same resource group as 
+   the Flexible scale set regardless of deployment methods.
+-) You can add the virtual machine to a scale set in the same region, zone, and resource group.
+
+
+-----------------------------------------------------------------------------------------------
+DNS (Domain name service)
+-------------------------
+
+DNS Port is "53"  <-- on the port basis AWS put the service name "Route 53" of its DNS service
+
+A virtual network can be linked to private DNS zone as a registration or as a resolution virtual network.
+
+Registration virtual network: 
+------------------------------
+A private DNS zone can have multiple registration virtual networks. However,every virtual network can 
+only have one registration zone associated with it. 
+it means that (One DNS-zone have one Virtual network, because it is autoassing is YES "Enable Auto Registration")
+
+Resolution virtual network: 
+---------------------------
+One private DNS zone can have multiple resolution virtual networks and a virtual network 
+can have multiple resolution zones associated to it.
+it means that (ONE DNS-zone can have multiple Virtual-network and one Virtual-network can assign to multiple DNS-zone
+because we mapping mannully so we can map many DBS-zone with one Virtual-network, in this case auto-assing is NO "Enable Auto Registration")
+
+(Imp)
+Q) How to connect to a domain named "www.abc.com" to a webapp ?
+-) You can use either a CNAME record or an A record to map a custom DNS name to App Service.
+-) You should use CNAME records for all custom DNS names except root domains (for example, abc.com). For root domains, use A records.
+
+Imp:
+----
+When we link a  "Virtual-Network" with a "Private DNS Zone" then a DNS record gets created automatically for each VM deployed in 
+that "Virtual-Network"
+
+
+
+
+-----------------------------------------------------------------------------------------------
+App service
+-----------
+
+Scale up          <-- it means we are adding more resources in a single app, means more ram,cpu 
+                     we can say it is a Vertical scaling
+Scale out         <-- it means we are adding more instances, it is like a Horizontal scaling
+                    
+Scale in:     <-- it means delete instances as per the condition applied
+
+
+Note: 
+App-service  resources are region-specific and can not be moved across regions.
+You must create a copy of your existing App Service resources in the target region, 
+then move your content over to the new app. You can then delete the source app and App Service plan.
+To make copying your app easier, you can clone an individual App Service app into an App Service plan in another region.
+----------------------------------------------------------------------------------------------
+Lock
+----
+
+Delete (or we can say "CanNotDelete lock")
+------
+-) A resource with delete lock, can be moved to another RG, because the resource by itself is not deleted and keeps on existing despite the move.
+-) A cannot-delete lock on a resource group prevents Azure Resource Manager from automatically deleting deployments in the history.
+If you reach 800 deployments in the history, your deployments fail.
+-) delete lock that means you cant delete but you can definitely move new resources in it.
+
+
+Read-Only
+---------
+-) ReadOnly means authorized users can read a resource, but they cannot delete or update the resource.
+-) A resource with readonly lock, can be moved to another RG, because the resource attributes do not change with the move.
+it means authorized users can read a resource, but they can not delete or update it, applying this lock is similar to restricting a authorized
+users to the permissions that the "Reader" role privides.
+-) A read-only lock on a resource group that contains an App Service plan prevents you from scaling up or out the plan.
+
+-) A read-only lock on a resource group that contains a virtual machine prevents all users from starting or restarting a virtual machine.
+   These operations require a POST method request.
+
+Note(imp) (below means that we put a lock on "Resource group")
+---------
+But if the resource is a RG and it has a readonly lock, its child resources can’t be moved to another RG, 
+because the RG attributes (in this case, the child resources’ list) would try to be modified, hence, prevented by the lock.
+If the RG has a delete lock, its child resources can be moved to another RG.
+
+
+Imp:
+----
+ASP.NET   WebApp can be created/hosted only on Windows
+".NET Core 3.0"  or  "ASP.NET core"    WebApp can be created/hosted only on both  Windows/Linux OS
+
+
+
+
+-----------------------------------------------------------------------------------------------
+Tags
+----
+Tags applied to the resource group are not inherited by the resources in that resource group.
+
+
+------------------------------------------------------------------------------------------
+Load Balancer (LB)
+------------------
+
+-) You can only attach virtual machines that are in the same location and on the same virtual network as the LB. 
+  Virtual machines must have a standard SKU public IP or no public IP.
+-) The LB needs to be a standard SKU to accept individual VMs outside an availability set or vmss. 
+  VMs do not need to have public IPs but if they do have them they have to be standard SKU. 
+  Virtual machines can only be from a single network. When they don’t have a public IP they are assigned an ephemeral IP.
+
+Note: when adding them to a backend pool, it doesn’t matter if the VM is running or stop
+
+
+
+Basic Load Balancer: 
+-------------------
+Basic Load-Balancer supports  Virtual machines in a "single availability set" or "virtual machine scale set".
+
+
+Standard Load Balancer:
+-----------------------
+Standard Load-Balancer supports any "virtual machines" or "virtual machine scale sets" in a "single virtual network".
+
+-------------------------------------------------------------------------------------------------
+CNI  (Azure Container Networking Interface)
+---
+With Azure CNI, every pod gets an IP address from the subnet and can be accessed directly. 
+These IP addresses must be unique across your network space.
+
+-------------------------------------------------------------------------------------------------
+DNS ( Domain name service)
+----
+
+FQDNS  <-- Fully qualified Domain name service
+
+if we do "nslookup" on any ip of the "VM" then it return us always "[VM-name].internal.cloudapp.net" 
+
+--------------------------------------------------------------------------------------------------
+Network Watcher  (below are the services comes under "Network watcher")
+--------------
+
+Packet capture:
+-) Network Watcher variable packet capture allows you to create packet capture sessions to track traffic 
+   to and from a virtual machine. Packet capture helps to diagnose network anomalies both reactively and proactively. 
+   Other uses include gathering network statistics, gaining information on network intrusions, 
+   to debug client-server communications and much more.
+
+Connection Monitor:
+-) We need to inspect all the network traffic from VM1 to VM2 and not between the 2 VMs. 
+   Even if we were using Connection monitor, this one would inspect only network traffic over a specific port. 
+   And for a period of 3 hours, packet capture session time limit default value is 18000 seconds(5 hours).
+
+IP Flow:
+-) At some point, a VM may become unable to communicate with other resources, because of a security rule. 
+   The IP flow verify capability enables you to specify a source and destination IPv4 address, port, protocol (TCP or UDP), 
+   and traffic direction (inbound or outbound). IP flow verify then tests the communication and informs you if the 
+   connection succeeds or fails. If the connection fails, IP flow verify tells you which.
+
+Connection Troubleshoot:
+-) Diagnose outbound connections from a VM: The connection troubleshoot capability enables you to test a connection between 
+   a VM and another VM, an FQDN, a URI, or an IPv4 address. The test returns similar information returned when using the 
+   connection monitor capability, but tests the connection at a point in time, rather than monitoring it over time, 
+   as connection monitor does. Learn more about how to troubleshoot connections using connection-troubleshoot.
+
+
+Data Collector Set (DCS):
+-) 
+
+
+Traffic Analytics:
+-) Traffic Analytics is a cloud-based solution that provides visibility into user and application activity in cloud networks. 
+  Traffic analytics analyzes Network Watcher network security group (NSG) flow logs to provide insights into traffic flow in your Azure cloud.
+
+
+------------------------------------------------------------------------------------------------------
+Policy
+-------
+You assign an Azure policy that has the following settings:
+
+⦿ Scope: Sub1
+
+⦿ Exclusions: Sub1/RG1/VNET1                          <-- in this "Exclusions" field we can put any "Resource-name", then this policy will not
+                                                                 apply on this "Resource"
+⦿ Policy definition: Append a tag and its value to resources
+
+⦿ Policy enforcement: Enabled
+
+⦿ Tag name: Tag4
+
+⦿ Tag value: value4
+
+-------------------------------------------------------------------------------------------------
+Tags
+----
+You apply tags to your Azure resources giving metadata to logically organize them into a taxonomy. 
+After you apply tags, you can retrieve all the resources in your subscription with that tag name and value. 
+Each resource or resource group can have a maximum of 15 tag name/value pairs. Tags applied to the resource 
+group are not inherited by the resources in that resource group.
+
+--------------------------------------------------------------------------------------------
+Azure Log Analytics Workspace
+----------------------------
+
+Three ways to search for "error" logs in "Log Analytics Workspace" by "Kusto" language
+
+1) Event | search "error"
+
+2) Event | where EventType == "error"
+
+3) search in (Event) "erro
+
+-------------------------------------------------------------------------------------------
+File-Share service
+------------------
+
+Imp:  File-Share uses NFS or SMB protocols 
+
+Note: we use for connecting from on-premiss to Azure-File-Share with  "SMB" (Server Message Block)
+      "SMB" require  TCP port 445 to be open between on-premiss and Azure-File-Share
+
+
+e.g-1  (Question - 4.23)
+-----
+
+1) 
+Storage account as "File-Share" in Azure
+Name = share1
+
+2)
+On-premises Storage-account "File-Share"
+Name = data1      Server=Server1    Path=D:\Folder1
+Name = data2      Server=Server2    Path=D:\Folder2
+
+3) we create an "Azure-File-Sync-Group" named "Sync1" and perform the following actions
+
+Explanation: 
+-) Here above we have created a "File-Sync-Group" = "Sync1"  in Azure. This "File-Sync-group" will defines the sync topology for a set of files.
+-) after that we have created a Storage-account as "File Share" = "share1"  in Azure
+-) after that we have added "share1" as "Cloud-Endpoint" for "Sync1"                         (Imp: we can have only one "Cloud-Endpoint" of "Azure File-Share")
+
+
+-) after that we have Registered "Server1" and "Server2" to "Sync1"
+-) after that we have added "data1" as a Server-Endpoint for "Sync1", as below we are registring the "Server1" to "Sync1" so it is ok
+-) after that we have added "data2" as a Server-Endpoint for "Sync1", as below we are registring the "Server2" to "Sync1" so it is ok
+                                                                                             (Imp: we can have many "Server-Endpoints")
+
+Explanation
+A sync group defines the sync topology for a set of files. Endpoints within a sync group are kept in sync with each other.
+A sync group must contain one cloud endpoint, which represents an Azure file share and one or more server endpoints.
+A server endpoint represents a path on a registered server. A server can have server endpoints in multiple sync groups. 
+You can create as many sync groups as you need to appropriately describe your desired sync topology.
+
+
+
+
+e.g-2  (5.15, 5.16, 5.17)
+-----
+1) 
+Storage account as "File-Share" in Azure
+Name = share1
+
+
+2)
+On-premises Storage-account "File-Share"
+Server=Server1    Path=D:\Folder1, E:\Folder2                       (Imp: we are not alloweed to have tow "Endpoints" for one "Server", only one is alloweed)
+Server=Server2    Path=D:\Data
+
+3) we create an "Azure-File-Sync-Group" named "Group1". 
+   Endpoints within a Sync-group are kept in sync with each other. 
+
+-) after that we have Registered "Server1" and "Server2" to "Sync1"
+-) after that we added D:\Folder1 on "Server1" as a server endpoint of "Group1"
+
+
+
+Azure Resources
+---------------
+we create a  Storage Sync Service name:   Sync1
+and an    Azure File Sync group name:     Group1
+
+On-Premises 
+----------
+Server1 :  D:\Folder1
+Server2 :  E:\Folder2
+
+
+-) "Group1" useses "share1" as a cloud endpoint
+-) we register "Server1" and "Server2" in "Sync1"
+-) you add D:\Folder1 on "Server1" as a server endpoint of "Group1"
+
+-----------------------------------------------------------------------------------------------
+AKS Kubernetes
+---------------
+
+Cluster Autoscaler:  <-- it means "Nodes Autoscaler" so we use "az aks" commands
+Pod Autoscaler:      <-- it means "Pod Autoscaler" so we use "kubectl" commands 
+
+Cluster-Autoscaler:        <--  means that we are increasing the nodes in the cluster
+Horizontal pod autoscaler: <--  means that we are increasing the number of pods
+
+
+-----------------------------------------------------------------------------------------------
+Log
+---
+
+NSG logs
+-------
+NSG flow logs allow viewing information about ingress and egress IP traffic through a Network security group. 
+Through this, the IP addresses that connect to the ILB can be monitored when the diagnostics are 
+enabled on a Network Security Group.
+
+
+IP flow verify
+---------------
+The IP flow verify capability enables you to specify a source and destination IPv4 address, port, protocol (TCP or UDP), 
+and traffic direction (inbound or outbound). IP flow verify then tests the communication and informs you if the 
+connection succeeds or fails. If the connection fails, IP flow verify tells you which security rule allowed or denied 
+the communication, so that you can resolve the problem.
+
+
+Connection Troubleshoot
+-----------------------
+The connection troubleshoot capability enables you to test a connection between a VM and another VM, an FQDN, a URI, 
+or an IPv4 address. The test returns similar information returned when using the connection monitor capability, 
+but tests the connection at a point in time, rather than monitoring it over time, as connection monitor does.
+
+
+
+Internal Loadbalancer Logs
+--------------------------
+We cannot enable diagnostics on an internal load balancer to check for the IP addresses. As for Internal LB, 
+it is basic one. Basic can only connect to storage account. Also, Basic LB has only activity logs, 
+which doesn’t include the connectivity workflow. So, we need to use NSG to meet the mentioned requirements.
+
+-------------------------------------------------------------------------------------------
+IP ( Overlapping)
+---
+
+VNet1  10.11.0.0/16
+VNet2  10.11.0.0/17
+VNet3  10.10.0.0/22
+VNet4  192.168.16.0/22
+
+Check which other "VNet" can be peered with "VNet1"
+
+
+VNet1 10.11.0.0/16      <-- it means     10.11.0.1 - 10.11.255.255   (overlap VNet2)
+
+VNet2 10.11.0.0/17      <-- it means     10.11.0.1 - 10.11.127.254   (overlap VNet1)
+
+VNet3 10.10.0.0/22      <-- it means      10.10.0.1 - 10.10.3.254    (no overlap)
+
+VNet4 192.168.16.0/22   <-- it means  192.168.16.1 - 192.168.19.254  (no overlap)
+-------------------------------------------------------------------------------------
+
+=======================================================================================================
+Azure AD:  1.2, 1.3, 1.4, 1.5, 1.7, 1.8, 1.9, 1.14, 1.15, 1.16, 1.17, 2.1, 2.2, 2.8, 2.66, 3.1, 3.2, 3.3
+      3.8, 3.9, 3.10, 3.12(imp), 2.13, 2.14, 2,15, 3.60, 3.61, 4.64, 4.65(doc-imp), 5.9, 6.8, 6.9, 6.10
+      6.14, 6,15, 6.52
+
+
+Role: 2.6, 2.7, 2.9, 2.10, 2.13, 5.12-13-14(doc-imp), 5.56-57, 5.58(doc-imp), 5.64(doc-imp), 5.65(doc-imp)
+      5.66, 6.7, 6.56, 6.64-65-66
+
+Policy: 2.44, 4.9, 4.15, 4.16, 4.17, 4.44-45(imp-doc), 6.63
+
+MFA: 2.12
+
+Azure WebApp: 1.11, 1.26, 1.27, 1.32, 4.43, 5.37 
+
+Role:  1.12, 1.14, 1.15, 1.16, 4.11, 5.12, 6.69
+
+Adviser Service: 1.13
+
+Custom Domain:  1.17
+
+Azure Storage: 1.19, 1.21, 1.22, 1.23, 1.24, 3.25(doc-end), 3.28(doc) 2.15, 2.16, 2.17, 2.18, 2.19, 2.22, 2.23, 2.26, 2.27, 2.63, 3.16, 3.17(imp)
+                3.18(doc-imp), 3.19, 3.20, 3.21, 3.22, 3.23, 3.24, 3,25(doc-imp), 3.63(doc-imp), 4.18, 4.19, 4.66(doc-imp)
+                4.70(doc-imp), 5.22, 5.23, 5.24(doc-imp), 5.70(doc-imp), 5.71-72(doc-imp), 6.19, 6.63, 6.64-65-66, 6.67-68, 6.69
+
+"File Share"  &  "File Sync":    1.18, 1.20, 4.22(doc-imp), 4.23, 5.15, 5.16(imp), 6.16-17(doc-imp-tipp), 6.20-21(doc-imp)
+                                 6.22(doc-imp), 6.28(doc-imp), 6.30, 6.31
+
+Azure Data Box Disk:  1.23(expl)
+
+ARM (Azure Resource Manager Template): 1.12,  1.25, 1.28, 1.40, 2.3, 2.30, 2.31, 4.1, 4.2, 4.3, 6.67-68, 6.69
+
+NSG (Network securety group): 1.33, 2.36, 2.37, 2.38
+
+ASG (Application Security group): 5.49
+
+Network Interface: 5.52-53-54-55
+
+vCPUs: 1.26
+
+Route table: 1.36, 1.37, 1.38,
+
+Site-to-Site VPN: 1.39,
+
+IP: 1.44, 1.45,, 6.18, 6.42(doc-imp)
+
+Disks: 1.46
+
+Scale-set: 1.47, 2.62, 2.64, 2.65, 3.26, 3.27, 5.34(doc-imp), 5.35, 5.36
+
+Virtual Network: 1.49, 1.50, 2.51, 2.72, 3.47, 4.42(doc-imp), 5.50-51 
+
+Load Balancer: 1.51, 1.52, 1.53, 4.49-50-51(doc-imp), 6.50, 6.51
+
+Internal Load Balancer: 6.1-2-3(doc-imp)
+
+DNS (Domain name service): 1.55(imp), 1.64, 1.72, 2.52, 2.55, 1.56, 1.57, 3.11, 5.28(doc-imp), 5.40(doc-imp), 5.41(doc-imp)
+                           5.42-43-44(doc-imp), 5.45, 5.47
+
+Backup - Recovery service Vault: 1.10, 1.57, 1.58, 2.20, 2.60, 2.61, 2.67, 3.6, 3.64(doc-imp), 4.59, 5.20, 5.21, 5.38(doc-imp)
+                                 5.39(doc-imp), 6.19, 6.32, 6.54, 6.55 
+
+Azure Monitoring: 1.59, 2.5, 2.58
+
+Azure Network Watcher: 1.61, 2.33, 2.53, 1.54, 6.47-48-49
+
+Virtual Machine (VM): 1.62, 1.69, 2.28, 2.29, 2.33, 2.35, 2.41, 2.43, 2.48, 3.35, 3.36(imp), 3.37, 3.39-40-41(doc-imp)
+                      3.47, 4.5, 5.7, 5.25-26-27, 6.4, 6.24-25-26-27, 6.36, 6.37, 6.38
+
+Azure Policy: 1.70, 1.71(imp)
+
+App Service: 2.32, 3.31, 3.56, 3,66, 4.26(doc-imp), 4.29(doc-imp), 4.71
+
+Load Balancer: 2.42, 2.49, 2.50, 2.69(imp), 3.38, 3.46
+
+Azure Advisor: 2.59
+
+Azure Kubernetes Service: 2.68, 3.28, 3.29, 4.34(doc-imp), 4.35(doc-imp), 4.53, 5.32, 5.33
+
+SKU: 2.70
+
+Express Route: 2.71
+
+VHD - VHDx: 3.5
+
+AzCopy: 3.5, 3.23, 5.18, 5.19, 6.70, 6.71-72
+
+Office 365: 3.7
+
+Budget: 3.32., 3.33
+
+Resource Group: 3.43, 3.44, 3.45, 6.33-34-35, 6.39
+
+Lock: 3.51(doc-imp), 4.14, 5.68
+
+Management Group: 4.6, 4.7, 4.8,
+
+Availability Set: 4.27(doc-imp), 4.28, 6.23
+
+Tags: 4.32(doc-imp), 4.33, 4.67-68-69(doc-imp), 5.5-6(doc-imp), 5.69
+
+Virtual appliance: 4.36-37-38(doc-imp)  <--  In the (Saurabh Gupta) az-104 exam prepration course their is a video-199 "User defined Routes" their he 
+                                            clearly explained about the "Virtual Appliance"
+
+Azure Marketplace: 5.8
+
+Alert: 5.30-31
+
+VM Static-IP: 6.4
+
+Micrososft System Center Service Manager: 6.6
+
+Azure Resource Template: 6.11-12-13,
+
+Managed Identity: 6.15
+
+Log Analytics Workspace: 6.40, 6.41(doc-imp)
+
+Network Performance Monitor: 6.53
+=======================================================================================================
+Open questions
+---------------
+2.1, 2.2, 3,30, 3,34, 3.53(doc-imp), 3.54, 3.55(doc-imp), 3.68,3.69, 3.70, 3.71, 3.72 
+
+Case study:
+3.58, 3.59, 4.60, 4.61, 4.62, 4.63, 5.61-62-63, 6.57-58-59-60-61
+
+
+Case study:
+
+
+6.43 ( Load Balancer)
+
+========================================================================================================
+1.2
+Azure AD - joined  ,  Azure Registration
+
+https://www.youtube.com/watch?v=03axPAFJmSs
+
+Note: "AD-joined"  or "AD-join" devices means those devices that company give to the 
+employ with pre configured company settings.
+-----------------------------------------------------------------------
+1.3
+
+Search  "Azure AD conditional access" service, in this service we can create 
+a policy for a user, their is also a option of "grant access" or "block access"
+
+https://www.youtube.com/watch?v=f9T8Tx_wejQ&t=394s
+
+-----------------------------------------------------------------------
+1.11
+----
+Note: the main point to understand the question is that "location" and "region" of the
+App service plan  remain same, so no issue with it, we are just changing the location of the
+App, that is alloweed.
+
+-----------------------------------------------------------------------
+1.19
+----
+
+https://www.youtube.com/watch?v=qgdF8pzjARY       
+
+
+Note:  "Option A" it just means while configuring the Firewall we have get a option to select the "V-Net" as shown also in the
+      above video also, so select the required "Virtual-Network"
+
+
+---------------------------------------------------------------------------------------
+1.36-37-38
+---------
+Note: 
+-) Main point is that we have created a Route-Table that any traffic goes out from "Subnet1 (VM1)" and "Subnet2 (VM2)"
+   should go to  "10.0.3.4 (VM3)"  and map this Route-Table to Subnet1 and Subnet2
+-) As all the traffic from VM1 and VM2 goes to VM3 and in the VM3 we have putted a "IP-Forwarding" 
+
+So at the end the traffic come from VM1 goes to VM3 and at end by "IP-Forwarding" the traffic goes from VM3 to VM2
+same flow goes  VM2  -> VM3  -> VM1
+
+
+
+--------------------------------------------------------------------------------------
+1.45
+
+
+https://www.communicationsquare.com/news/azure-managed-disks-vs-unmanaged-disks/  <-- to understand 
+
+--------------------------------------------------------------------------
+1.47
+----
+
+Main point to understand this question is, their are two options
+1) create  "Virtual-machine"           <-- here we are creating a simple VM
+2) create "Virtual MAchine Scale-set"  <-- here we are creating a VM with a scaleset, 
+
+Note: as per the question, when we create a VM with a scaleset then it is automatically one option is their
+to choose only one Resourse-group for both, in the question it is just confusing us.
+Note: in the explanation their it is explains the meaning or "orchestration"
+
+-----------------------------------------------------------------------------
+3.54
+----
+
+https://www.youtube.com/watch?v=xEQOpLmYq2M
+
+Note: "AzureBastionSubnet"  <-- this is a predefined name and we must use this same name for "Azure Bastion"
+
+===================================================================================================
+############################################################################################################
+############   These all notes i have make from the test taken on  13-12-2022   ############################
+############################################################################################################
+Important questions:
+
+1.8-9, 1.19, 1.25-26-27, 1.28, 1.36-37-38, 4.41-42-43, 1.54, 1.55, 1.56, 1.61, 1.62, 1.63, 1.64
+
+2.5-6, 2.9, 2.10, 2.11-12-13, 2.14, 2.18, 2.22, 2.33, 2.34, 2.35, 2.43, 2.45, 2.49-50(at first step we create "Pool", at second step we create "NSG"), 
+2.51, 2.52, 2.53, 2.55-57, 2.58, 2.59, 5.60-61, 2.62, 2.66, 2.67, 2.68, 2.69, 2.70, 2.70 
+
+
+3.2-3, 3.4, 3.5, 3.6, 3.7, 3.8-9-10, 3.11(MX or TXT), 3.16-17("App1" is a "Azure service app" so it can use Managed identity with "IAM" and "SAS", for "App2" as asked in question acces for 30-days so we need "SAS" that we can configure )
+3.20(end-line-doc-imp),  3.22(doc-imp), 3.23-24(check-dif-exactely), 3.25(doc-end), 3.28(doc), 3.34, 3.37(doc-end), 3.42, 3.44-45(doc-imp), 3.46, 3.47(virtual-network-gateway)
+3.51-52, 3.53, 3.57, 3.60, 3.64, 3.65, 3.66
+
+
+4.1-2(doc), 4.7(doc-imp), 4.10, 4.11-12-13, 4.18, 4.19, 4.22(must only one clour-endpoint), 4.26, 4.29, 4.32-33,
+4.36-37-38 (main thing to understand is "Assigned to = Gatewaysubnet" <-- means "Address prefix" and "Next hop" just assing this rule to "GatewaySubnet" )
+4.41 ( Virtual-Network  -> Subnet -> Network-Security-Group  -> Network-Interface       these all should be in same "Azure Region")
+4.42, 4.43, 4.44-45-46-47, 4.49-50-51(doc-imp), 4.54, 4.55-56-57-58, 4.59, 4.64, 4.65(imp), 4.66, 4.67-68-69, 4.70, 4.71, 4.72
+
+
+5.1, 5.4-6, 5.7(doc-imp), 5.8, 5.9, 5.10, 5.11(doc-imp), 5.12-13-14, 5.16-17, 5.18-19, 5.22, 5.23, 5.24, 5.25-26-27, 5.28, 5.29,  5.30-31, 5.32, 5.33
+5.34, 5.35-36, 5.37, 5.38-39, 5.40-41, 5.42-43-44, 5.45, 5.46-47, 5.48, 5.49, 5.52-53-54-55, 5.56-57-58, 5.59-60, 5.64, 5.65, 5.66-67, 5.68,69, 
+5.70-71-72(understand the difference between "bace blob" <-- it means when first time the "blob" uploded, that should be modified. when it is modified then it is no more "base")   
+
+
+
+
+6.1-2-3, 6.7, 6.8-9-10, 6.14, 6.17, 6.20-21-22, 6.28(obly blob or blob and file both), 6.30, 6.31(check-diff), 6.36(doc-imp), 6.37-38, 6.39, 6.41, 6.43, 6.44-45-46, 
+6.47-48-49, 6.50-51(doc-imp-lastline), 6.53, 6.54, 6.56, 6.64-65-66, 6.67-68-69, 6.70, 6.71.72
+
+--------------------------------------------------------------------------------------------------------------
+Must extra:
+3.30, 3.34, 6.54, 4.18, 4.42, 5.10
+
+
+Azure Recovery service Vault supports:
+-------------------------------------
+1) Azure Backup supports backup of 64-bit Windows server operating system from Windows Server 2008.
+2) Azure Backup supports backup of 64-bit Windows 10 operating system.
+3) Azure Backup supports backup of 64-bit Ubuntu Server operating system from Ubuntu 12.04.
+4) Azure Backup supports backup of VM that are shutdown or offline.
+
+-) Vault service can not do backup for Blobs 
+
+-------------------------------
+2,5,20    ( 23,24 check diff), 32, 36,45, 53, 57
+
+
