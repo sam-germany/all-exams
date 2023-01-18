@@ -467,6 +467,12 @@ You assign an Azure policy that has the following settings:
 
 ⦿ Tag value: value4
 
+
+Policy Scope:
+------------
+we can apply a policy to "Management groups", "Subscriptions" , "Resource groups", "Resources"
+
+
 -------------------------------------------------------------------------------------------------
 Tags
 ----
@@ -766,6 +772,32 @@ view based on subscription, resource groups, or a collection of resources.
 
 Note: we can apply "Budget rule" on subscription, resource groups, or a collection of resources.
 
+--------------------------------------------------------------------------------
+Managed Identites ( for retriving secrets from "Azure Key Vault")
+=================
+
+Their are two types of "Managed Identites"
+
+System-assigned Managed Identites:
+---------------------------------
+Some Azure services allow you to enable a managed identity directly on a service instance. When you enable a 
+system-assigned managed identity an identity is created in Azure AD that is tied to the lifecycle of that service instance. 
+So when the resource is deleted, Azure automatically deletes the identity for you. By design, only that Azure resource 
+can use this identity to request tokens from Azure AD.
+
+User-assigned Managed Identites:
+-------------------------------
+You may also create a managed identity as a standalone Azure resource. You can create a user-assigned managed identity 
+and assign it to one or more instances of an Azure service. In the case of user-assigned managed identities, 
+the identity is managed separately from the resources that use it.
+
+--------------------------------------------------------------------------------------------------
+Network Watchers:
+-----------------
+
+Types of Network Watchers:
+
+1) IP-flow
 
 
 =================================================================================================================
@@ -794,30 +826,42 @@ Azure Activity Log: 1.1
 Azure Log Analytics: 1.2
 
 Key Vault: 1.6, 1.7
-Key Vault access: 2.6-7-8,
+Key Vault access: 2.6-7-8, 3.30-31(doc)
 
 Certificate: 1.8--10
 
 Azure AD: 1.11, 1.12-13(doc), 1.14--16, 1.18, 1.19, 1.20-21, 1.48, 2.9-10, 2.11-12, 2.13--15, 2.16-18, 2.20-21
-          2.22, 2.23-24    
+          2.22, 2.23-24, 3.15    
 
 Azure AD Application Proxy: 1.53
 
+Policy: 3.8, 3.16-17
+
 Logs: 2.23-24
 
-Blueprint: 2.16--18
+Blueprint: 2.16--18, 3.12-13-14 
 
 Management Group: 2.16--18
 
 Alert Rule: 1.17, 
 
-Azure SQL DB: 1.22-23, 1.28, 2.1, 2.25, 2.26, 2.27, 2.30, 3.2--4, 3.5(doc), 3.6
+Azure SQL DB: 1.22-23, 1.28, 2.1, 2.25, 2.26, 2.27, 2.30, 3.2--4, 3.5(doc), 3.6, 3.27-28, 3.39
 
 Azure SQL Managed Istance: 3.5(doc)
 
 Azure SQL Analytics: 3.6
 
 SQLInsights: 3.2--4
+
+Cosmos DB: 3.24
+
+Azure Functions: 3.24
+
+Migration: 3.33--35
+
+Data Migration from On-Premis to Azure: 3.25-26, 3.37
+
+Azure Data Factory: 3.25-26
 
 Event Hubs: 3.4(doc), 3.5
 
@@ -827,9 +871,11 @@ Azure Data Factory: 1.24,
 
 Azure Databricks: 1.54-55
 
-Azure Storage: 1.25, 1.48, 2.3-4-5,  2.28-29, 2.31, 2.34(retention-polic), 2.53-54-55
+Azure Storage: 1.25, 1.48, 2.3-4-5,  2.28-29, 2.31, 2.34(retention-polic), 2.53-54-55, 3.11, 3.23, 3.32, 3.37
 
 BlockBlobStorage: 2.53-54
+
+Diagnostic data: 3.23
 
 Azure Backup: 2.32-33
 
@@ -846,6 +892,7 @@ Azure Service Bus: 1.36
 Azure Batch: 1.37, 1.39(doc), 1.40(doc)
 
 AKS: 1.38(ingress),
+Azure Service Fabric: 3.38
 
 Azure Front Door: 1.41(doc), 1.42
 
@@ -857,11 +904,15 @@ Licenses: 2.2
 
 Hyper V: 2.2, 2.37
 
-Azure Site Recovery: 2.37
+Azure Site Recovery: 2.37, 3.35(doc)
+
+Azure Migrate: 3.35(doc)
 
 .Net Core: 2.38
 
-Network connectivity: 2.40-41, 2.42("Virtual Network peering" and "Global Virtual Network peering")
+Network connectivity: 2.40-41, 2.42("Virtual Network peering" and "Global Virtual Network peering"), 3.20(IP-flow-doc)
+
+Azure Network Watcher: 3.20(IP-flow-doc)
 
 NSG: 2.40-42
 
@@ -877,10 +928,14 @@ Azure Runbook: 3.1(doc)
 
 Cost Management Budgets: 3.1
 
+Azure API Management: 3.9
+Azure API Management OAuth2: 3.18-19
 
+Microsoft Office 365 IdFix: 3.10
 
+Azure Advisor: 3.21
 
-
+Azure Monitor: 3.40
 
 -------------------------------------------------------------------------------
 Steps questions:
