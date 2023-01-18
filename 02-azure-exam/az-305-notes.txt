@@ -758,6 +758,14 @@ Extra points:
 -) Azure Application Gateway:  <-- with this we can load balancer the service in same region, it works with "Layer 7" 
 
 
+------------------------------------------------------------------------------------
+Cost Management Budget:
+-----------------------
+Budgets are commonly used as part of cost control. Budgets can be scoped in Azure. For instance, you could narrow your budget 
+view based on subscription, resource groups, or a collection of resources.
+
+Note: we can apply "Budget rule" on subscription, resource groups, or a collection of resources.
+
 
 
 =================================================================================================================
@@ -790,21 +798,42 @@ Key Vault access: 2.6-7-8,
 
 Certificate: 1.8--10
 
-Azure AD: 1.11, 1.12-13(doc), 1.14--16, 1.18, 1.19, 1.20-21, 1.48,
+Azure AD: 1.11, 1.12-13(doc), 1.14--16, 1.18, 1.19, 1.20-21, 1.48, 2.9-10, 2.11-12, 2.13--15, 2.16-18, 2.20-21
+          2.22, 2.23-24    
 
 Azure AD Application Proxy: 1.53
 
+Logs: 2.23-24
+
+Blueprint: 2.16--18
+
+Management Group: 2.16--18
+
 Alert Rule: 1.17, 
 
-Azure SQL DB: 1.22-23, 1.28, 2.1
+Azure SQL DB: 1.22-23, 1.28, 2.1, 2.25, 2.26, 2.27, 2.30, 3.2--4, 3.5(doc), 3.6
+
+Azure SQL Managed Istance: 3.5(doc)
+
+Azure SQL Analytics: 3.6
+
+SQLInsights: 3.2--4
+
+Event Hubs: 3.4(doc), 3.5
+
+Resource Lock: 2.29(doc-imp)
 
 Azure Data Factory: 1.24, 
 
 Azure Databricks: 1.54-55
 
-Azure Storage: 1.25, 1.48, 2.3-4-5, 
+Azure Storage: 1.25, 1.48, 2.3-4-5,  2.28-29, 2.31, 2.34(retention-polic), 2.53-54-55
 
-Azure Web App: 1.33, 
+BlockBlobStorage: 2.53-54
+
+Azure Backup: 2.32-33
+
+Azure Web App: 1.33, 2.39
 
 Azure Web Apps for Containers: 1.34, 1.45,
 
@@ -822,13 +851,31 @@ Azure Front Door: 1.41(doc), 1.42
 
 Azure WAF: 1.41
 
-Azure Traffic Manager: 1.41(doc), 1.46, 1.47(doc-imp)
+Azure Traffic Manager: 1.41(doc), 1.46, 1.47(doc-imp), 2.47-48
 
 Licenses: 2.2
 
-Hyper V: 2.2
+Hyper V: 2.2, 2.37
 
+Azure Site Recovery: 2.37
 
+.Net Core: 2.38
+
+Network connectivity: 2.40-41, 2.42("Virtual Network peering" and "Global Virtual Network peering")
+
+NSG: 2.40-42
+
+Application Gateway Ingress Controller: 2.43
+
+Azure Application Gateway: 2.44
+
+Gateway Subnet: 2.46(this explantion not understnad)
+
+Azure Logic App: 3.1
+
+Azure Runbook: 3.1(doc)
+
+Cost Management Budgets: 3.1
 
 
 
