@@ -41,30 +41,35 @@ Certificate: 1.8--10
 
 Azure AD: 1.11, 1.12-13(doc), 1.14--16, 1.18, 1.19, 1.20-21, 1.48, 2.9-10, 2.11-12, 2.13--15, 2.16-18, 2.20-21
           2.22, 2.23-24, 3.15, 4.10-11, 4.12, 4.13--15, 4.16, 4.18-19, 4.20, 4.21, 4.22(guest account), 4.38  
-          4.48 
+          4.48, 5.6-7, 5.8-9, 5.10, 5.11, 5.13-14 
 
 Azure AD Application Proxy: 1.53
 
-Policy: 3.8, 3.16-17, 4.23
+Policy: 3.8, 3.16-17, 4.23, 5.6-7
+
+Azure AD Privileged Identity Management: 5.6-7
+
+Brute Force atttacks: 5.8-9
 
 Logs: 2.23-24
 
-Blueprint: 2.16--18, 3.12-13-14, 4.18-19 
+Blueprint: 2.16--18, 3.12-13-14, 4.18-19, 5.12
 
 Management Group: 2.16--18
 
 Alert Rule: 1.17, 
 
 Azure SQL DB: 1.22-23, 1.28, 2.1, 2.25, 2.26, 2.27, 2.30, 3.2--4, 3.5(doc), 3.6, 3.27-28, 3.39, 3.47, 3.53(doc), 3.54(doc), 4.1-2
+              5.1, 5.19-20 
               
 
-Azure SQL Managed Istance: 3.5(doc), 3.47
+Azure SQL Managed Istance: 3.5(doc), 3.47, 5.1(automatic-tuning doc)
 
 Azure SQL Analytics: 3.6
 
 SQLInsights: 3.2--4
 
-Cosmos DB: 3.24, 3.55, 4.53
+Cosmos DB: 3.24, 3.55, 4.53, 5.24-25
 
 Azure Time Series Insights: 3.55
 
@@ -158,7 +163,7 @@ Microsoft System Center Service Manager: 4.3
 
 Load Balancer: 4.8-9, 4.55
 
-Tags: 4.23
+Tags: 4.23, 5.16--18
 
 Virtual Machine Scale-Set: 4.29-30
 
@@ -169,6 +174,14 @@ Azure File Sync: 4.35
 Azure Event Hub: 4.39(AMQP)
 
 Windows Virtual Desktop: 4.45
+
+Azure Sentinel: 5.5
+
+Virtual Machines: 5.21
+
+Azure Data Factory: 5.22, 5.23
+
+Azure Data Lake Storage: 5.22
 
 -------------------------------------------------------------------------------
 Steps questions: 4.21
