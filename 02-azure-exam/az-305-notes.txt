@@ -28,26 +28,26 @@ Azure "Basic Plan" supports "Virtual Network Connectivity" and  "Private endpoin
 
 =========================================================================================================================
 
-Application Insight: 1.2--5(check-doc how all logging in Azure works)
+Application Insight: 1.2--5(check-doc how all logging in Azure works), 6.2, 6.41
 
 Azure Activity Log: 1.1
 
-Azure Log Analytics: 1.2
+Azure Log Analytics: 1.2, 6.1
 
-Key Vault: 1.6, 1.7, 4.17, 4.37
+Key Vault: 1.6, 1.7, 4.17, 4.37, 6.37
 Key Vault access: 2.6-7-8, 3.30-31(doc)
 
 Certificate: 1.8--10
 
 Azure AD: 1.11, 1.12-13(doc), 1.14--16, 1.18, 1.19, 1.20-21, 1.48, 2.9-10, 2.11-12, 2.13--15, 2.16-18, 2.20-21
           2.22, 2.23-24, 3.15, 4.10-11, 4.12, 4.13--15, 4.16, 4.18-19, 4.20, 4.21, 4.22(guest account), 4.38  
-          4.48, 5.6-7, 5.8-9, 5.10, 5.11, 5.13-14 
+          4.48, 5.6-7, 5.8-9, 5.10, 5.11, 5.13-14, 6.9, 6.25, 6.26, 6.34, 6.35 
 
 Azure AD Application Proxy: 1.53
 
-Policy: 3.8, 3.16-17, 4.23, 5.6-7
+Azure Policy: 3.8, 3.16-17, 4.23, 5.6-7, 6.3, 6.11-13
 
-Azure AD Privileged Identity Management: 5.6-7
+Azure AD Privileged Identity Management (PIM): 5.6-7, 6.34
 
 Brute Force atttacks: 5.8-9
 
@@ -60,20 +60,22 @@ Management Group: 2.16--18
 Alert Rule: 1.17, 
 
 Azure SQL DB: 1.22-23, 1.28, 2.1, 2.25, 2.26, 2.27, 2.30, 3.2--4, 3.5(doc), 3.6, 3.27-28, 3.39, 3.47, 3.53(doc), 3.54(doc), 4.1-2
-              5.1, 5.19-20 
+              5.1, 5.19-20, 5.31, 6.7, 6.39, 6.40
               
 
-Azure SQL Managed Istance: 3.5(doc), 3.47, 5.1(automatic-tuning doc)
+Azure SQL Database Managed Istance: 3.5(doc), 3.47, 5.1(automatic-tuning doc), 6.38
+
+Azure SQL Server 2016 on Instance: 5.40--42
 
 Azure SQL Analytics: 3.6
 
 SQLInsights: 3.2--4
 
-Cosmos DB: 3.24, 3.55, 4.53, 5.24-25
+Cosmos DB: 3.24, 3.55, 4.53, 5.24-25, 6.28
 
 Azure Time Series Insights: 3.55
 
-Azure Functions: 3.24, 4.43
+Azure Functions: 3.24, 4.43, 5.35
 
 Migration: 3.33--35
 
@@ -90,9 +92,11 @@ Azure Data Factory: 1.24,
 Azure Databricks: 1.54-55
 
 Azure Storage: 1.25, 1.48, 2.3-4-5,  2.28-29, 2.31, 2.34(retention-polic), 2.53-54-55, 3.11, 3.23, 3.32, 3.37, 4.17, 4.24-25(doc-all-info), 
-               4.26-27, 4.31-32, 4.34, 4.47
+               4.26-27, 4.31-32, 4.34, 4.47, 5.30(doc), 5.32-33, 6.14, 6.26, 6.29--31, 6.36, 6.52, 6.53
 
-BlockBlobStorage: 2.53-54, 4.26-27
+BlockBlobStorage: 2.53-54, 4.26-27, 5.32
+
+Azure Blob Storage: 5.30(Doc), 6.33
 
 Diagnostic data: 3.23
 
@@ -106,7 +110,7 @@ Virtual appliance: 1.35
 
 Express Route: 1.35
 
-Azure Service Bus: 1.36
+Azure Service Bus: 1.36, 5.43
 
 Azure Batch: 1.37, 1.39(doc), 1.40(doc)
 
@@ -117,7 +121,7 @@ Azure Front Door: 1.41(doc), 1.42, 3.43, 4.36
 
 Azure WAF: 1.41
 
-Azure Traffic Manager: 1.41(doc), 1.46, 1.47(doc-imp), 2.47-48
+Azure Traffic Manager: 1.41(doc), 1.46, 1.47(doc-imp), 2.47-48, 6.16--19
 
 Licenses: 2.2
 
@@ -130,9 +134,11 @@ Azure Migrate: 3.35(doc)
 .Net Core: 2.38
 
 Network connectivity: 2.40-41, 2.42("Virtual Network peering" and "Global Virtual Network peering"), 3.20(IP-flow-doc)
-                      3.48  
+                      3.48, 5.46  
 
 Azure Network Watcher: 3.20(IP-flow-doc)
+
+Accelerated Networking: 5.46
 
 NSG: 2.40-42
 
@@ -148,7 +154,7 @@ Azure Runbook: 3.1(doc)
 
 Cost Management Budgets: 3.1
 
-Azure API Management: 3.9, 3.44, 4.40-42, 4.46
+Azure API Management: 3.9, 3.44, 4.40-42, 4.46, 5.45
 Azure API Management OAuth2: 3.18-19
 
 Microsoft Office 365 IdFix: 3.10
@@ -157,7 +163,7 @@ Azure Advisor: 3.21
 
 Azure Monitor: 3.40-41, 4.4-5, 
 
-Azure Container Instances: 3.42
+Azure Container Instances: 3.42, 6.22
 
 Microsoft System Center Service Manager: 4.3
 
@@ -167,7 +173,7 @@ Tags: 4.23, 5.16--18
 
 Virtual Machine Scale-Set: 4.29-30
 
-AKS Azure Kubernetes Service: 4.34, 4.36, 4.44
+Azure Kubernetes Service (AKS): 4.34, 4.36, 4.44, 6.42--44
 
 Azure File Sync: 4.35
 
@@ -177,11 +183,23 @@ Windows Virtual Desktop: 4.45
 
 Azure Sentinel: 5.5
 
-Virtual Machines: 5.21
+Azure Virtual Machines: 5.21, 5.28, 5.46, 6.10, 6.23-24, 6.27, 6.32
 
-Azure Data Factory: 5.22, 5.23
+Azure Data Factory: 5.22, 5.23, 5.26, 5.29, 5.31
 
 Azure Data Lake Storage: 5.22
+
+Azure Data Box: 5.27(doc)
+
+CDN ( Content Delivery Network): 5.35, 5.38-39, 6.15
+
+Azure Virtual WAN: 5.44
+
+Azure Queue Storage: 6.20(asynchronously)
+
+Azure Batch: 6.21
+
+Microsoft Graph API: 6.25
 
 -------------------------------------------------------------------------------
 Steps questions: 4.21
@@ -191,13 +209,21 @@ Case Study: 1.49--52, 2.49--52, 3.49--52, 4.49--52, 5.2--5,5.47--50, 6.4--6, 6.4
 
 
 ==================================================================================
+Test-1)
+
+
+Test-2)
+
+
 Test-3)
 4,5,6,9,12,27,28,29,30,31, 33--36, 37,39,42,43,44,45,46,47, 53-54
 
 Test-4)
 3,8,9,16,20,21,26,27,38,45,46
 
+Test-5)
 
+ i am on 5.23
 
 
 
