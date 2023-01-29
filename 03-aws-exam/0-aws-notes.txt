@@ -1,0 +1,208 @@
+AWS Certificate Manager - 
+-------------------------
+AWS Certificate Manager (ACM) is the preferred tool to provision, manage, and deploy server certificates. With ACM you can request a 
+certificate or deploy an existing ACM or external certificate to AWS resources. Certificates provided by ACM are free and 
+automatically renew. In a supported Region, you can use ACM to manage server certificates from the console or programmatically.
+
+
+IAM
+---
+IAM is used as a certificate manager only when you must support HTTPS connections in a Region that is not supported by ACM. 
+IAM securely encrypts your private keys and stores the encrypted version in IAM SSL certificate storage. IAM supports deploying 
+server certificates in all Regions, but you must obtain your certificate from an external provider for use with AWS. 
+You cannot upload an ACM certificate to IAM. Additionally, you cannot manage your certificates from the IAM Console.
+
+
+AWS Secrets Manager - 
+-------------------
+AWS Secrets Manager helps you protect secrets needed to access your applications, services, and IT resources. The service enables 
+you to easily rotate, manage, and retrieve database credentials, API keys, and other secrets throughout their lifecycle. 
+Users and applications retrieve secrets with a call to Secrets Manager APIs, eliminating the need to hardcode sensitive 
+information in plain text. It cannot be used to discover and protect your sensitive data in AWS.
+
+
+AWS Systems Manager - 
+------------------
+AWS Systems Manager gives you visibility and control of your infrastructure on AWS. Systems Manager provides a unified user interface so 
+you can view operational data from multiple AWS services and allows you to automate operational tasks such as running commands, 
+managing patches, and configuring servers across AWS Cloud as well as on-premises infrastructure.
+
+AWS CloudFormation - 
+-----------------
+AWS CloudFormation allows you to use programming languages or a simple text file to model and provision, in an automated and secure manner, 
+all the resources needed for your applications across all Regions and accounts. Think infrastructure as code; think CloudFormation. 
+You cannot use CloudFormation for running commands or managing patches on servers.
+
+--------------------------------------------------------------------------------------------------
+AWS X-Ray
+--------
+X-Ray sampling
+--------------
+By customizing sampling rules, you can control the amount of data that you record, and modify sampling behavior on the fly without modifying 
+or redeploying your code. Sampling rules tell the X-Ray SDK how many requests to record for a set of criteria. X-Ray SDK applies a sampling 
+algorithm to determine which requests get traced however because our application is failing to send data to X-Ray it does not help in 
+determining the cause of failure.
+
+EC2 X-Ray Daemon - 
+-----------------
+The AWS X-Ray daemon is a software application that listens for traffic on UDP port 2000, gathers raw segment data, and relays it to the AWS X-Ray API 
+The daemon logs could help with figuring out the problem.
+
+EC2 Instance Role - 
+-----------------
+The X-Ray daemon uses the AWS SDK to upload trace data to X-Ray, and it needs AWS credentials with permission to do that. On Amazon EC2, 
+the daemon uses the instance's instance profile role automatically. Eliminates API permission issues (in case the role doesn't have IAM permissions
+ to write data to the X-Ray service)
+
+CloudTrail - 
+------------
+With CloudTrail, you can log, continuously monitor, and retain account activity related to actions across your AWS infrastructure. 
+You can use AWS CloudTrail to answer questions such as - “Who made an API call to modify this resource?”. CloudTrail provides event history
+ of your AWS account activity thereby enabling governance, compliance, operational auditing, and risk auditing of your AWS account. 
+ You can check CloudTrail to see if any API call is being denied on X-Ray.
+
+--------------------------------------------------------------------------------------------------------------------
+Key MAnagement Store (KMS)
+-------------------------
+KMS stores the CMK, and receives data from the clients, which it encrypts and sends back
+
+A customer master key (CMK) is a logical representation of a master key. The CMK includes metadata, such as the key ID, creation date, 
+description, and key state. The CMK also contains the key material used to encrypt and decrypt data. You can generate CMKs in KMS, 
+in an AWS CloudHSM cluster, or import them from your key management infrastructure.
+
+AWS KMS supports symmetric and asymmetric CMKs. A symmetric CMK represents a 256-bit key that is used for encryption and decryption. 
+An asymmetric CMK represents an RSA key pair that is used for encryption and decryption or signing and verification (but not both), 
+or an elliptic curve (ECC) key pair that is used for signing and verification.
+
+AWS KMS supports three types of CMKs: customer-managed CMKs, AWS managed CMKs, and AWS owned CMKs.
+
+---------------------------------------------------------------------------------------
+Elastic BeanStack:
+----------------
+https://www.youtube.com/watch?v=yjHmzo91Rek
+
+It help us to deploy the application on EC2 instances or deploy other resources.
+Their are 4 types of "deployment-policy" types.
+
+
+"All at once" deployment policy - 
+------------
+Note: Assume we have 4 instances of an application, it try to updated all the 4 at once with the new code through Elastic-beanstalk, so at the time of updation the application may not 
+be able to get requests. so we have downtime
+
+This is the quickest deployment method. Suitable if you can accept a short loss of service, and if quick deployments are important to you. 
+With this method, Elastic Beanstalk deploys the new application version to each instance. Then, the web proxy or application server might 
+need to restart. As a result, your application might be unavailable to users (or have low availability) for a short time.
+
+
+"Rolling" deployment policy - 
+----------------------------
+Note: Assume we have ASG with 4 instances of an application, it takes two instances and update them with the new git code through Elastic beanstalk, 
+once thes two are healthy then it goes to next two and update them also
+
+With this method, your application is deployed to your environment one batch of instances at a time. Most bandwidth is retained throughout the deployment. 
+Avoids downtime and minimizes reduced availability, at a cost of a longer deployment time. Suitable if you can't accept any period of completely lost service.
+The use case states that the application has high traffic and high availability requirements, so full capacity must be maintained during deployments, 
+hence rolling with additional batch deployment is a better fit than the rolling deployment.
+
+"Rolling with additional batch" deployment policy - 
+------------------------------
+Note: Assume we have ASG with 4 instances of an Application, then in the policy AWS create two new instances and update with the new version of code 
+that we want to deploy, once these two new instances are healthy then it shut down the two instances from old 4 instances and the process goes like this furhter
+
+With this method, Elastic Beanstalk launches an extra batch of instances, then performs a rolling deployment. Launching the extra batch takes time, 
+and ensures that the same bandwidth is retained throughout the deployment. This policy also avoids any reduced availability, although at a
+cost of an even longer deployment time compared to the Rolling method. Finally, this option is suitable if you must maintain the same 
+bandwidth throughout the deployment.
+
+
+"Immutable" deployment policy - 
+-----------
+Note: Assume we have ASG with 4 instances of an Application, then in the policy AWS create a new seperate temporary ASG and run 4 new instances and put the new 
+uploaded code on it, if the new instances run good then it take these new instances for the new ASG and put it to the old ASG and replace the old instances
+with the new instances.
+
+
+A slower deployment method, that ensures your new application version is always deployed to new instances, instead of updating existing instances. 
+It also has the additional advantage of a quick and safe rollback in case the deployment fails. With this method, Elastic Beanstalk performs an 
+immutable update to deploy your application. In an immutable update, a second Auto Scaling group is launched in your environment and the new version 
+serves traffic alongside the old version until the new instances pass health checks.
+
+
+
+--------------------------------------------------------------------------------------
+IAM Policy
+---------
+
+AWS Organizations Service Control Policy (SCP) – 
+----------------------------------------------
+Use an AWS Organizations Service Control Policy (SCP) to define the maximum permissions for account members of an organization or organizational unit (OU). 
+SCPs limit permissions that identity-based policies or resource-based policies grant to entities (users or roles) within the account, but do not grant permissions.
+
+Permissions boundary - 
+-------------------
+Permissions boundary is a managed policy that is used for an IAM entity (user or role). The policy defines the maximum permissions that the 
+identity-based policies can grant to an entity, but does not grant permissions.
+
+
+Identity-based policies – 
+----------------------
+Attach managed and inline policies to IAM identities (users, groups to which users belong, or roles). Identity-based policies grant permissions to an identity.
+
+Resource-based policies – 
+------------------------
+Attach inline policies to resources. The most common examples of resource-based policies are Amazon S3 bucket policies and IAM role trust policies. 
+Resource-based policies grant permissions to the principal that is specified in the policy. Principals can be in the same account as the resource 
+or in other accounts.
+
+Permissions boundaries – 
+----------------------
+Use a managed policy as the permissions boundary for an IAM entity (user or role). That policy defines the maximum permissions that the identity-based 
+policies can grant to an entity, but does not grant permissions. Permissions boundaries do not define the maximum permissions that a resource-based
+policy can grant to an entity.
+
+Organizations SCPs – 
+------------------
+Use an AWS Organizations service control policy (SCP) to define the maximum permissions for account members of an organization or organizational unit (OU). 
+SCPs limit permissions that identity-based policies or resource-based policies grant to entities (users or roles) within the account, but do not grant permissions.
+
+Access control lists (ACLs) – 
+----------------------------
+Use ACLs to control which principals in other accounts can access the resource to which the ACL is attached. ACLs are similar to resource-based policies, 
+although they are the only policy type that does not use the JSON policy document structure. ACLs are cross-account permissions policies that grant 
+permissions to the specified principal. ACLs cannot grant permissions to entities within the same account.
+
+Session policies – 
+-----------------
+Pass advanced session policies when you use the AWS CLI or AWS API to assume a role or a federated user. Session policies limit the permissions that 
+the role or user's identity-based policies grant to the session. Session policies limit permissions for a created session, but do not grant permissions. 
+For more information, see Session Policies.
+
+
+------------------------------------------------------------------------------------------------
+Network ACL: (Active controll list)
+-------------
+It acts as a  "Stateless firewall", it means we define the incoming rule for src-dest  (port and ip)  and also we have to define the returning traffic
+src-dest  (port and ip) 
+we can place it on the Subnet-level, through this "list" we can define which traffic can goes inside-outside from the "Subnet"
+
+
+Security Group:
+--------------
+It acts as a  "Stateful firewall", it means we define the incoming rule for src-dest  (port and ip)  and the returing traffic will go automatically to src port. 
+We can place a Security-group  on a "Instance-level", with this we can define which traffic can go inside-outside the instance
+
+
+----------------------------------------------------------------------------------------------------------
+Amazon EFS volumes
+------------------
+EFS volumes provide a simple, scalable, and persistent file storage for use with your Amazon ECS tasks. With Amazon EFS, storage capacity is elastic, 
+growing and shrinking automatically as you add and remove files. Your applications can have the storage they need, when they need it. 
+Amazon EFS volumes are supported for tasks hosted on "Fargate" or "Amazon EC2 instances".
+
+You can use Amazon EFS file systems with Amazon ECS to export file system data across your fleet of container instances. 
+That way, your tasks have access to the same persistent storage, no matter the instance on which they land. However, you must configure your 
+container instance AMI to mount the Amazon EFS file system before the Docker daemon starts. Also, your task definitions must reference 
+volume mounts on the container instance to use the file system.
+
+-----------------------------------------------------------------------------
