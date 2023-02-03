@@ -4,7 +4,7 @@ AWS Certificate Manager (ACM) is the preferred tool to provision, manage, and de
 certificate or deploy an existing ACM or external certificate to AWS resources. Certificates provided by ACM are free and 
 automatically renew. In a supported Region, you can use ACM to manage server certificates from the console or programmatically.
 
-
+-------------------------------------------------------------------------------------------------------------
 IAM
 ---
 IAM is used as a certificate manager only when you must support HTTPS connections in a Region that is not supported by ACM. 
@@ -12,7 +12,7 @@ IAM securely encrypts your private keys and stores the encrypted version in IAM 
 server certificates in all Regions, but you must obtain your certificate from an external provider for use with AWS. 
 You cannot upload an ACM certificate to IAM. Additionally, you cannot manage your certificates from the IAM Console.
 
-
+-------------------------------------------------------------------------------------------------------------
 AWS Secrets Manager - 
 -------------------
 AWS Secrets Manager helps you protect secrets needed to access your applications, services, and IT resources. The service enables 
@@ -20,18 +20,26 @@ you to easily rotate, manage, and retrieve database credentials, API keys, and o
 Users and applications retrieve secrets with a call to Secrets Manager APIs, eliminating the need to hardcode sensitive 
 information in plain text. It cannot be used to discover and protect your sensitive data in AWS.
 
-
+-------------------------------------------------------------------------------------------------------------
 AWS Systems Manager - 
 ------------------
 AWS Systems Manager gives you visibility and control of your infrastructure on AWS. Systems Manager provides a unified user interface so 
 you can view operational data from multiple AWS services and allows you to automate operational tasks such as running commands, 
 managing patches, and configuring servers across AWS Cloud as well as on-premises infrastructure.
 
+-------------------------------------------------------------------------------------------------------------
 AWS CloudFormation - 
 -----------------
 AWS CloudFormation allows you to use programming languages or a simple text file to model and provision, in an automated and secure manner, 
 all the resources needed for your applications across all Regions and accounts. Think infrastructure as code; think CloudFormation. 
 You cannot use CloudFormation for running commands or managing patches on servers.
+
+"Resources" section in CloudFormation-Template is the only required section and specifies the stack resources and their properties, 
+such as an Amazon Elastic Compute Cloud instance or an Amazon Simple Storage Service bucket. You can refer to resources in 
+the Resources and Outputs sections of the template.
+
+'Parameters' section of the template - This optional section is helpful in passing Values to your template at runtime 
+(when you create or update a stack). You can refer to parameters from the Resources and Outputs sections of the template.
 
 --------------------------------------------------------------------------------------------------
 AWS X-Ray
@@ -61,6 +69,13 @@ You can use AWS CloudTrail to answer questions such as - “Who made an API call
  of your AWS account activity thereby enabling governance, compliance, operational auditing, and risk auditing of your AWS account. 
  You can check CloudTrail to see if any API call is being denied on X-Ray.
 
+Config:
+-------
+Config - AWS Config is a service that enables you to assess, audit, and evaluate the configurations of your AWS resources. With Config, 
+you can review changes in configurations and relationships between AWS resources, dive into detailed resource configuration histories, 
+and determine your overall compliance against the configurations specified in your internal guidelines. You can use Config to answer 
+questions such as - “What did my AWS resource look like at xyz point in time?”. Config cannot help determine the source for KMS API calls.
+
 --------------------------------------------------------------------------------------------------------------------
 Key MAnagement Store (KMS)
 -------------------------
@@ -81,6 +96,30 @@ Elastic BeanStack:
 ----------------
 https://www.youtube.com/watch?v=yjHmzo91Rek
 
+
+AWS Elastic Beanstalk makes it even easier for developers to quickly deploy and manage applications in the AWS Cloud. 
+Developers simply upload their application, and Elastic Beanstalk automatically handles the deployment details of capacity 
+provisioning, load balancing, auto-scaling, and application health monitoring.
+
+This platform-as-a-service solution is typically for those who want to deploy and manage their applications within 
+minutes in the AWS Cloud without worrying about the underlying infrastructure.
+
+AWS Elastic Beanstalk supports the following languages and development stacks:
+Apache Tomcat for Java applications
+Apache HTTP Server for PHP applications
+Apache HTTP Server for Python applications
+Nginx or Apache HTTP Server for Node.js applications
+Passenger or Puma for Ruby applications
+Microsoft IIS for .NET applications
+Java SE
+Docker
+Go
+
+Elastic Beanstalk also supports deployment versioning. It maintains a copy of older deployments so that it is easy for 
+the developer to rollback any changes made on the application.
+
+
+------------
 It help us to deploy the application on EC2 instances or deploy other resources.
 Their are 4 types of "deployment-policy" types.
 
@@ -129,8 +168,7 @@ immutable update to deploy your application. In an immutable update, a second Au
 serves traffic alongside the old version until the new instances pass health checks.
 
 
-
---------------------------------------------------------------------------------------
+==================================================================================================================
 IAM Policy
 ---------
 
@@ -179,7 +217,63 @@ the role or user's identity-based policies grant to the session. Session policie
 For more information, see Session Policies.
 
 
-------------------------------------------------------------------------------------------------
+Trust policy - 
+--------------
+Trust policies define which principal entities (accounts, users, roles, and federated users) can assume the role. An IAM role 
+is both an identity and a resource that supports resource-based policies. For this reason, you must attach both a trust policy 
+and an identity-based policy to an IAM role. The IAM service supports only one type of resource-based policy called a role trust
+ policy, which is attached to an IAM role.
+
+
+IAM policy variables
+--------------------
+Instead of creating individual policies for each user, you can use policy variables and create a single policy that applies to multiple 
+users (a group policy). Policy variables act as placeholders. When you make a request to AWS, the placeholder is replaced by a 
+alue from the request when the policy is evaluated.
+
+As an example, the following policy gives each of the users in the group full programmatic access to a user-specific object
+ (their own "home directory") in Amazon S3.
+
+IAM policy principal - 
+---------------------
+You can use the Principal element in a policy to specify the principal that is allowed or denied access to a resource 
+(In IAM, a principal is a person or application that can make a request for an action or operation on an AWS resource. 
+The principal is authenticated as the AWS account root user or an IAM entity to make requests to AWS). You cannot use
+ the Principal element in an IAM identity-based policy. You can use it in the trust policies for IAM roles and in resource-based policies.
+
+IAM policy condition - 
+--------------------
+The Condition element (or Condition block) lets you specify conditions for when a policy is in effect, 
+like so - "Condition" : { "StringEquals" : { "aws:username" : "johndoe" }}. This can not be used to address the requirements 
+of the given use-case.
+
+Access Advisor feature on IAM console- 
+---------------------------------------
+To help identify the unused roles, IAM reports the last-used timestamp that represents when a role was last used to make an AWS request. 
+Your security team can use this information to identify, analyze, and then confidently remove unused roles. This helps improve the 
+security posture of your AWS environments. Additionally, by removing unused roles, you can simplify your monitoring and auditing
+ efforts by focusing only on roles that are in use.
+
+
+AWS Trusted Advisor - 
+---------------------
+AWS Trusted Advisor is an online tool that provides you real-time guidance to help you provision your resources following 
+AWS best practices on cost optimization, security, fault tolerance, service limits, and performance improvement.
+
+IAM Access Analyzer - 
+---------------------
+AWS IAM Access Analyzer helps you identify the resources in your organization and accounts, such as Amazon S3 buckets 
+or IAM roles, that are shared with an external entity. This lets you identify unintended access to your resources and data, 
+which is a security risk.
+
+Amazon Inspector - 
+------------------
+Amazon Inspector is an automated security assessment service that helps improve the security and compliance of applications 
+deployed on AWS. Amazon Inspector automatically assesses applications for exposure, vulnerabilities, and deviations from 
+best practices.
+
+
+===========================================================================================================================
 Network ACL: (Active controll list)
 -------------
 It acts as a  "Stateless firewall", it means we define the incoming rule for src-dest  (port and ip)  and also we have to define the returning traffic
@@ -206,3 +300,349 @@ container instance AMI to mount the Amazon EFS file system before the Docker dae
 volume mounts on the container instance to use the file system.
 
 -----------------------------------------------------------------------------
+AWS CodeDeploy ( Code Deploy)
+----------------------------
+AWS CodeDeploy is a service that coordinates application deployments across EC2 instances and instances running on-premises. 
+It makes it easier for you to rapidly release new features, helps you avoid downtime during deployment, and handles the complexity of updating your applications.
+
+Unlike Elastic Beanstalk, CodeDeploy does not automatically handle capacity provisioning, scaling, and monitoring.
+
+Unlike CloudFormation and OpsWorks, CodeDeploy does not deal with infrastructure configuration and orchestration.
+
+AWS CodeDeploy is a building block service focused on helping developers deploy and update software on any instance, 
+including EC2 instances and instances running on-premises. AWS Elastic Beanstalk and AWS OpsWorks are end-to-end application management solutions.
+
+You create a deployment configuration file to specify how deployments proceed.
+
+CodeDeploy complements CloudFormation well when deploying code to infrastructure that is provisioned and managed with CloudFormation. 
+
+
+---------------------------------------------------------------------------------
+AWS OpsWorks
+------------
+AWS OpsWorks is a configuration management service that provides managed instances of Chef and Puppet. OpsWorks lets you use Chef and Puppet to 
+automate how servers are configured, deployed, and managed across your EC2 instances or on-premises compute environments.
+
+OpsWorks offers three services:
+
+Chef Automate
+Puppet Enterprise
+OpsWorks Stacks
+
+OpsWorks for Puppet Enterprise lets you use Puppet to automate how nodes are configured, deployed, and managed, whether they 
+are EC2 instances or on-premises devices.
+
+OpsWorks for Chef Automate lets you create AWS-managed Chef servers, and use the Chef DK and other Chef tooling to manage them.
+
+OpsWorks Stacks lets you create stacks that help you manage cloud resources in specialized groups called layers. A layer represents a set of EC2 
+instances that serve a particular purpose. Layers depend on Chef recipes to handle tasks such as installing packages on instances, deploying apps, 
+and running scripts.
+
+Compared to CloudFormation, OpsWorks focuses more on orchestration and software configuration, and less on what and how AWS resources are procured.
+
+------------------------------------------------------------------------------------------------------------------------
+SQS Queue
+=========
+
+Visibility timeout:   
+------------------
+-) It means that we send a message to a queue but if we set "Visibility timeout=20s" that means this message will not be Visible(displayed)
+to the Consumer, it means the Consumer can not pull this message, only after 20 sec he can pull this message, for some usecase this option has made
+               
+-) The length of time, in seconds, for which the delivery of all messages in the queue is delayed is configured using DelaySeconds attribute. 
+MessageRetentionPeriod attribute controls the length of time, in seconds, for which Amazon SQS retains a message.               
+
+-) Queue tags are case-sensitive. A new tag with a key identical to that of an existing tag overwrites the existing tag. To be able to tag a queue 
+on creation, you must have the sqs:CreateQueue and sqs:TagQueue permissions.
+
+DeleteQueue - 
+------------
+Deletes the queue specified by the QueueUrl, regardless of the queue's contents. When you delete a queue, any messages in the 
+queue are no longer available.
+
+When you delete a queue, the deletion process takes up to 60 seconds. Requests you send involving that queue during the 60 seconds 
+might succeed. For example, a SendMessage request might succeed, but after 60 seconds the queue and the message you sent no longer exist.
+
+When you delete a queue, you must wait at least 60 seconds before creating a queue with the same name.
+
+
+PurgeQueue - 
+------------
+Deletes the messages in a queue specified by the QueueURL parameter. When you use the PurgeQueue action, you can't retrieve
+any messages deleted from a queue. The queue however remains.
+
+RemovePermission - 
+---------------------
+Revokes any permissions in the queue policy that matches the specified Label parameter.
+
+-----------------------------------------------------------------------------------------------------------------
+AWS Lambda
+----------
+Lambda allocates CPU power in proportion to the amount of memory configured. Memory is the amount of memory available to your Lambda function at runtime. 
+You can increase or decrease the memory and CPU power allocated to your function using the Memory (MB) setting. To configure the memory for your function, 
+set a value between 128 MB and 10,240 MB in 1-MB increments. At 1,769 MB, a function has the equivalent of one vCPU (one vCPU-second of credits per second).
+
+--------------------------------------------------------------------------------------------------------------
+AWS Serverless Application Model (AWS SAM)
+================================
+
+
+SAM supports the following resource types:
+
+1) AWS::Serverless::Api
+2) AWS::Serverless::Application
+3) AWS::Serverless::Function
+4) AWS::Serverless::HttpApi
+5) AWS::Serverless::LayerVersion
+6) AWS::Serverless::SimpleTable
+7) AWS::Serverless::StateMachine
+
+
+
+
+AWS::Serverless::Function - 
+--------------------------
+This resource creates a Lambda function, IAM execution role, and event source mappings that trigger the function.
+
+AWS::Serverless::Api - 
+--------------------
+This creates a collection of Amazon API Gateway resources and methods that can be invoked through HTTPS endpoints. 
+It is useful for advanced use cases where you want full control and flexibility when you configure your APIs.
+
+AWS::Serverless::SimpleTable - 
+---------------------------
+This creates a DynamoDB table with a single attribute primary key. It is useful when data only needs to be accessed via a primary key.
+
+====================================================================================================================
+Kinesis
+=======
+
+Amazon Kinesis Data Streams 
+---------------------------
+It is useful for rapidly moving data off data producers and then continuously processing the data, be it to transform the data 
+before emitting to a data store, run real-time metrics and analytics, or derive more complex data streams for further processing. 
+Kinesis data streams can continuously capture gigabytes of data per second from hundreds of thousands of sources such as website 
+clickstreams, database event streams, financial transactions, social media feeds, IT logs, and location-tracking events.
+
+
+
+Amazon Kinesis Data Firehose 
+----------------------------
+It is the easiest way to load streaming data into data stores and analytics tools. Kinesis Firehose cannot be used to process 
+and analyze the streaming data in custom applications. It can capture, transform, and load streaming data into Amazon S3, 
+Amazon Redshift, Amazon Elasticsearch Service, and Splunk, enabling near real-time analytics.
+
+
+=========================================================================================================================
+CloudWatch   vs   CloudTrail    vs    Config
+----------        ----------          ------
+
+CloudWatch:      <--  Think resource performance monitoring, events, and alerts; think CloudWatch.
+
+CloudTrail:      <--  Think account-specific activity and audit; think CloudTrail.
+
+Config:          <--  Think resource-specific history, audit, and compliance; think Config.
+
+========================================================================================================================
+EC2
+===
+
+Dedicated Instances - 
+---------------------
+Dedicated Instances are Amazon EC2 instances that run in a virtual private cloud (VPC) on hardware that's dedicated 
+to a single customer. Dedicated Instances that belong to different AWS accounts are physically isolated at a hardware level, 
+even if those accounts are linked to a single-payer account. However, Dedicated Instances may share hardware with other instances 
+from the same AWS account that are not Dedicated Instances.
+
+Dedicated Host
+--------------
+A Dedicated Host is also a physical server that's dedicated for your use. With a Dedicated Host, you have visibility and 
+control over how instances are placed on the server.
+
+Spot Instances - 
+--------------
+A Spot Instance is an unused EC2 instance that is available for less than the On-Demand price. Your Spot Instance runs 
+whenever capacity is available and the maximum price per hour for your request exceeds the Spot price. Any instance present 
+with unused capacity will be allocated. Even though this is cost-effective, it does not fulfill the single-tenant hardware 
+requirement of the client and hence is not the correct option.
+
+
+Dedicated Hosts - 
+--------------
+An Amazon EC2 Dedicated Host is a physical server with EC2 instance capacity fully dedicated to your use. Dedicated Hosts 
+allow you to use your existing software licenses on EC2 instances. With a Dedicated Host, you have visibility and control 
+over how instances are placed on the server. This option is costlier than the Dedicated Instance and hence is not the right 
+choice for the current requirement.
+
+
+On-Demand Instances -
+--------------------
+With On-Demand Instances, you pay for compute capacity by the second with no long-term commitments. You have full control over 
+its lifecycle—you decide when to launch, stop, hibernate, start, reboot, or terminate it. Hardware isolation is not possible 
+and on-demand has one of the costliest instance charges and hence is not the correct answer for current requirements.
+
+EC2 Price:
+=========
+
+Reserved Instances
+-----------------
+Reserved Instances offer significant savings on Amazon EC2 costs compared to On-Demand Instance pricing. A Reserved Instance 
+can be purchased for a one-year or three-year commitment, with the three-year commitment offering a bigger discount. Reserved 
+instances come with two offering classes - Standard or Convertible.
+
+Convertible Reserved instances - 
+------------------------------
+A Convertible Reserved Instance can be exchanged during the term for another Convertible Reserved Instance with new attributes 
+including instance family, instance type, platform, scope, or tenancy. This is the best fit for the current requirement.
+
+
+Standard Reserved instances - 
+----------------------------
+With Standard Reserved Instances, some attributes, such as instance size, can be modified during the term; however, 
+the instance family cannot be modified. You cannot exchange a Standard Reserved Instance, only modify it
+
+
+Scheduled Reserved instances - 
+------------------------------
+Scheduled Reserved Instances (Scheduled Instances) enable you to purchase capacity reservations that recur on a daily, 
+weekly, or monthly basis, with a specified start time and duration, for a one-year term. You reserve the capacity in 
+advance so that you know it is available when you need it.
+
+
+
+
+
+
+
+===================================================================================================================
+Secret Manager
+--------------
+AWS Secrets Manager enables you to easily rotate, manage, and retrieve database credentials, API keys, and other secrets 
+throughout their lifecycle. Users and applications retrieve secrets with a call to Secrets Manager APIs, eliminating the 
+need to hardcode sensitive information in plain text. Secrets Manager offers secret rotation with built-in integration 
+for Amazon RDS, Amazon Redshift, and Amazon DocumentDB.
+
+==============================================================================================================
+IAM
+===
+
+IAM Access Analyzer - 
+-------------------
+AWS IAM Access Analyzer helps you identify the resources in your organization and accounts, such as Amazon S3 buckets or IAM roles, 
+that are shared with an external entity. This lets you identify unintended access to your resources and data, which is a security risk.
+You can set the scope for the analyzer to an organization or an AWS account. This is your zone of trust. The analyzer scans 
+all of the supported resources within your zone of trust. When Access Analyzer finds a policy that allows access to a resource 
+from outside of your zone of trust, it generates an active finding.
+
+
+Access Advisor feature on IAM console - 
+------------------------------------
+To help identify the unused roles, IAM reports the last-used timestamp that represents when a role was last used to make an AWS request. 
+Your security team can use this information to identify, analyze, and then confidently remove unused roles. This helps improve the 
+security posture of your AWS environments. This does not provide information about non-IAM entities such as S3, hence it's not a 
+correct choice here
+
+===========================================================================================================
+Cognito
+=======
+
+"Cognito User Pools"
+-------------------
+After successful authentication, Amazon Cognito returns user pool tokens to your app. You can use the tokens to grant your users 
+access to your own server-side resources, or to the Amazon API Gateway.
+Amazon Cognito user pools implement ID, access, and refresh tokens as defined by the OpenID Connect (OIDC) open standard.
+The ID token is a JSON Web Token (JWT) that contains claims about the identity of the authenticated user such as name, email, 
+and phone_number. You can use this identity information inside your application. The ID token can also be used to authenticate 
+users against your resource servers or server applications.
+
+
+"Cognito Identity Pools" - 
+------------------------
+You can use Identity pools to grant your users access to other AWS services. With an identity pool, your users can obtain 
+temporary AWS credentials to access AWS services, such as Amazon S3 and DynamoDB. Identity pools support anonymous guest users,
+as well as the specific identity providers that you can use to authenticate users for identity pools.
+
+"Cognito Sync" - 
+----------------
+Amazon Cognito Sync is an AWS service and client library that enables cross-device syncing of application-related user data. 
+You can use it to synchronize user profile data across mobile devices and the web without requiring your own backend.
+
+===========================================================================================================
+AWS AppSync - 
+-------------
+AWS AppSync is a fully managed service that makes it easy to develop GraphQL APIs by handling the heavy lifting of securely 
+connecting to data sources like AWS DynamoDB, Lambda, and more. Organizations choose to build APIs with GraphQL because it 
+helps them develop applications faster, by giving front-end developers the ability to query multiple databases, microservices, 
+and APIs with a single GraphQL endpoint.
+
+AWS Service Catalog - 
+--------------------
+AWS Service Catalog allows organizations to create and manage catalogs of IT services that are approved for use on AWS. 
+These IT services can include everything from virtual machine images, servers, software, and databases to complete multi-tier 
+application architectures. AWS Service Catalog allows you to centrally manage deployed IT services and your applications, 
+resources, and metadata. This helps you achieve consistent governance and meet your compliance requirements while enabling 
+users to quickly deploy only the approved IT services they need.
+
+
+==================================================================================================================
+ECS   Elastic Container Service
+--------------------------------
+Use ECS service scheduler - 
+--------------------------
+Amazon ECS provides a service scheduler (for long-running tasks and applications), the ability to run tasks manually 
+(for batch jobs or single run tasks), with Amazon ECS placing tasks on your cluster for you. You can specify task 
+placement strategies and constraints that allow you to run tasks in the configuration you choose, such as spread 
+out across Availability Zones. It is also possible to integrate with custom or third-party schedulers.
+
+Use ECS step scaling policy - 
+---------------------------
+Although Amazon ECS Service Auto Scaling supports using Application Auto Scaling step scaling policies, 
+AWS recommends using target tracking scaling policies instead. For example, if you want to scale your service when 
+CPU utilization falls below or rises above a certain level, create a target tracking scaling policy based on the 
+CPU utilization metric provided by Amazon ECS.
+
+With step scaling policies, you create and manage the CloudWatch alarms that trigger the scaling process. 
+If the target tracking alarms don't work for your use case, you can use step scaling. You can also use target 
+tracking scaling with step scaling for an advanced scaling policy configuration. For example, you can configure 
+a more aggressive response when utilization reaches a certain level.
+
+Step Scaling scales your cluster on various lengths of steps based on different ranges of thresholds. 
+Target tracking on the other hand intelligently picks the smart lengths needed for the given configuration.
+
+==========================================================================================================
+keys
+----
+
+SSH Keys - 
+---------
+Are locally generated public-private key pair that you can associate with your IAM user to communicate with CodeCommit repositories over SSH.
+
+AWS access keys - 
+---------------
+You can use these keys with the credential helper included with the AWS CLI to communicate with CodeCommit repositories over HTTPS.
+
+======================================================================================================
+AWS Cli Commands
+---------------
+The AWS CLI has a few general options:
+
+Variable                 Option 	       Config Entry 	        Environment Variable 	   Description
+
+profile 	             --profile 	            N/A 	               AWS_PROFILE 	             Default profile name
+region 	                 --region 	           region 	               AWS_DEFAULT_REGION 	     Default AWS Region
+output 	                 --output 	           output 	               AWS_DEFAULT_OUTPUT 	     Default output style
+cli_timestamp_format 	    N/A 	        cli_timestamp_format 	         N/A 	             Output format of timestamps
+cli_follow_urlparam 	    N/A 	        cli_follow_urlparam 	         N/A 	             Fetch URL url parameters
+ca_bundle 	             --ca-bundle 	       ca_bundle 	           AWS_CA_BUNDLE             CA Certificate Bundle
+parameter_validation 	     N/A 	        parameter_validation 	         N/A 	             Toggles parameter validation
+tcp_keepalive  	             N/A 	        tcp_keepalive 	                 N/A 	             Toggles TCP Keep-Alive
+max_attempts  	             N/A 	         max_attempts 	           AWS_MAX_ATTEMPTS 	     Number of total requests
+retry_mode                	 N/A              retry_mode 	            AWS_RETRY_MODE 	         Type of retries performed
+
+
+===============================================================================================================
+VPC Flow Logs: 
+----------------
+VPC Flow Logs is a feature that enables you to capture information about the IP traffic going to and from network 
+interfaces in your VPC. Flow log data is used to analyze network traces and helps with network security. Flow log data 
+can be published to Amazon CloudWatch Logs or Amazon S3. You cannot use VPC Flow Logs to debug and trace data across accounts.
