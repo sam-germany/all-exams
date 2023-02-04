@@ -375,6 +375,17 @@ RemovePermission -
 ---------------------
 Revokes any permissions in the queue policy that matches the specified Label parameter.
 
+Increase the VisibilityTimeout -
+-------------------------------
+When a consumer receives and processes a message from a queue, the message remains in the queue. Amazon SQS doesn't automatically 
+delete the message. Immediately after a message is received, it remains in the queue. To prevent other consumers from processing 
+the message again, Amazon SQS sets a visibility timeout, a period of time during which Amazon SQS prevents other consumers from 
+receiving and processing the message.
+
+Reduce the VisibilityTimeout - 
+-----------------------------
+As explained above, VisibilityTimeout makes sure that the message is not read by any other consumer while it is being processed by one consumer. 
+
 -----------------------------------------------------------------------------------------------------------------
 AWS Lambda
 ----------
@@ -646,3 +657,14 @@ VPC Flow Logs:
 VPC Flow Logs is a feature that enables you to capture information about the IP traffic going to and from network 
 interfaces in your VPC. Flow log data is used to analyze network traces and helps with network security. Flow log data 
 can be published to Amazon CloudWatch Logs or Amazon S3. You cannot use VPC Flow Logs to debug and trace data across accounts.
+
+================================================================================================================
+Cloud Front (CloudFront)
+------------------------
+
+Explanation of the question in test 2.3:  (https://www.youtube.com/watch?v=NTOCzsn7b4A)
+----------------------------------------
+In the video their he clearly explains how the flow works, After creating a new public-private key
+we can attach the pulblic in the cloudfront and after that for creating the neu url we are using the private-key
+
+===============================================================================================================
