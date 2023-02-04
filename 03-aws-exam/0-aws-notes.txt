@@ -41,6 +41,24 @@ the Resources and Outputs sections of the template.
 'Parameters' section of the template - This optional section is helpful in passing Values to your template at runtime 
 (when you create or update a stack). You can refer to parameters from the Resources and Outputs sections of the template.
 
+---------------------------------------------------------------------------------------------------------------
+AWS CodePipeline - ( CI <- it is like a "Continous Integration")
+-----------------
+AWS CodePipeline is a fully managed "continuous delivery" service that helps you automate your release pipelines 
+for fast and reliable application and infrastructure updates. CodePipeline automates the build, test, 
+and deploy phases of your release process every time there is a code change, based on the release model 
+you define. This enables you to rapidly and reliably deliver features and updates. Whereas CodeDeploy is a 
+deployment service, CodePipeline is a continuous delivery service. For our current scenario, CodeDeploy is 
+the correct choice.
+
+AWS CodeDeploy - (CD  <-- it is like "Continous Deployment")
+---------------
+AWS CodeDeploy is a fully managed "deployment" service that automates software deployments to a variety 
+of compute services such as Amazon EC2, AWS Fargate, AWS Lambda, and your on-premises servers. 
+AWS CodeDeploy makes it easier for you to rapidly release new features, helps you avoid downtime during 
+application deployment, and handles the complexity of updating your applications. This is the right 
+choice for the current use case.
+
 --------------------------------------------------------------------------------------------------
 AWS X-Ray
 --------
@@ -393,6 +411,13 @@ Lambda allocates CPU power in proportion to the amount of memory configured. Mem
 You can increase or decrease the memory and CPU power allocated to your function using the Memory (MB) setting. To configure the memory for your function, 
 set a value between 128 MB and 10,240 MB in 1-MB increments. At 1,769 MB, a function has the equivalent of one vCPU (one vCPU-second of credits per second).
 
+
+Lambda function as container image:
+----------------------------------
+You can deploy Lambda function as container image with the maximum size of 10GB.
+
+
+
 --------------------------------------------------------------------------------------------------------------
 AWS Serverless Application Model (AWS SAM)
 ================================
@@ -435,6 +460,12 @@ before emitting to a data store, run real-time metrics and analytics, or derive 
 Kinesis data streams can continuously capture gigabytes of data per second from hundreds of thousands of sources such as website 
 clickstreams, database event streams, financial transactions, social media feeds, IT logs, and location-tracking events.
 
+-) Use Amazon Kinesis Agent instead of Kinesis Producer Library (KPL) for sending data to Kinesis Data Streams - 
+Kinesis Agent works with data producers. 
+
+-) Use Kinesis enhanced fan-out for Kinesis Data Streams - You should use enhanced fan-out if you have, or expect to have, 
+multiple consumers retrieving data from a stream in parallel. 
+
 
 
 Amazon Kinesis Data Firehose 
@@ -443,6 +474,10 @@ It is the easiest way to load streaming data into data stores and analytics tool
 and analyze the streaming data in custom applications. It can capture, transform, and load streaming data into Amazon S3, 
 Amazon Redshift, Amazon Elasticsearch Service, and Splunk, enabling near real-time analytics.
 
+Amazon Kinesis Data Firehose is a fully managed service for delivering real-time streaming data to destinations such as 
+Amazon Simple Storage Service (Amazon S3), Amazon Redshift, Amazon Elasticsearch Service (Amazon ES), and Splunk. 
+With Kinesis Data Firehose, you don't need to write applications or manage resources. You configure your data producers 
+to send data to Kinesis Data Firehose, and it automatically delivers the data to the destination that you specified.
 
 =========================================================================================================================
 CloudWatch   vs   CloudTrail    vs    Config
@@ -567,16 +602,30 @@ and phone_number. You can use this identity information inside your application.
 users against your resource servers or server applications.
 
 
-"Cognito Identity Pools" - 
+"Cognito Identity Pools" -   e.g  Facebook, Google, twitter, ect... are "Identity Pools"
 ------------------------
 You can use Identity pools to grant your users access to other AWS services. With an identity pool, your users can obtain 
 temporary AWS credentials to access AWS services, such as Amazon S3 and DynamoDB. Identity pools support anonymous guest users,
 as well as the specific identity providers that you can use to authenticate users for identity pools.
 
+Public providers: 
+Login with Amazon (Identity Pools), Facebook (Identity Pools), Google (Identity Pools), Sign in with Apple (Identity Pools).
+
+Amazon Cognito User Pools
+Open ID Connect Providers (Identity Pools)
+SAML Identity Providers (Identity Pools)
+Developer Authenticated Identities (Identity Pools
+
+
 "Cognito Sync" - 
 ----------------
 Amazon Cognito Sync is an AWS service and client library that enables cross-device syncing of application-related user data. 
 You can use it to synchronize user profile data across mobile devices and the web without requiring your own backend.
+The client libraries cache data locally so your app can read and write data regardless of device connectivity status. 
+When the device is online, you can synchronize data, and if you set up push sync, notify other devices immediately 
+that an update is available.
+
+
 
 ===========================================================================================================
 AWS AppSync - 
@@ -668,3 +717,75 @@ In the video their he clearly explains how the flow works, After creating a new 
 we can attach the pulblic in the cloudfront and after that for creating the neu url we are using the private-key
 
 ===============================================================================================================
+Flow Logs
+---------
+
+-) We can create a "Flow logs" for a  "VPC" or a "Subnet" or a "Network Interface"
+
+VPC Flow Logs is a feature that enables you to capture information about the IP traffic going to and from 
+network interfaces in your VPC. Flow log data can be published to Amazon CloudWatch Logs or Amazon S3. 
+After you've created a flow log, you can retrieve and view its data in the chosen destination.
+
+You can create a flow log for a VPC, a subnet, or a network interface. If you create a flow log for a 
+subnet or VPC, each network interface in that subnet or VPC is monitored.
+
+Flow log data for a monitored network interface is recorded as flow log records, which are log 
+events consisting of fields that describe the traffic flow.
+
+To create a flow log, you specify:
+The resource for which to create the flow log
+The type of traffic to capture (accepted traffic, rejected traffic, or all traffic)
+The destinations to which you want to publish the flow log data
+
+================================================================================================================
+Step Function   ()
+-------------
+https://www.youtube.com/watch?v=ge6Dm2HYG1E     <-- In this video easily explained
+
+Note:
+A Task state ("Type": "Task") represents a single unit of work performed by a state machine.
+
+All work in your state machine is done by tasks. A task performs work by using an activity or an 
+AWS Lambda function, or by passing parameters to the API actions of other services.
+
+AWS Step Functions can invoke Lambda functions directly from a task state. A Lambda function 
+is a cloud-native task that runs on AWS Lambda. You can write Lambda functions in a variety of 
+programming languages, using the AWS Management Console or by uploading code to Lambda.
+
+=========================================================================================================
+Amazon Simple Email Service:
+---------------------------
+
+Use Exponential Backoff technique to introduce delay in time before attempting to execute the operation again - 
+A “Throttling – Maximum sending rate exceeded” error is retriable. This error is different than other errors returned 
+by Amazon SES. A request rejected with a “Throttling” error can be retried at a later time and is likely to succeed.
+
+Retries are “selfish.” In other words, when a client retries, it spends more of the server's time to get a higher 
+chance of success. Where failures are rare or transient, that's not a problem. This is because the overall number
+ of retried requests is small, and the tradeoff of increasing apparent availability works well. When failures are 
+ caused by overload, retries that increase load can make matters significantly worse. They can even delay recovery 
+ by keeping the load high long after the original issue is resolved.
+
+The preferred solution is to use a backoff. Instead of retrying immediately and aggressively, the client waits some 
+amount of time between tries. The most common pattern is an exponential backoff, where the wait time is increased 
+exponentially after every attempt.
+
+A variety of factors can affect your send rate, e.g. message size, network performance or Amazon SES availability. 
+The advantage of the exponential backoff approach is that your application will self-tune and it will call Amazon 
+SES at close to the maximum allowed rate.
+
+
+Configure Timeout mechanism for each request made to the SES service - Requests are configured to timeout if they 
+do not complete successfully in a given time. This helps free up the database, application and any other resource 
+that could potentially keep on waiting to eventually succeed. But, if errors are caused by load, retries can be
+ ineffective if all clients retry at the same time. Throttling error signifies that load is high on SES and it does 
+ not make sense to keep retrying.
+
+Raise a service request with Amazon to increase the throttling limit for the SES API - If throttling error is persistent, 
+then it indicates a high load on the system consistently and increasing the throttling limit will be the right solution
+ for the problem. But, the error is only intermittent here, signifying that decreasing the rate of requests will handle the error.
+
+Implement retry mechanism for all 4xx errors to avoid throttling error - 4xx status codes indicate that there was a
+ problem with the client request. Common client request errors include providing invalid credentials and omitting 
+ required parameters. When you get a 4xx error, you need to correct the problem and resubmit a properly formed client 
+ request. Throttling is a server error and not a client error, hence retry on 4xx errors does not make sense here.
