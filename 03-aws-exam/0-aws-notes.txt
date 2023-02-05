@@ -179,7 +179,6 @@ Note: Assume we have ASG with 4 instances of an Application, then in the policy 
 uploaded code on it, if the new instances run good then it take these new instances for the new ASG and put it to the old ASG and replace the old instances
 with the new instances.
 
-
 A slower deployment method, that ensures your new application version is always deployed to new instances, instead of updating existing instances. 
 It also has the additional advantage of a quick and safe rollback in case the deployment fails. With this method, Elastic Beanstalk performs an 
 immutable update to deploy your application. In an immutable update, a second Auto Scaling group is launched in your environment and the new version 
@@ -321,7 +320,8 @@ volume mounts on the container instance to use the file system.
 AWS CodeDeploy ( Code Deploy)
 ----------------------------
 AWS CodeDeploy is a service that coordinates application deployments across EC2 instances and instances running on-premises. 
-It makes it easier for you to rapidly release new features, helps you avoid downtime during deployment, and handles the complexity of updating your applications.
+It makes it easier for you to rapidly release new features, helps you avoid downtime during deployment, and handles the complexity 
+of updating your applications.
 
 Unlike Elastic Beanstalk, CodeDeploy does not automatically handle capacity provisioning, scaling, and monitoring.
 
@@ -334,6 +334,30 @@ You create a deployment configuration file to specify how deployments proceed.
 
 CodeDeploy complements CloudFormation well when deploying code to infrastructure that is provisioned and managed with CloudFormation. 
 
+
+Lifecycle Event Hook Availability:
+---------------------------------
+https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-run-order
+
+ValidateService: 
+---------------
+ValidateService is the last deployment lifecycle event. It is used to verify the deployment was completed successfully.
+
+
+AfterInstall - 
+-------------
+You can use this deployment lifecycle event for tasks such as configuring your application or changing file permissions
+
+
+ApplicationStart - 
+------------------
+You typically use this deployment lifecycle event to restart services that were stopped during ApplicationStop
+
+
+AllowTraffic - 
+-------------
+During this deployment lifecycle event, internet traffic is allowed to access instances after a deployment. 
+This event is reserved for the AWS CodeDeploy agent and cannot be used to run scripts
 
 ---------------------------------------------------------------------------------
 AWS OpsWorks
@@ -361,12 +385,25 @@ Compared to CloudFormation, OpsWorks focuses more on orchestration and software 
 ------------------------------------------------------------------------------------------------------------------------
 SQS Queue
 =========
+Standard queues 
+---------------
+It offer maximum throughput, best-effort ordering, and at-least-once delivery. SQS FIFO queues are designed to guarantee that 
+messages are processed exactly once, in the exact order that they are sent.
+
+Delay queues 
+------------
+It let you postpone the delivery of new messages to a queue for several seconds, for example, when your consumer application 
+needs additional time to process messages. If you create a delay queue, any messages that you send to the queue remain 
+invisible to consumers for the duration of the delay period. The default (minimum) delay for a queue is 0 seconds. 
+The maximum is 15 minutes.
+
 
 Visibility timeout:   
 ------------------
--) It means that we send a message to a queue but if we set "Visibility timeout=20s" that means this message will not be Visible(displayed)
-to the Consumer, it means the Consumer can not pull this message, only after 20 sec he can pull this message, for some usecase this option has made
-               
+-) Visibility timeout is a period during which Amazon SQS prevents other consumers from receiving and processing a given message. 
+
+-) The default visibility timeout for a message is 30 seconds. The minimum is 0 seconds. The maximum is 12 hours               
+
 -) The length of time, in seconds, for which the delivery of all messages in the queue is delayed is configured using DelaySeconds attribute. 
 MessageRetentionPeriod attribute controls the length of time, in seconds, for which Amazon SQS retains a message.               
 
@@ -555,11 +592,6 @@ weekly, or monthly basis, with a specified start time and duration, for a one-ye
 advance so that you know it is available when you need it.
 
 
-
-
-
-
-
 ===================================================================================================================
 Secret Manager
 --------------
@@ -716,6 +748,43 @@ Explanation of the question in test 2.3:  (https://www.youtube.com/watch?v=NTOCz
 In the video their he clearly explains how the flow works, After creating a new public-private key
 we can attach the pulblic in the cloudfront and after that for creating the neu url we are using the private-key
 
+
+Signed-URL  vs  Signed-Cookies
+------------------------------
+https://www.youtube.com/watch?v=JIW_pV3zau8
+
+Signed-URL: 
+-----------
+It provides limited permission and time to make a request to a "Single File"
+
+Signed-Cookies:
+--------------
+Note: in case of "Signed-Cookies" the user request for the access, for this we have to develop a application then 
+that application will send a "Cookies-header" then that "Cookies-header" will sent back to the user, and when 
+user send request for accessing the file then he has to send those cookies in the header, as per the Cookies
+present in the request-header, the Cloudfrond authenticate the request and gie the access to the files
+
+It is a cookie that provides limited permission and time to make requests for a set of files "Multiple Files"
+e.g: If their are 50 files that has same "cookies header", then user will get access to all those 50-files 
+     as those files has same "cookies-header"
+
+
+Note: If our request url contains these parameters  expires, policy, signature, key-pair-id   then Cloud-Front
+     will reject the request.
+
+
+
+
+CloudFront's Field-Level Encryption:
+-----------------------------------
+CloudFront's Field-Level Encryption to help protect sensitive data - CloudFront's field-level encryption further 
+encrypts sensitive data in an HTTPS form using field-specific encryption keys (which you supply) before a POST 
+request is forwarded to your origin. This ensures that sensitive data can only be decrypted and viewed by certain 
+components or services in your application stack. This feature is not useful for the given use case.
+
+
+
+
 ===============================================================================================================
 Flow Logs
 ---------
@@ -789,3 +858,103 @@ Implement retry mechanism for all 4xx errors to avoid throttling error - 4xx sta
  problem with the client request. Common client request errors include providing invalid credentials and omitting 
  required parameters. When you get a 4xx error, you need to correct the problem and resubmit a properly formed client 
  request. Throttling is a server error and not a client error, hence retry on 4xx errors does not make sense here.
+
+=======================================================================================================================
+ASG  Auto Scaling Group
+========================
+
+Target Tracking Scaling Policy:  (here it is clearly explaine how Auto-scaling works internally in AWS side)
+-------------------------------
+With target tracking scaling policies, you select a scaling metric and set a target value. Amazon EC2 Auto Scaling creates 
+and manages the CloudWatch alarms that trigger the scaling policy and calculates the scaling adjustment based on the 
+metric and the target value.
+
+It is important to note that a target tracking scaling policy assumes that it should scale out your Auto Scaling group when 
+the specified metric is above the target value. You cannot use a target tracking scaling policy to scale out your Auto Scaling 
+group when the specified metric is below the target value.
+
+========================================================================================================================
+DynamoDB:
+---------
+With Amazon DynamoDB transactions, you can group multiple actions together and submit them as a single all-or-nothing 
+TransactWriteItems or TransactGetItems operation.
+
+TransactWriteItems 
+------------------
+It is a synchronous and idempotent write operation that groups up to 25 write actions in a 
+single all-or-nothing operation. These actions can target up to 25 distinct items in one or more DynamoDB tables 
+within the same AWS account and in the same Region. The aggregate size of the items in the transaction cannot exceed 4 MB. 
+The actions are completed atomically so that either all of them succeed or none of them succeeds.
+
+You can optionally include a client token when you make a TransactWriteItems call to ensure that the request is idempotent. 
+Making your transactions idempotent helps prevent application errors if the same operation is submitted multiple times due to a 
+connection time-out or other connectivity issue.
+
+BatchWriteItem API 
+------------------
+With this we can update multiple tables simultaneously - A TransactWriteItems operation differs from a BatchWriteItem operation 
+in that all the actions it contains must be completed successfully, or no changes are made at all. With a BatchWriteItem operation,
+it is possible that only some of the actions in the batch succeed while the others do not.
+
+DynamoDB backups
+----------------
+1)
+Use the DynamoDB on-demand backup capability to write to Amazon S3 and download locally - 
+This option is not feasible for the given use-case. DynamoDB has two built-in backup methods (On-demand, Point-in-time recovery) 
+that write to Amazon S3, but you will not have access to the S3 buckets that are used for these backups.
+
+2)
+Use AWS Data Pipeline to export your table to an S3 bucket in the account of your choice and download locally - 
+This is the easiest method. This method is used when you want to make a one-time backup using the lowest amount of AWS resources possible. 
+Data Pipeline uses Amazon EMR to create the backup, and the scripting is done for you. You don't have to learn Apache Hive or 
+Apache Spark to accomplish this task.
+
+3)
+Use Hive with Amazon EMR to export your data to an S3 bucket and download locally - Use Hive to export data to an S3 bucket. 
+Or, use the open-source emr-dynamodb-connector to manage your own custom backup method in Spark or Hive. These methods are the 
+best practice to use if you're an active Amazon EMR user and are comfortable with Hive or Spark. These methods offer more control 
+than the Data Pipeline method.
+
+4)
+Use AWS Glue to copy your table to Amazon S3 and download locally - Use AWS Glue to copy your table to Amazon S3. This is the best 
+practice to use if you want automated, continuous backups that you can also use in another service, such as Amazon Athena.
+
+==========================================================================================================================
+EBS Volumes:
+------------
+
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html           <-- current list of EBS values
+
+-) 1 GB can have up-to 50-IOPS         <-- Note: 1-GB  can have 20 or 30 IOPS but maximum 50-IOPS  
+ 
+200 * 50  = 10,000 IOPS        <-- it means 200-GB  10,000 IOPS
+
+
+EBS volumes are by-default AZ locked:     (it means in which AZ you create and only be re-attach to another EC2 in the same AZ)
+-------------------------------------
+An Amazon EBS volume is a durable, block-level storage device that you can attach to your instances. After you attach a volume to an 
+instance, you can use it as you would use a physical hard drive. EBS volumes are flexible. For current-generation volumes attached 
+to current-generation instance types, you can dynamically increase size, modify the provisioned IOPS capacity, and change volume 
+type on live production volumes.
+
+When you create an EBS volume, it is automatically replicated within its Availability Zone to prevent data loss due to the failure 
+of any single hardware component. You can attach an EBS volume to an EC2 instance in the same Availability Zone.
+
+==========================================================================================================================
+EC2 Spot Instance
+-----------------
+
+It is always possible that Spot Instances might be interrupted. Therefore, you must ensure that your application 
+is prepared for a Spot Instance interruption.
+
+These three actions can be done when we are using a "Spot Instance" and it will be taken back from AWS
+
+1) Stop the Spot Instance - This is a valid option. Amazon EC2 can be configured to stop the instance when an 
+                             interruption occurs on Spot instances.
+
+2) Hibernate the Spot Instance - This is a valid option. Amazon EC2 can be configured to hibernate the instance 
+                             when an interruption occurs on Spot instances.
+
+3) Terminate the Spot Instance - This is a valid option. Amazon EC2 can be configured to hibernate the instance 
+                              when an interruption occurs on Spot instances. The default behavior is to terminate 
+                              Spot Instances when they are interrupted.
