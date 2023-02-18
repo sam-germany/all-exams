@@ -1,3 +1,126 @@
+https://tutorialsdojo.com/           <-- all AWS notes are here
+
+
+==================================================================================================================
+IAM Policy
+---------
+
+AWS Organizations Service Control Policy (SCP) – 
+----------------------------------------------
+Use an AWS Organizations Service Control Policy (SCP) to define the maximum permissions for account members of an organization or organizational unit (OU). 
+SCPs limit permissions that identity-based policies or resource-based policies grant to entities (users or roles) within the account, but do not grant permissions.
+
+Permissions boundary - 
+-------------------
+Permissions boundary is a managed policy that is used for an IAM entity (user or role). The policy defines the maximum permissions that the 
+identity-based policies can grant to an entity, but does not grant permissions.
+
+
+Identity-based policies – 
+----------------------
+Attach managed and inline policies to IAM identities (users, groups to which users belong, or roles). Identity-based policies grant permissions to an identity.
+
+Resource-based policies – 
+------------------------
+Attach inline policies to resources. The most common examples of resource-based policies are Amazon S3 bucket policies and IAM role trust policies. 
+Resource-based policies grant permissions to the principal that is specified in the policy. Principals can be in the same account as the resource 
+or in other accounts.
+
+Permissions boundaries – 
+----------------------
+Use a managed policy as the permissions boundary for an IAM entity (user or role). That policy defines the maximum permissions that the identity-based 
+policies can grant to an entity, but does not grant permissions. Permissions boundaries do not define the maximum permissions that a resource-based
+policy can grant to an entity.
+
+Organizations SCPs – 
+------------------
+Use an AWS Organizations service control policy (SCP) to define the maximum permissions for account members of an organization or organizational unit (OU). 
+SCPs limit permissions that identity-based policies or resource-based policies grant to entities (users or roles) within the account, but do not grant permissions.
+
+Access control lists (ACLs) – 
+----------------------------
+Use ACLs to control which principals in other accounts can access the resource to which the ACL is attached. ACLs are similar to resource-based policies, 
+although they are the only policy type that does not use the JSON policy document structure. ACLs are cross-account permissions policies that grant 
+permissions to the specified principal. ACLs cannot grant permissions to entities within the same account.
+
+Session policies – 
+-----------------
+Pass advanced session policies when you use the AWS CLI or AWS API to assume a role or a federated user. Session policies limit the permissions that 
+the role or user's identity-based policies grant to the session. Session policies limit permissions for a created session, but do not grant permissions. 
+For more information, see Session Policies.
+
+
+Trust policy - 
+--------------
+Trust policies define which principal entities (accounts, users, roles, and federated users) can assume the role. An IAM role 
+is both an identity and a resource that supports resource-based policies. For this reason, you must attach both a trust policy 
+and an identity-based policy to an IAM role. The IAM service supports only one type of resource-based policy called a role trust
+ policy, which is attached to an IAM role.
+
+
+IAM policy variables
+--------------------
+Instead of creating individual policies for each user, you can use policy variables and create a single policy that applies to multiple 
+users (a group policy). Policy variables act as placeholders. When you make a request to AWS, the placeholder is replaced by a 
+alue from the request when the policy is evaluated.
+
+As an example, the following policy gives each of the users in the group full programmatic access to a user-specific object
+ (their own "home directory") in Amazon S3.
+
+IAM policy principal - 
+---------------------
+You can use the Principal element in a policy to specify the principal that is allowed or denied access to a resource 
+(In IAM, a principal is a person or application that can make a request for an action or operation on an AWS resource. 
+The principal is authenticated as the AWS account root user or an IAM entity to make requests to AWS). You cannot use
+ the Principal element in an IAM identity-based policy. You can use it in the trust policies for IAM roles and in resource-based policies.
+
+IAM policy condition - 
+--------------------
+The Condition element (or Condition block) lets you specify conditions for when a policy is in effect, 
+like so - "Condition" : { "StringEquals" : { "aws:username" : "johndoe" }}. This can not be used to address the requirements 
+of the given use-case.
+
+Access Advisor feature on IAM console- 
+---------------------------------------
+To help identify the unused roles, IAM reports the last-used timestamp that represents when a role was last used to make an AWS request. 
+Your security team can use this information to identify, analyze, and then confidently remove unused roles. This helps improve the 
+security posture of your AWS environments. Additionally, by removing unused roles, you can simplify your monitoring and auditing
+ efforts by focusing only on roles that are in use.
+
+
+AWS Trusted Advisor - 
+---------------------
+AWS Trusted Advisor is an online tool that provides you real-time guidance to help you provision your resources following 
+AWS best practices on cost optimization, security, fault tolerance, service limits, and performance improvement.
+
+IAM Access Analyzer - 
+---------------------
+AWS IAM Access Analyzer helps you identify the resources in your organization and accounts, such as Amazon S3 buckets 
+or IAM roles, that are shared with an external entity. This lets you identify unintended access to your resources and data, 
+which is a security risk.
+
+Amazon Inspector - 
+------------------
+Amazon Inspector is an automated security assessment service that helps improve the security and compliance of applications 
+deployed on AWS. Amazon Inspector automatically assesses applications for exposure, vulnerabilities, and deviations from 
+best practices.
+
+----------------------------------------------------------------------------------------------------------------
+IAM Role
+-------
+we can create four types of ROLES
+
+1) AWS service              (for EC2, Lambda)
+2) Another AWS account      (another account can be belonging to you, or a 3rd party)
+3) WEB Identity             (Cognito or any OpenID provider)
+4) SAML 2.0 federation      (Your Corperate directory)   
+
+
+Note: to understand  IAM role, user, policies just check "Niels" AWS associate course video 12, everything is clearly explained
+
+
+
+-----------------------------------------------------------------------------------------------------------
 AWS Certificate Manager - 
 -------------------------
 AWS Certificate Manager (ACM) is the preferred tool to provision, manage, and deploy server certificates. With ACM you can request a 
@@ -27,9 +150,27 @@ AWS Systems Manager gives you visibility and control of your infrastructure on A
 you can view operational data from multiple AWS services and allows you to automate operational tasks such as running commands, 
 managing patches, and configuring servers across AWS Cloud as well as on-premises infrastructure.
 
--------------------------------------------------------------------------------------------------------------
-AWS CloudFormation - 
------------------
+==========================================================================================================================
+AWS CloudFormation  ( cloud formation ) - 
+==================
+
+Supported "Parameters" used in the CloudFromation Template:
+------------------------------------------------------------
+String                            –  A literal string
+Number                            –  An integer or float
+List<Number>                      –  An array of integers or floats
+CommaDelimitedList                –  An array of literal strings that are separated by commas
+AWS::EC2::KeyPair::KeyName        –  An Amazon EC2 key pair name
+AWS::EC2::SecurityGroup::Id       –  A security group ID
+AWS::EC2::Subnet::Id              –  A subnet ID
+AWS::EC2::VPC::Id                 –  A VPC ID
+List<AWS::EC2::VPC::Id>           –  An array of VPC IDs
+List<AWS::EC2::SecurityGroup::Id> –  An array of security group IDs
+List<AWS::EC2::Subnet::Id>        –  An array of subnet IDs
+
+
+
+
 AWS CloudFormation allows you to use programming languages or a simple text file to model and provision, in an automated and secure manner, 
 all the resources needed for your applications across all Regions and accounts. Think infrastructure as code; think CloudFormation. 
 You cannot use CloudFormation for running commands or managing patches on servers.
@@ -41,7 +182,38 @@ the Resources and Outputs sections of the template.
 'Parameters' section of the template - This optional section is helpful in passing Values to your template at runtime 
 (when you create or update a stack). You can refer to parameters from the Resources and Outputs sections of the template.
 
----------------------------------------------------------------------------------------------------------------
+
+Use Drift Detection feature of CloudFormation
+---------------------------------------------
+Drift detection enables you to detect whether a stack's actual configuration differs, or has drifted, from its expected configuration. 
+Use CloudFormation to detect drift on an entire stack, or individual resources within the stack. A resource is considered to have 
+drifted if any of its actual property values differ from the expected property values. This includes if the property or resource has 
+been deleted. A stack is considered to have drifted if one or more of its resources have drifted.
+
+To determine whether a resource has drifted, CloudFormation determines the expected resource property values, as defined in 
+the stack template and any values specified as template parameters. CloudFormation then compares those expected values with the
+ actual values of those resource properties as they currently exist in the stack. A resource is considered to have drifted if one 
+ or more of its properties have been deleted, or had their value changed.
+
+You can then take corrective action so that your stack resources are again in sync with their definitions in the stack template, 
+such as updating the drifted resources directly so that they agree with their template definition. Resolving drift helps to ensure 
+configuration consistency and successful stack operations.
+
+Use Change Sets feature of CloudFormation - 
+------------------------------------------
+When you need to update a stack, understanding how your changes will affect running resources before you implement them can help 
+you update stacks with confidence. Change sets allow you to preview how proposed changes to a stack might impact your running 
+resources, for example, whether your changes will delete or replace any critical resources, AWS CloudFormation makes the changes 
+to your stack only when you decide to execute the change set, allowing you to decide whether to proceed with your proposed 
+changes or explore other changes by creating another change set. Change sets are not useful for the given use-case.
+
+
+
+
+
+
+
+====================================================================================================================
 AWS CodePipeline - ( CI <- it is like a "Continous Integration")
 -----------------
 AWS CodePipeline is a fully managed "continuous delivery" service that helps you automate your release pipelines 
@@ -185,109 +357,6 @@ immutable update to deploy your application. In an immutable update, a second Au
 serves traffic alongside the old version until the new instances pass health checks.
 
 
-==================================================================================================================
-IAM Policy
----------
-
-AWS Organizations Service Control Policy (SCP) – 
-----------------------------------------------
-Use an AWS Organizations Service Control Policy (SCP) to define the maximum permissions for account members of an organization or organizational unit (OU). 
-SCPs limit permissions that identity-based policies or resource-based policies grant to entities (users or roles) within the account, but do not grant permissions.
-
-Permissions boundary - 
--------------------
-Permissions boundary is a managed policy that is used for an IAM entity (user or role). The policy defines the maximum permissions that the 
-identity-based policies can grant to an entity, but does not grant permissions.
-
-
-Identity-based policies – 
-----------------------
-Attach managed and inline policies to IAM identities (users, groups to which users belong, or roles). Identity-based policies grant permissions to an identity.
-
-Resource-based policies – 
-------------------------
-Attach inline policies to resources. The most common examples of resource-based policies are Amazon S3 bucket policies and IAM role trust policies. 
-Resource-based policies grant permissions to the principal that is specified in the policy. Principals can be in the same account as the resource 
-or in other accounts.
-
-Permissions boundaries – 
-----------------------
-Use a managed policy as the permissions boundary for an IAM entity (user or role). That policy defines the maximum permissions that the identity-based 
-policies can grant to an entity, but does not grant permissions. Permissions boundaries do not define the maximum permissions that a resource-based
-policy can grant to an entity.
-
-Organizations SCPs – 
-------------------
-Use an AWS Organizations service control policy (SCP) to define the maximum permissions for account members of an organization or organizational unit (OU). 
-SCPs limit permissions that identity-based policies or resource-based policies grant to entities (users or roles) within the account, but do not grant permissions.
-
-Access control lists (ACLs) – 
-----------------------------
-Use ACLs to control which principals in other accounts can access the resource to which the ACL is attached. ACLs are similar to resource-based policies, 
-although they are the only policy type that does not use the JSON policy document structure. ACLs are cross-account permissions policies that grant 
-permissions to the specified principal. ACLs cannot grant permissions to entities within the same account.
-
-Session policies – 
------------------
-Pass advanced session policies when you use the AWS CLI or AWS API to assume a role or a federated user. Session policies limit the permissions that 
-the role or user's identity-based policies grant to the session. Session policies limit permissions for a created session, but do not grant permissions. 
-For more information, see Session Policies.
-
-
-Trust policy - 
---------------
-Trust policies define which principal entities (accounts, users, roles, and federated users) can assume the role. An IAM role 
-is both an identity and a resource that supports resource-based policies. For this reason, you must attach both a trust policy 
-and an identity-based policy to an IAM role. The IAM service supports only one type of resource-based policy called a role trust
- policy, which is attached to an IAM role.
-
-
-IAM policy variables
---------------------
-Instead of creating individual policies for each user, you can use policy variables and create a single policy that applies to multiple 
-users (a group policy). Policy variables act as placeholders. When you make a request to AWS, the placeholder is replaced by a 
-alue from the request when the policy is evaluated.
-
-As an example, the following policy gives each of the users in the group full programmatic access to a user-specific object
- (their own "home directory") in Amazon S3.
-
-IAM policy principal - 
----------------------
-You can use the Principal element in a policy to specify the principal that is allowed or denied access to a resource 
-(In IAM, a principal is a person or application that can make a request for an action or operation on an AWS resource. 
-The principal is authenticated as the AWS account root user or an IAM entity to make requests to AWS). You cannot use
- the Principal element in an IAM identity-based policy. You can use it in the trust policies for IAM roles and in resource-based policies.
-
-IAM policy condition - 
---------------------
-The Condition element (or Condition block) lets you specify conditions for when a policy is in effect, 
-like so - "Condition" : { "StringEquals" : { "aws:username" : "johndoe" }}. This can not be used to address the requirements 
-of the given use-case.
-
-Access Advisor feature on IAM console- 
----------------------------------------
-To help identify the unused roles, IAM reports the last-used timestamp that represents when a role was last used to make an AWS request. 
-Your security team can use this information to identify, analyze, and then confidently remove unused roles. This helps improve the 
-security posture of your AWS environments. Additionally, by removing unused roles, you can simplify your monitoring and auditing
- efforts by focusing only on roles that are in use.
-
-
-AWS Trusted Advisor - 
----------------------
-AWS Trusted Advisor is an online tool that provides you real-time guidance to help you provision your resources following 
-AWS best practices on cost optimization, security, fault tolerance, service limits, and performance improvement.
-
-IAM Access Analyzer - 
----------------------
-AWS IAM Access Analyzer helps you identify the resources in your organization and accounts, such as Amazon S3 buckets 
-or IAM roles, that are shared with an external entity. This lets you identify unintended access to your resources and data, 
-which is a security risk.
-
-Amazon Inspector - 
-------------------
-Amazon Inspector is an automated security assessment service that helps improve the security and compliance of applications 
-deployed on AWS. Amazon Inspector automatically assesses applications for exposure, vulnerabilities, and deviations from 
-best practices.
 
 
 ===========================================================================================================================
@@ -458,7 +527,7 @@ You can deploy Lambda function as container image with the maximum size of 10GB.
 --------------------------------------------------------------------------------------------------------------
 AWS Serverless Application Model (AWS SAM)
 ================================
-
+https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy.html
 
 SAM supports the following resource types:
 
@@ -485,6 +554,23 @@ It is useful for advanced use cases where you want full control and flexibility 
 AWS::Serverless::SimpleTable - 
 ---------------------------
 This creates a DynamoDB table with a single attribute primary key. It is useful when data only needs to be accessed via a primary key.
+
+
+
+
+SAM Template:
+-------------
+Transform: AWS::Serverless-2016-10-31   ( "Transform" and "Resources" this is the required fields)
+
+Globals:     set of globals
+Description: String
+Metadata:    template metadata
+Parameters:  set of parameters
+Mappings:    set of mappings
+Conditions:  set of conditions
+Resources:   set of resources
+Outputs:     set of outputs
+
 
 ====================================================================================================================
 Kinesis
@@ -590,6 +676,20 @@ Scheduled Reserved instances -
 Scheduled Reserved Instances (Scheduled Instances) enable you to purchase capacity reservations that recur on a daily, 
 weekly, or monthly basis, with a specified start time and duration, for a one-year term. You reserve the capacity in 
 advance so that you know it is available when you need it.
+
+
+
+
+gp2 Volume:
+----------
+The performance of gp2 volumes is tied to volume size, which determines the baseline performance level of the volume 
+and how quickly it accumulates I/O credits; larger volumes have higher baseline performance levels and accumulate 
+I/O credits faster.
+
+5.3 TiB - General Purpose SSD (gp2) volumes offer cost-effective storage that is ideal for a broad range of workloads. 
+These volumes deliver single-digit millisecond latencies and the ability to burst to 3,000 IOPS for extended periods of 
+time. Between a minimum of 100 IOPS (at 33.33 GiB and below) and a maximum of 16,000 IOPS (at 5,334 GiB and above), 
+baseline performance scales linearly at 3 IOPS per GiB of volume size.
 
 
 ===================================================================================================================
@@ -919,6 +1019,26 @@ than the Data Pipeline method.
 Use AWS Glue to copy your table to Amazon S3 and download locally - Use AWS Glue to copy your table to Amazon S3. This is the best 
 practice to use if you want automated, continuous backups that you can also use in another service, such as Amazon Athena.
 
+
+Eventually Consistent Reads:
+-----------------------------
+When you read data from a DynamoDB table, the response might not reflect the results of a recently completed write operation. 
+The response might include some stale data. If you repeat your read request after a short time, the response should return 
+the latest data.
+
+
+Strongly Consistent Reads:
+--------------------------
+When you request a strongly consistent read, DynamoDB returns a response with the most up-to-date data, reflecting the updates 
+from all prior write operations that were successful.
+
+DynamoDB uses eventually consistent reads by default. Read operations (such as GetItem, Query, and Scan) provide a ConsistentRead
+parameter. If you set this parameter to true, DynamoDB uses strongly consistent reads during the operation. As per the given 
+use-case, to make sure that only the last updated value of any item is used in the application, you should use strongly 
+consistent reads by setting ConsistentRead = true for GetItem operation.
+
+
+
 ==========================================================================================================================
 EBS Volumes:
 ------------
@@ -958,3 +1078,15 @@ These three actions can be done when we are using a "Spot Instance" and it will 
 3) Terminate the Spot Instance - This is a valid option. Amazon EC2 can be configured to hibernate the instance 
                               when an interruption occurs on Spot instances. The default behavior is to terminate 
                               Spot Instances when they are interrupted.
+
+===========================================================================================================================
+RDS  Relation Database Service:
+==============================
+
+IAM Database Authentication:
+----------------------------
+You can authenticate to your DB instance using AWS Identity and Access Management (IAM) database authentication. 
+With this authentication method, you don't need to use a password when you connect to a DB instance. Instead, you use an 
+authentication token. An authentication token is a unique string of characters that Amazon RDS generates on request.
+Each token has a lifetime of 15 minutes. You don't need to store user credentials in the database, because authentication 
+is managed externally using IAM.

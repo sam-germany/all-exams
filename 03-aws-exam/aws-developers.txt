@@ -8,9 +8,9 @@
 
 Certificate Manager: 1.33 (https://www.youtube.com/watch?v=zxEgB_fIpCE), 
 
-X-Ray: 1.42, 1.50, 
+X-Ray ( x ray , xray ): 1.42, 1.50, 2.58
 
-Cloud Formation (CloudFormation): 1.3, 1.4, 1.19, 1.29, 1.30, 1.64, 1.65, 2.14, 2.35, 2.42
+Cloud Formation ( CloudFormation ): 1.3, 1.4, 1.19, 1.29, 1.30, 1.64, 1.65, 2.14, 2.35, 2.42, 2.56, 2.63
 
 Cloud Front (cloudfront): 2.3(this question explained in notes), 2.37 
 
@@ -20,11 +20,11 @@ Elastic Load Balance (ELB): 1.9, 1.31      (cross-zone load balancing),
 
 Elastic Beanstalk: 1.5, 1.6, 1.20, 1.28, 1.39, 1.46, 1.60, 2.27, 2.43
 
-AWS Lambda Functions: 1.10, 1.55, 1.63, 2.19, 2.49
+AWS Lambda Functions: 1.10, 1.55, 1.63, 2.19, 2.49,2.52
 
 SQS  <-- Amazon Simple Queue Service: 1.23, 1.45, 2.1, 2.23, 2.46
 
-API Gateway: 1.14, 1.58, 2.44 
+API Gateway: 1.14, 1.58, 2.44, 2.55 
 
 CloudTrail: 1.17, 1.41
 
@@ -36,7 +36,7 @@ SSM  <-- Systems Manager:
 
 Secret Manager: 1.35
 
-S3: 1.57, 2.4, 2.6, 2.15
+S3: 1.57, 2.4, 2.6, 2.15, 2.57(IAM-Role)
 
 CloudFront: 1.18
 
@@ -44,15 +44,15 @@ Cognito: 1.1, 2.17, 2.22, 2.47
 
 SAR  <-- AWS Serverless Application Repository: 1.44
 
-SAM  <-- Serverless application model: 1.54
+SAM  <-- Serverless application model: 1.54, 2.59
 
-ECS  Elastic Container Service: 1.15, 1.38
+ECS  Elastic Container Service: 1.15, 1.38, 2.60
 
 ECR  <-- Elastic Container Registry: 1.24, 2.19
 
 CDK  <-- AWS Cloud Development Kit: 1.40, 1.43
 
-CodeBuild (Code Build): 1.36, 2.8
+CodeBuild (Code Build): 1.36, 2.8, 2.64
 
 CodeCommit (Code Commit): 1.8, 2.26
 
@@ -62,7 +62,7 @@ MFA  <-- Mult Factor Authentication: 1.61
 
 ElastiCache: 
 
-AWS CLI Commands: 1.37 (cli paramaters are listed), 
+AWS CLI Commands: 1.37 (cli paramaters are listed), 2.51
 
 IAM User: 
 
@@ -70,13 +70,15 @@ IAM Policy: 1.13, 1.21, 1.51, 1.57, 1.62, 2.29
 
 IAM Policy principal: 
 
-IAM Roles: 1.59
+IAM Roles: 1.59, 2.57
 
 EC2: 1.32, 1.47, 1.48, 1.52 (user data)
 
 EC2 "Instance" Pricing: 1.2, 1.16, 2.12, 2.13, 2.30
 
-EC2 Auto Scaling group (autoscaling): 1.11, 2.16, 2.34              
+EC2 "Instance" Size: 2,62
+
+EC2 Auto Scaling group (autoscaling): 1.11, 2.16, 2.34, 2.50(read-all-opt)              
 
 ALB  <-- Application Load Balancer: 1.22 
 
@@ -88,13 +90,13 @@ AWS Cost Management: 1.26, 1.49
 
 EFS  Elastic File System: 1.27
 
-DynamoDB: 2.2, 2.18, 2.28, 2.45
+DynamoDB: 2.2, 2.18, 2.28, 2.45, 2.65
 
 VPC: 2.7
 
 VPC Endpoint: 2.41
 
-Step Functions: 2.11
+Step Functions: 2.11, 2.53
 
 Amazon Simple Email Service: 2.21
 
@@ -104,4 +106,6 @@ HTTP - HTTPS: 2.36
 
 EBS  Elastic Block Store: 2.48, 
 
-i am at 2.49
+RDS  Relational Database Service: 2.54
+
+i am atewew
