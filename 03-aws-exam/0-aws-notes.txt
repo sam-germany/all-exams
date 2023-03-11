@@ -2,7 +2,7 @@ https://tutorialsdojo.com/           <-- all AWS notes are here
 
 
 ==================================================================================================================
-IAM Policy
+IAM Policy   ( Identity and Access Management policies)
 ---------
 
 AWS Organizations Service Control Policy (SCP) – 
@@ -266,8 +266,8 @@ you can review changes in configurations and relationships between AWS resources
 and determine your overall compliance against the configurations specified in your internal guidelines. You can use Config to answer 
 questions such as - “What did my AWS resource look like at xyz point in time?”. Config cannot help determine the source for KMS API calls.
 
---------------------------------------------------------------------------------------------------------------------
-Key MAnagement Store (KMS)
+======================================================================================================================
+Key Management Store (KMS)
 -------------------------
 KMS stores the CMK, and receives data from the clients, which it encrypts and sends back
 
@@ -279,9 +279,46 @@ AWS KMS supports symmetric and asymmetric CMKs. A symmetric CMK represents a 256
 An asymmetric CMK represents an RSA key pair that is used for encryption and decryption or signing and verification (but not both), 
 or an elliptic curve (ECC) key pair that is used for signing and verification.
 
-AWS KMS supports three types of CMKs: customer-managed CMKs, AWS managed CMKs, and AWS owned CMKs.
 
----------------------------------------------------------------------------------------
+AWS KMS supports three types of CMKs: 
+--------------------------------------
+customer-managed CMKs, AWS managed CMKs, and AWS owned CMKs.
+
+Server-Side Encryption – 
+-----------------------
+Request Amazon S3 to encrypt your object before saving it on disks in its data centers and then decrypt it when you 
+download the objects.
+
+Client-Side Encryption – 
+----------------------
+Encrypt data client-side and upload the encrypted data to Amazon S3. In this case, you manage the encryption process, 
+the encryption keys, and related tools.
+When you use server-side encryption with AWS KMS (SSE-KMS), you can use the default AWS managed CMK, or you can specify 
+a customer-managed CMK that you have already created.
+Creating your own customer-managed CMK gives you more flexibility and control over the CMK. For example, you can create,
+rotate, and disable customer-managed CMKs. You can also define access controls and audit the customer-managed CMKs 
+that you use to protect your data.
+
+Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3) -
+------------------------------------------------------------ 
+When you use Server-Side Encryption with Amazon S3-Managed Keys (SSE-S3), each object is encrypted with a unique key. 
+As an additional safeguard, AWS encrypts the key itself with a master key that it regularly rotates. So this option 
+is incorrect for the given use-case.
+
+Server-Side Encryption with Customer-Provided Keys (SSE-C) - 
+---------------------------------------------------------
+With Server-Side Encryption with Customer-Provided Keys (SSE-C), you will need to create the encryption keys as well 
+as manage the corresponding process to rotate and remove the encryption keys. Amazon S3 manages the data encryption, 
+as it writes to disks, as well as the data decryption when you access your objects. So this option is incorrect for 
+the given use-case.
+
+Server-Side Encryption with Secrets Manager - 
+-------------------------------------------
+AWS Secrets Manager helps you protect secrets needed to access your applications, services, and IT resources. 
+The service enables you to easily rotate, manage, and retrieve database credentials, API keys, and other secrets 
+throughout their lifecycle. You cannot combine Server-Side Encryption with Secrets Manager to create, rotate, 
+or disable the encryption keys.
+===================================================================================================================================
 Elastic BeanStack:
 ----------------
 https://www.youtube.com/watch?v=yjHmzo91Rek
@@ -459,6 +496,10 @@ Standard queues
 It offer maximum throughput, best-effort ordering, and at-least-once delivery. SQS FIFO queues are designed to guarantee that 
 messages are processed exactly once, in the exact order that they are sent.
 
+Amazon SQS leverages the AWS cloud to dynamically scale, based on demand. SQS scales elastically with your application so you don't have 
+to worry about capacity planning and pre-provisioning. For most standard queues (depending on queue traffic and message backlog), there can 
+be a maximum of approximately 120,000 inflight messages
+
 Delay queues 
 ------------
 It let you postpone the delivery of new messages to a queue for several seconds, for example, when your consumer application 
@@ -510,7 +551,29 @@ Reduce the VisibilityTimeout -
 -----------------------------
 As explained above, VisibilityTimeout makes sure that the message is not read by any other consumer while it is being processed by one consumer. 
 
------------------------------------------------------------------------------------------------------------------
+
+Short Polling:
+-------------
+Amazon SQS provides short polling and long polling to receive messages from a queue. By default, queues use short polling. With short polling, 
+Amazon SQS sends the response right away, even if the query found no messages. With long polling, Amazon SQS sends a response after it collects 
+at least one available message, up to the maximum number of messages specified in the request. Amazon SQS sends an empty response only 
+if the polling wait time expires.
+
+Long Polling:
+------------
+Long polling makes it inexpensive to retrieve messages from your Amazon SQS queue as soon as the messages are available. Long polling helps 
+reduce the cost of using Amazon SQS by eliminating the number of empty responses (when there are no messages available for a ReceiveMessage request) 
+and false empty responses (when messages are available but aren't included in a response). When the wait time for the ReceiveMessage API action 
+is greater than 0, long polling is in effect. The maximum long polling wait time is 20 seconds.
+
+
+
+
+
+
+
+
+=====================================================================================================================================
 AWS Lambda
 ----------
 Lambda allocates CPU power in proportion to the amount of memory configured. Memory is the amount of memory available to your Lambda function at runtime. 
@@ -521,6 +584,15 @@ set a value between 128 MB and 10,240 MB in 1-MB increments. At 1,769 MB, a func
 Lambda function as container image:
 ----------------------------------
 You can deploy Lambda function as container image with the maximum size of 10GB.
+
+Lambda Reserved/Provisioned concurrency:
+---------------------------------------
+Use provisioned concurrency to account for the compute-heavy workflows
+
+Concurrency is the number of requests that your function is serving at any given time. When your function is invoked, Lambda allocates an instance of 
+it to process the event. When the function code finishes running, it can handle another request. If the function is invoked again while a request 
+is still being processed, another instance is allocated, which increases the function's concurrency.
+
 
 
 
@@ -602,6 +674,60 @@ Amazon Simple Storage Service (Amazon S3), Amazon Redshift, Amazon Elasticsearch
 With Kinesis Data Firehose, you don't need to write applications or manage resources. You configure your data producers 
 to send data to Kinesis Data Firehose, and it automatically delivers the data to the destination that you specified.
 
+
+Kinesis Data Streams:
+----------------------
+Kinesis Data Streams enables real-time processing of streaming big data. It provides ordering of records, as well as the ability 
+to read and/or replay records in the same order to multiple Amazon Kinesis Applications. 
+Kinesis data streams is highly customizable and best suited for developers building custom applications or streaming data for 
+specialized needs. Data Streams also provide greater flexibility in integrating downstream applications than Firehose. 
+Data Streams is also a cost-effective option compared to Firehose
+
+
+
+Kinesis Client Libraray:
+------------------------
+The Amazon Kinesis Client Library (KCL) delivers all records for a given partition key to the same record processor, 
+making it easier to build multiple applications reading from the same Amazon Kinesis data stream 
+(for example, to perform counting, aggregation, and filtering).
+
+===========================================================================================================================
+RDS
+===
+
+Use cross-Region Read Replicas:
+------------------------------
+In addition to using Read Replicas to reduce the load on your source DB instance, you can also use Read Replicas to implement a DR solution for your 
+production DB environment. If the source DB instance fails, you can promote your Read Replica to a standalone source server. Read Replicas can also 
+be created in a different Region than the source database. Using a cross-Region Read Replica can help ensure that you get back up and running if 
+you experience a regional availability issue.
+
+Enable the automated backup feature of Amazon RDS in a multi-AZ deployment that creates backups in a single AWS Region
+----------------------------------------------------------------------------------------------------------------
+Amazon RDS provides high availability and failover support for DB instances using Multi-AZ deployments. Amazon RDS uses several 
+different technologies to provide failover support. Multi-AZ deployments for MariaDB, MySQL, Oracle, and PostgreSQL DB instances 
+use Amazon's failover technology.
+
+The automated backup feature of Amazon RDS enables point-in-time recovery for your database instance. Amazon RDS will backup 
+your database and transaction logs and store both for a user-specified retention period. If it’s a Multi-AZ configuration, 
+backups occur on the standby to reduce I/O impact on the primary. Automated backups are limited to a single AWS Region while
+manual snapshots and Read Replicas are supported across multiple Regions.
+
+-) Amazon RDS Provisioned IOPS Storage is an SSD-backed storage option designed to deliver fast, predictable, and 
+   consistent I/O performance. This storage type enhances the performance of the RDS database, but this isn't a 
+   disaster recovery option.
+
+
+
+=======================================================================================================================
+Aurora DB
+=========
+
+
+
+
+
+
 =========================================================================================================================
 CloudWatch   vs   CloudTrail    vs    Config
 ----------        ----------          ------
@@ -611,6 +737,40 @@ CloudWatch:      <--  Think resource performance monitoring, events, and alerts;
 CloudTrail:      <--  Think account-specific activity and audit; think CloudTrail.
 
 Config:          <--  Think resource-specific history, audit, and compliance; think Config.
+
+
+===========================================================================================================================
+CloudWatch  (cloud watch)
+==========
+
+EC2 Cloudwatch metric
+---------------------
+You can create a custom CloudWatch metric for your EC2 Linux instance statistics by creating a script through the AWS Command Line 
+Interface (AWS CLI). Then, you can monitor that metric by pushing it to CloudWatch.
+
+
+Standard Resoultuion Metric:
+---------------------------
+
+
+
+High Resolution Metric:
+----------------------
+You can publish your own metrics to CloudWatch using the AWS CLI or an API. Metrics produced by AWS services are standard resolution 
+by default. When you publish a custom metric, you can define it as either standard resolution or high resolution. When you publish a 
+high-resolution metric, CloudWatch stores it with a resolution of 1 second, and you can read and retrieve it with a period of 1 second, 
+5 seconds, 10 seconds, 30 seconds, or any multiple of 60 seconds.
+
+High-resolution metrics can give you more immediate insight into your application's sub-minute activity. But, every PutMetricData call 
+for a custom metric is charged, so calling PutMetricData more often on a high-resolution metric can lead to higher charges.
+
+
+EC2 "detailed monitoring:
+-------------------------
+By enabling detailed monitoring you define the frequency at which the metric data has to be sent to CloudWatch, from 5 minutes to 1-minute 
+frequency window. But, you still need to create and collect the custom metric you wish to track.
+
+
 
 ========================================================================================================================
 EC2
@@ -832,6 +992,13 @@ max_attempts  	             N/A 	         max_attempts 	           AWS_MAX_ATTEM
 retry_mode                	 N/A              retry_mode 	            AWS_RETRY_MODE 	         Type of retries performed
 
 
+
+> aws ec2 monitor-instances --instance-ids <instance-id>                     <-- this command will enable monitoring
+> aws ec2 run-instances --image-id <image-id>  --monitoring Enabled=true    <--  This syntax is used to enable detailed monitoring 
+                                                                                 when launching an instance from AWS CLI
+> 
+
+
 ===============================================================================================================
 VPC Flow Logs: 
 ----------------
@@ -907,7 +1074,7 @@ The type of traffic to capture (accepted traffic, rejected traffic, or all traff
 The destinations to which you want to publish the flow log data
 
 ================================================================================================================
-Step Function   ()
+Step Function   
 -------------
 https://www.youtube.com/watch?v=ge6Dm2HYG1E     <-- In this video easily explained
 
@@ -955,9 +1122,17 @@ then it indicates a high load on the system consistently and increasing the thro
  for the problem. But, the error is only intermittent here, signifying that decreasing the rate of requests will handle the error.
 
 Implement retry mechanism for all 4xx errors to avoid throttling error - 4xx status codes indicate that there was a
- problem with the client request. Common client request errors include providing invalid credentials and omitting 
- required parameters. When you get a 4xx error, you need to correct the problem and resubmit a properly formed client 
- request. Throttling is a server error and not a client error, hence retry on 4xx errors does not make sense here.
+problem with the client request. Common client request errors include providing invalid credentials and omitting 
+required parameters. When you get a 4xx error, you need to correct the problem and resubmit a properly formed client 
+request. Throttling is a server error and not a client error, hence retry on 4xx errors does not make sense here.
+
+
+Note:
+-----
+Express Workflows have a maximum duration of five minutes and Standard workflows have a maximum duration of 180 days or 6 months - 
+
+
+
 
 =======================================================================================================================
 ASG  Auto Scaling Group
@@ -1090,3 +1265,253 @@ With this authentication method, you don't need to use a password when you conne
 authentication token. An authentication token is a unique string of characters that Amazon RDS generates on request.
 Each token has a lifetime of 15 minutes. You don't need to store user credentials in the database, because authentication 
 is managed externally using IAM.
+
+=======================================================================================================
+S3 ( Simple storage service )
+-----------------------------
+Customers may use four mechanisms for controlling access to Amazon S3 resources: Identity and Access Management (IAM) policies, 
+bucket policies, Access Control Lists (ACLs), and Query String Authentication.
+
+IAM policy for S3:
+-------------------
+IAM enables organizations with multiple employees to create and manage multiple users under a single AWS account. With IAM policies, 
+customers can grant IAM users fine-grained control to their Amazon S3 bucket or objects while also retaining full control over 
+everything the users do.
+
+
+
+EC2 access S3:
+--------------
+IAM roles have been incorporated so that your applications can securely make API requests from your instances, without 
+requiring you to manage the security credentials that the applications use. Instead of creating and distributing your 
+AWS credentials, you can delegate permission to make API requests using IAM roles.
+
+Amazon EC2 uses an instance profile as a container for an IAM role. When you create an IAM role using the IAM console, 
+the console creates an instance profile automatically and gives it the same name as the role to which it corresponds.
+
+This is the most secure option as the role assigned to EC2 can be used to access S3 without storing any credentials 
+onto the EC2 instance.
+
+
+Bucket Policies:
+---------------
+With bucket policies, customers can define rules which apply broadly across all requests to their Amazon S3 resources, such as 
+granting write privileges to a subset of Amazon S3 resources. Customers can also restrict access based on an aspect of the request,
+such as HTTP referrer and IP address.
+
+
+ACL:
+----
+With ACLs, customers can grant specific permissions (i.e. READ, WRITE, FULL_CONTROL) to specific users for an individual bucket or object.
+Amazon S3 access control lists (ACLs) enable you to manage access to buckets and objects. Each bucket and object has an ACL attached to
+it as a subresource. A bucket ACLs allow you to control access at bucket level.
+
+Query String Authentication:
+----------------------------
+With Query String Authentication, customers can create a URL to an Amazon S3 object which is only valid for a limited time. 
+Using query parameters to authenticate requests is useful when you want to express a request entirely in a URL. This method is 
+also referred as presigning a URL
+
+S3 Cross-Origin Resource Sharing (CORS) - 
+----------------------------------------
+Cross-origin resource sharing (CORS) defines a way for client web applications that are loaded in one domain to interact with resources in a 
+different domain. With CORS support, you can build rich client-side web applications with Amazon S3 and selectively allow cross-origin access
+to your Amazon S3 resources.
+
+To configure your bucket to allow cross-origin requests, you create a CORS configuration. The CORS configuration is a document with 
+rules that identify the origins that you will allow to access your bucket, the operations (HTTP methods) that will support each origin, 
+and other operation-specific information. You can add up to 100 rules to the configuration. You can add the CORS configuration as the 
+cors subresource to the bucket.
+
+If you are configuring CORS in the S3 console, you must use JSON to create a CORS configuration. The new S3 console only supports JSON CORS configurations.
+
+
+S3 Transfer Acceleration - 
+------------------------
+Amazon S3 Transfer Acceleration enables fast, easy, and secure transfers of files over long distances between your client and your Amazon S3 bucket. 
+S3 Transfer Acceleration leverages Amazon CloudFront’s globally distributed AWS Edge Locations. As data arrives at an AWS Edge Location, 
+data is routed to your Amazon S3 bucket over an optimized network path.
+
+S3 Access Analyzer - 
+-------------------
+Access Analyzer for S3 is a feature that monitors your access policies, ensuring that the policies provide only the intended access to your S3 resources. 
+Access Analyzer for S3 evaluates your bucket access policies and enables you to discover and swiftly remediate buckets with potentially unintended access.
+
+Access Analyzer for S3 helps review all buckets that have bucket access control lists (ACLs), bucket policies, or access point policies that 
+grant public or shared access. Access Analyzer for S3 alerts you to buckets that are configured to allow access to anyone on the internet or 
+other AWS accounts, including AWS accounts outside of your organization.
+
+
+S3 Access Points - 
+-----------------
+Amazon S3 Access Points simplifies managing data access at scale for applications using shared data sets on S3. With S3 Access Points, 
+you can now easily create hundreds of access points per bucket, representing a new way of provisioning access to shared data sets. 
+Access Points provide a customized path into a bucket, with a unique hostname and access policy that enforces the specific permissions 
+and network controls for any request made through the access point.
+
+S3 Object Ownership -  bucket-owner-full-control
+------------------------------------------------
+S3 Object Ownership is an Amazon S3 bucket setting that you can use to control ownership of new objects that are uploaded to your buckets. 
+By default, when other AWS accounts upload objects to your bucket, the objects remain owned by the uploading account. With S3 Object Ownership, 
+any new objects that are written by other accounts with the bucket-owner-full-control canned access control list (ACL) automatically become 
+owned by the bucket owner, who then has full control of the objects.
+
+S3 Object Ownership has two settings: 1. Object writer – The uploading account will own the object. 2. Bucket owner preferred – 
+The bucket owner will own the object if the object is uploaded with the bucket-owner-full-control canned ACL. Without this setting 
+and canned ACL, the object is uploaded and remains owned by the uploading account.
+
+
+Server side Encryption are of three types:     ( SSE-S3, SSE-KMS, SSE-C)
+=========================================
+
+1) SSE-S3: (SSE with AWS S3-Managed Keys )
+-------------------------------------------
+In this mode of SSE, AWS S3 manages and handles the encryption keys. It uses a unique key to encrypt each object on the server side using AES-256. 
+The client doesn’t directly access the encryption key or use it to encrypt and decrypt your data manually. AWS S3 also encrypts that unique key 
+using a root or master key, adding an extra layer of security. The root key is also rotated regularly, making it difficult for attackers to 
+find the unique key. There is no additional charge for this encryption other than requests for default encryption configuration.
+
+You can use a bucket policy to enforce this encryption. For instance, you can add a check if the data upload request header contains 
+the x-and-server-side-encryption and denies the upload operation if it doesn’t have it.
+However, you cannot enforce SSE-S3 encryption when you upload files using pre-signed URLs.
+
+2) SSE-KMS: (SSE with AWS Key Managed Service)
+---------------
+In contrast to SSE-S3, SSE-KMS includes additional layers of security and charges. S3 uses the AWS Key Management Service (AWS KMS) keys 
+for encrypting bucket objects. AWS KMS is a specifically designed service for managing encryption keys at scale in the cloud. Therefore, 
+users benefit from the additional security and features provided by KMS.
+
+SSE-KMS allows you to create keys centrally and define their usage through policies. Also, you can find out when and who used those keys 
+to ensure the keys are being used properly. When using SSE-KMS keys with S3, both the bucket and the keys need to locate in the same region.
+
+Furthermore, you need separate permissions to use SSE-KMS. For example, use the kms:GenerateDataKey permission to use KMS keys when uploading 
+an object. If you need to download an object with SSE-KMS encryption, you must define kms: Decrypt as permission.
+
+3) SSE-C  (SSE with Customer-Provided Keys)
+-------------------------------------------
+If you are not ready to hand over the encryption key management to AWS services but want to take that responsibility yourself, SSE-C is an 
+ideal option. In SSE-C encryption, you manage the encryption keys on your own, while S3 manages the encryption and decryption processes. 
+When uploading an object into your S3 bucket, S3 uses your encryption key to encrypt them.
+
+You must provide the same key to download the objects. Then it checks if the customer-provided key matches the correct key. S3 will only 
+proceed with the encryption if the provided key is valid. Once the encryption finishes, S3 removes it from its memory.
+
+
+GenerateDataKey operation
+=========================
+Make a GenerateDataKey API call that returns a plaintext key and an encrypted copy of a data key. Use a plaintext key to encrypt 
+the data - GenerateDataKey API, generates a unique symmetric data key for client-side encryption. This operation returns a plaintext 
+copy of the data key and a copy that is encrypted under a customer master key (CMK) that you specify. You can use the plaintext key to 
+encrypt your data outside of AWS KMS and store the encrypted data key with the encrypted data.
+
+
+GenerateDataKey returns a unique data key for each request. The bytes in the plaintext key are not related to the caller or the CMK.
+
+
+Steps to encrypt data outside of AWS KMS:
+----------------------------------------
+1) Use the GenerateDataKey operation to get a data key.
+2) Use the plaintext data key (in the Plaintext field of the response) to encrypt your data outside of AWS KMS. Then erase the plaintext data key from memory.
+3) Store the encrypted data key (in the CiphertextBlob field of the response) with the encrypted data.
+
+
+Steps to decrypt data outside of AWS KMS:
+-----------------------------------------
+1) Use the Decrypt operation to decrypt the encrypted data key. The operation returns a plaintext copy of the data key.
+2) Use the plaintext data key to decrypt data outside of AWS KMS, then erase the plaintext data key from memory.
+
+
+
+================================================================================================================================================
+ALB  Application Load Balancer:
+-------------------------------
+
+
+Use the header X-Forwarded-For - 
+------------------------------
+The X-Forwarded-For request header helps you identify the IP address of a client when you use an HTTP or HTTPS load balancer. 
+Because load balancers intercept traffic between clients and servers, your server access logs contain only the IP address 
+of the load balancer. To see the IP address of the client, use the X-Forwarded-For request header. Elastic Load Balancing 
+stores the IP address of the client in the X-Forwarded-For request header and passes the header to your server
+
+Sticky sessions are enabled for the load balancer - 
+-------------------------------------------------
+This can be the reason for potential unequal traffic routing by the load balancer. Sticky sessions are a mechanism to route requests to 
+the same target in a target group. This is useful for servers that maintain state information in order to provide a continuous experience 
+to clients. To use sticky sessions, the clients must support cookies.
+
+When a load balancer first receives a request from a client, it routes the request to a target, generates a cookie named AWSALB that 
+encodes information about the selected target, encrypts the cookie, and includes the cookie in the response to the client. The client 
+should include the cookie that it receives in subsequent requests to the load balancer. When the load balancer receives a request from 
+a client that contains the cookie, if sticky sessions are enabled for the target group and the request goes to the same target group, 
+the load balancer detects the cookie and routes the request to the same target.
+
+If you use duration-based session stickiness, configure an appropriate cookie expiration time for your specific use case. If you set 
+session stickiness from individual applications, use session cookies instead of persistent cookies where possible.
+
+
+Instances of a specific capacity type aren’t equally distributed across Availability Zones - 
+-------------------------------------------------------------------------------------------
+A Classic Load Balancer with HTTP or HTTPS listeners might route more traffic to higher-capacity instance types. This distribution aims to prevent 
+lower-capacity instance types from having too many outstanding requests. It’s a best practice to use similar instance types and configurations to 
+reduce the likelihood of capacity gaps and traffic imbalances.
+
+A traffic imbalance might also occur if you have instances of similar capacities running on different Amazon Machine Images (AMIs). In this scenario, 
+the imbalance of the traffic in favor of higher-capacity instance types is desirable.
+
+Note:
+-)  With Application Load Balancers, cross-zone load balancing is always enabled.
+
+
+===============================================================================================================================================
+Elasticache Redis:
+-----------------
+
+Implement Amazon ElastiCache Redis in Cluster-Mode - 
+--------------------------------------------------
+One can leverage ElastiCache for Redis with cluster mode enabled to enhance reliability and availability with little change 
+to your existing workload. Cluster mode comes with the primary benefit of horizontal scaling of your Redis cluster, with 
+almost zero impact on the performance of the cluster.
+
+When building production workloads, you should consider using a configuration with replication, unless you can easily 
+recreate your data. Enabling Cluster-Mode provides a number of additional benefits in scaling your cluster. In short, 
+it allows you to scale in or out the number of shards (horizontal scaling) versus scaling up or down the node 
+type (vertical scaling). This means that Cluster-Mode can scale to very large amounts of storage (potentially 100s of terabytes) 
+across up to 90 shards, whereas a single node can only store as much data in memory as the instance type has capacity for.
+
+Implement Amazon ElastiCache Memcached - 
+--------------------------------------
+Redis and Memcached are popular, open-source, in-memory data stores. Although they are both easy to use and offer high 
+performance, there are important differences to consider when choosing an engine. Memcached is designed for simplicity
+while Redis offers a rich set of features that make it effective for a wide range of use cases. Redis offers snapshots 
+facility, replication, and supports transactions, which Memcached cannot and hence ElastiCache Redis is the right 
+choice for our use case.
+
+====================================================================================================
+API Gateway:
+-----------
+Restrict access by using CORS - 
+-------------------------------
+Cross-origin resource sharing (CORS) defines a way for client web applications that are loaded in one domain to interact with resources in a 
+different domain. When your API's resources receive requests from a domain other than the API's own domain and you want to restrict servicing 
+these requests, you must disable cross-origin resource sharing (CORS) for selected methods on the resource.
+
+
+Use Account-level throttling - 
+-----------------------------
+To prevent your API from being overwhelmed by too many requests, Amazon API Gateway throttles requests to your API. By default, API Gateway 
+limits the steady-state request rate to 10,000 requests per second (rps). It limits the burst (that is, the maximum bucket size) to 5,000 
+requests across all APIs within an AWS account. This is Account-level throttling. As you see, this is about limit on the number of 
+requests and is not a suitable answer for the current scenario.
+
+Use Mapping Templates - 
+-----------------------
+A mapping template is a script expressed in Velocity Template Language (VTL) and applied to the payload using JSONPath expressions. 
+Mapping templates help format/structure the data in a way that it is easily readable, unlike a server response that might always be 
+easy to ready. Mapping Templates have nothing to do with access and are not useful for the current scenario.
+
+Assign a Security Group to your API Gateway - 
+---------------------------------------------
+API Gateway does not use security groups but uses resource policies, which are JSON policy documents that you attach to an API to 
+control whether a specified principal (typically an IAM user or role) can invoke the API. You can restrict IP address using this, 
+the downside being, an IP address can be changed by the accessing user. So, this is not an optimal solution for the current use case.
