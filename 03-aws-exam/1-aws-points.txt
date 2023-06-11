@@ -1,0 +1,7 @@
+WAF points
+----------
+
+-) In the WAF we create a Regex, in this Regex we will create a logic to read the token
+-) After that we will create a ACL (active-controll-list) ´, in this ACL we will create a 
+   rule, This rule says, if the Regex match then only let the request go further, else
+   block the request

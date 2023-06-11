@@ -1,0 +1,273 @@
+A-AWS-Organization: 2.60
+P-AWS-Organization: 
+
+A-Organization-Unit: 1.23
+P-Organization-Unit: 
+
+A-Gloal Accelerator: 1.1
+P-Gloal Accelerator: 
+
+A-Lmabda: 1.7, 2.24
+P-Lambda:
+
+A-Amazon-FSx: 1.49, 1.61
+P-Amazon-FSx:
+
+A-Amazon-FSx-Luster: 2.13, 2,14, 2.45
+P-Amazon-FSx-Luster:
+
+A-Amazon-FSx-Windows: 2.47, 2.57
+P-Amazon-FSx-Windows:
+
+A-Snowball-Edge: 1.12
+P-Snowball-Edge:
+
+A-PrivateLink: 1.13, 2.29
+P-PrivateLink: 
+
+A-CloudFront: 1.16, 1.19, 1.33, 1.47, 1.60, 2.2, 2.25, 2.38, 2.39, 2.56
+P-CloudFront:
+
+A-CloudTrail: 2.48, 2.55
+P-CloudTrail:
+
+A-DataSync: 1.20,1.39(i), 2.49
+P-DataSync: 
+
+A-Direct-Connect: 1.39
+P-Direct-Connect:
+
+A-Aurora-global-DB: 1.21
+P-Aurora-global-DB: 1.21
+
+A-EFA: 1.9
+P-EFA: 
+
+A-Ec2: 1.10, 1.45, 1.63, 2.51
+P-Ec2: 
+
+A-Ec2-price: 1.15, 1.30, 1.43, 1.53  
+P-Ec2-price:
+
+A-Ec2-AutoScaling: 2.32, 2.62
+P-Ec2-AutoScaling:
+
+A-ECS: 1.22, 2.64
+P-ECS: 
+
+A-EBS:
+P-EBS:
+
+A-EBS-Price: 1.44(i)
+P-EBS-Price: 
+
+A-EKS: 1.65
+P-EKS:
+
+A-IAM: 1.38, 2.4, 2.5, 2.52, 2.53
+P-IAM:
+
+A-EFS: 1.2, 1.18, 1.36, 2.11, 2.23, 2.50 
+P-EFS
+
+A-NLB: 1.4
+P-NLB: 
+
+A-ALB: 1.28,
+P-ALB:
+
+A-API-Gateway: 2.58
+P-API-Gateway:
+
+A-WAF: 1.52, 2.33
+P-WAF:
+
+A-AWS-Network-Firewall: 2.65
+P-AWS-Network-Firewall:
+
+A-RDS: 1.5, 1.29, 1.34, 1.35, 1.37, 1.50, 2.7, 2.9, 2.27, 2.37, 2.42
+P-RDS: 
+
+A-RDS-Proxy: 2.40
+P-RDS-Proxy:
+
+A-Aurora MySQL: 2.44
+P-Aurora MySQL:
+
+A-DynamoDB: 2.61
+P-DynamoDB:
+
+A-S3: 1.6, 1.25, 1.32, 1.59, 1.64, 2.10
+P-S3:
+
+A-S3-Encryption: 2.63
+P-S3-Encryption:
+
+A-S3-Lifecycle-policy: 2.36
+P-S3-Lifecycle-policy:
+
+A-ECS: 1.62, 2.64
+P-ECS:
+
+A-ECS-Fargate: 2.31, 2.41
+P-ECS-Fargate:
+
+A-VPC: 1.41, 2.3
+P-VPC:
+
+A-SQS: 1.11, 1.14, 1.17(RBP), 1.42, 1.51, 2.19, 2.34
+P-SQS:
+
+A-SQS-FIFO: 3.1
+P-SQS-FIFO:
+
+A-MQ: 1.40
+P-MQ:
+
+A-Stograge-Gateway: 1.24(I), 1.31, 1.54(i), 2.6, 2.22
+P-Stograge-Gateway:
+
+A-VPC-Interface-Endpoint: 1.27(i)
+P-VPC-Interface-Endpoint: 
+
+A-VPC-Gateway-Endpoint: 1.27(i), 1.57, 2.30
+P-VPC-Gateway-Endpoint: 
+
+A-Kinesis-Data-Stream & Firehose: 1.46, 2.8, 2.54
+P-Kinesis-Data-Stream & Firehose:
+
+A-Route-53: 1.55, 1.56(i)
+P-Route-53:
+
+A-Security-Group: 2.1
+P-Security-Group:
+
+Â-Presigned-URL: 2.10
+P-Presigned-URL: 
+
+A-SnowBall: 2.12, 2.16 
+P-SnowBall:
+
+A-Direct-Connect (DX): 2.17
+P-Direct-Connect (DX):
+
+A-Direct-Connect-Link: 2.15
+P-Direct-Connect-Link:
+
+A-Transit-Gateway: 2.18
+P-Transit-Gateway:
+
+A-AMI: 2.20
+P-AMI:
+
+A-Glue: 2.21
+P-Glue:
+
+A-Cluster-Placement-Group: 2.26
+P-Cluster-Placement-Group:
+
+A-ElastiCache: 2.35
+P-ElastiCache:
+
+A-RedShift: 2.46
+P-RedShift:
+
+A-QuickSight-Dashboard: 2.55
+P-QuickSight-Dashboard:
+
+
+----------------------------------------------------------
+i am on 2.48
+
+NAS:       Network Attached Storage
+RBP:       Resource-based-policy
+SMB:       Server Message Block (protocol)
+AWS DX:    Amazon Direct Connect
+AWS VIFs:  Aws Direct Connect Virtual Interface (public or private Virtural Interface)
+
+#############################################################################################################
+Important Points:
+-----------------
+EBS:   We can multi-attach an EBS volume to multiple EC2 instances but the instances must be in the same AZ.
+
+
+Cluster Placement Group:
+------------------------
+A cluster placement group provides low latency and high throughput for instances deployed in a single AZ. 
+It is the best way to provide the performance required for this application
+
+Partition Placement Group:
+--------------------------
+A partition placement group is used for grouping instances into logical segments. It provides control and 
+visibility into instance placement but is not the best option for performance.
+
+Spread Placement Group:
+----------------------
+A spread placement group is used to spread instances across underlying hardware. 
+It is not the best option for performance.
+
+
+==============================================================================================
+S3
+==
+
+S3 Standard-IA:
+--------------
+S3 Standard-IA is for data that is accessed less frequently, but requires rapid access when needed. S3 Standard-IA offers 
+the high durability, high throughput, and low latency of S3 Standard, with a low per GB storage price and per GB retrieval charge
+
+
+S3 One Zone-IA:
+--------------
+S3 One Zone-IA is for data that is accessed less frequently, but requires rapid access when needed. Unlike other 
+S3 Storage Classes which store data in a minimum of three Availability Zones (AZs), S3 One Zone-IA stores data in a 
+single AZ and costs 20% less than S3 Standard-IA.
+
+
+Their are three type of life-cycle actions:  <- these "life-cycle" actions mean that we can change the data from one tarif to another 
+
+1) INTELLIGENT_TIERING:
+----------------------
+
+
+
+
+
+2) STANDARD_IA:
+---------------
+
+
+
+
+3) ONEZONE_IA:
+--------------
+
+
+
+4) REDUCED_REDUNDANCY:
+----------------------
+
+
+5) GLACIER:
+----------
+
+==============================================================================================
+DLM (Amazon Data Lifecycle Manager )
+-------------------------------------
+DLM is used for automating the process of taking and managing snapshots for EBS volumes
+
+
+==============================================================================================
+AWS Shield: 
+----------
+It is used to protect against DDoS attacks.
+
+
+##########################################################################################################
+Open-Question:
+--------------
+1) EBS--  "RAID 0"  "RAID 1" ?
+
+2) What is "Cluster Placement Group" and "Partition Placement Group" ?
+
+3) S3-bucket       "S3 Standard-IA"  or  "S3 One Zone-IA"
