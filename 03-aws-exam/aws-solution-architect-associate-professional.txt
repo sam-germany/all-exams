@@ -13,25 +13,28 @@ P-Lambda:
 A-Amazon-FSx: 1.49, 1.61
 P-Amazon-FSx:
 
-A-Amazon-FSx-Luster: 2.13, 2,14, 2.45
+A-Amazon-FSx-Luster: 2.13, 2,14, 2.45, 3.31
 P-Amazon-FSx-Luster:
 
-A-Amazon-FSx-Windows: 2.47, 2.57
+A-Amazon-FSx-Windows: 2.47, 2.57, 3.12(i), 3.24
 P-Amazon-FSx-Windows:
 
 A-Snowball-Edge: 1.12
 P-Snowball-Edge:
 
-A-PrivateLink: 1.13, 2.29
+A-PrivateLink: 1.13, 2.29, 3.39(i)
 P-PrivateLink: 
 
-A-CloudFront: 1.16, 1.19, 1.33, 1.47, 1.60, 2.2, 2.25, 2.38, 2.39, 2.56
+A-CloudFront: 1.16, 1.19, 1.33, 1.47, 1.60, 2.2, 2.25, 2.38, 2.39, 2.56, 3.40(i)
 P-CloudFront:
 
-A-CloudTrail: 2.48, 2.55
+A-CloudTrail: 2.48, 2.55, 3.33(i)
 P-CloudTrail:
 
-A-DataSync: 1.20,1.39(i), 2.49
+A-CloudWatch: 3.3, 3.4
+P-CloudWatch:
+
+A-DataSync: 1.20,1.39(i), 2.49, 3.48
 P-DataSync: 
 
 A-Direct-Connect: 1.39
@@ -43,31 +46,37 @@ P-Aurora-global-DB: 1.21
 A-EFA: 1.9
 P-EFA: 
 
-A-Ec2: 1.10, 1.45, 1.63, 2.51
+A-Ec2: 1.10, 1.45, 1.63, 2.51, 3.16
 P-Ec2: 
 
 A-Ec2-price: 1.15, 1.30, 1.43, 1.53  
 P-Ec2-price:
 
-A-Ec2-AutoScaling: 2.32, 2.62
+A-Ec2-AutoScaling: 2.32, 2.62, 3.2, 3.15, 3.32, 3.54
 P-Ec2-AutoScaling:
 
-A-ECS: 1.22, 2.64
+A-Ec2-Instance-Store: 3.10
+P-Ec2-Instance-Store:  
+
+A-Ec2-Cluster-Placement-Group: 3.49
+P-Ec2-Cluster-Placement-Group:
+
+A-ECS: 1.22, 2.64, 3.29
 P-ECS: 
 
 A-EBS:
 P-EBS:
 
-A-EBS-Price: 1.44(i)
+A-EBS-Price: 1.44(i), 3.28
 P-EBS-Price: 
 
 A-EKS: 1.65
 P-EKS:
 
-A-IAM: 1.38, 2.4, 2.5, 2.52, 2.53
+A-IAM: 1.38, 2.4, 2.5, 2.52, 2.53, 3.25, 3.26
 P-IAM:
 
-A-EFS: 1.2, 1.18, 1.36, 2.11, 2.23, 2.50 
+A-EFS: 1.2, 1.18, 1.36, 2.11, 2.23, 2.50, 3.7 
 P-EFS
 
 A-NLB: 1.4
@@ -76,7 +85,7 @@ P-NLB:
 A-ALB: 1.28,
 P-ALB:
 
-A-API-Gateway: 2.58
+A-API-Gateway: 2.58, 3.21, 3.43
 P-API-Gateway:
 
 A-WAF: 1.52, 2.33
@@ -85,25 +94,31 @@ P-WAF:
 A-AWS-Network-Firewall: 2.65
 P-AWS-Network-Firewall:
 
-A-RDS: 1.5, 1.29, 1.34, 1.35, 1.37, 1.50, 2.7, 2.9, 2.27, 2.37, 2.42
+A-RDS: 1.5, 1.29, 1.34, 1.35, 1.37, 1.50, 2.7, 2.9, 2.27, 2.37, 2.42, 3.35
 P-RDS: 
 
 A-RDS-Proxy: 2.40
 P-RDS-Proxy:
 
-A-Aurora MySQL: 2.44
+A-Aurora MySQL: 2.44, 3.14
 P-Aurora MySQL:
 
-A-DynamoDB: 2.61
+A-Aurora-MySQL-Cluster: 3.46(i)
+P-Aurora-MySQL-Cluster:
+
+A-Aurora-Serverless: 3.41
+P-Aurora-Serverless:
+
+A-DynamoDB: 2.61, 3.8
 P-DynamoDB:
 
-A-S3: 1.6, 1.25, 1.32, 1.59, 1.64, 2.10
+A-S3: 1.6, 1.25, 1.32, 1.59, 1.64, 2.10, 3.22, 3.42, 3.53
 P-S3:
 
 A-S3-Encryption: 2.63
 P-S3-Encryption:
 
-A-S3-Lifecycle-policy: 2.36
+A-S3-Lifecycle-policy: 2.36, 3.5, 3.51
 P-S3-Lifecycle-policy:
 
 A-ECS: 1.62, 2.64
@@ -112,10 +127,16 @@ P-ECS:
 A-ECS-Fargate: 2.31, 2.41
 P-ECS-Fargate:
 
-A-VPC: 1.41, 2.3
+A-VPC: 1.41, 2.3, 3.39(i), 3.44
 P-VPC:
 
-A-SQS: 1.11, 1.14, 1.17(RBP), 1.42, 1.51, 2.19, 2.34
+A-VPN: 3.19(i)
+P-VPN:
+
+A-Virtual-Private-Gateway: 3.19(i)
+P-Virtual-Private-Gateway:
+
+A-SQS: 1.11, 1.14, 1.17(RBP), 1.42, 1.51, 2.19, 2.34, 3.30, 3.37, 3.45
 P-SQS:
 
 A-SQS-FIFO: 3.1
@@ -124,19 +145,23 @@ P-SQS-FIFO:
 A-MQ: 1.40
 P-MQ:
 
-A-Stograge-Gateway: 1.24(I), 1.31, 1.54(i), 2.6, 2.22
+A-Stograge-Gateway: 1.24(I), 1.31, 1.54(i), 2.6, 2.22, 3.17
 P-Stograge-Gateway:
+
+A-AWS Storage Gateway volume gateway: 
+P-AWS Storage Gateway volume gateway:
 
 A-VPC-Interface-Endpoint: 1.27(i)
 P-VPC-Interface-Endpoint: 
 
-A-VPC-Gateway-Endpoint: 1.27(i), 1.57, 2.30
-P-VPC-Gateway-Endpoint: 
+(VPC-Gateway-Endpoint is only for  S3 and DynamoDB)
+A-VPC-Gateway-Endpoint or (VPC-Endpoint): 1.27(i), 1.57, 2.30, 3.18, 3.36
+P-VPC-Gateway-Endpoint or (VPC-Endpoint): 
 
 A-Kinesis-Data-Stream & Firehose: 1.46, 2.8, 2.54
 P-Kinesis-Data-Stream & Firehose:
 
-A-Route-53: 1.55, 1.56(i)
+A-Route-53: 1.55, 1.56(i), 3.6
 P-Route-53:
 
 A-Security-Group: 2.1
@@ -145,7 +170,7 @@ P-Security-Group:
 Â-Presigned-URL: 2.10
 P-Presigned-URL: 
 
-A-SnowBall: 2.12, 2.16 
+A-SnowBall: 2.12, 2.16, 3.50 
 P-SnowBall:
 
 A-Direct-Connect (DX): 2.17
@@ -160,14 +185,20 @@ P-Transit-Gateway:
 A-AMI: 2.20
 P-AMI:
 
+A-Network-ACLs: 3.34(i)
+P-Network-ACLs:
+
+A-Security-Group: 3.34(i)
+P-Security-Group:
+
 A-Glue: 2.21
 P-Glue:
 
 A-Cluster-Placement-Group: 2.26
 P-Cluster-Placement-Group:
 
-A-ElastiCache: 2.35
-P-ElastiCache:
+A-ElastiCache-Redis: 2.35, 3.13
+P-ElastiCache-Redis:
 
 A-RedShift: 2.46
 P-RedShift:
@@ -175,15 +206,45 @@ P-RedShift:
 A-QuickSight-Dashboard: 2.55
 P-QuickSight-Dashboard:
 
+A-Bastion-Host: 2.9
+P-Bastion-Host:
 
-----------------------------------------------------------
-i am on 2.48
+A-CloudFormation: 3.20(i)
+P-CloudFormation:
 
-NAS:       Network Attached Storage
-RBP:       Resource-based-policy
-SMB:       Server Message Block (protocol)
-AWS DX:    Amazon Direct Connect
-AWS VIFs:  Aws Direct Connect Virtual Interface (public or private Virtural Interface)
+A-Global-Accelerator: 3.23(i), 3.52(i)
+P-Global-Accelerator:
+
+A-GuardDuty: 3.27
+P-GuardDuty:
+
+A-Amazon Quantum Ledger Database (QLDB): 3.38
+P-Amazon Quantum Ledger Database (QLDB)
+
+A-NatGateway: 3.47
+P-NatGateway:
+
+
+============================================================================================
+Some important questions:
+-------------------------
+
+Associate:
+3.39:
+
+Professional:
+
+
+
+============================================================================================
+i am on  3.
+
+NAS:           Network Attached Storage
+RBP:           Resource-based-policy
+SMB:           Server Message Block (protocol)
+UDP:           User Datagram Protocol
+AWS DX:        Amazon Direct Connect
+AWS VIFs:      Aws Direct Connect Virtual Interface (public or private Virtural Interface)
 
 #############################################################################################################
 Important Points:
@@ -194,17 +255,49 @@ EBS:   We can multi-attach an EBS volume to multiple EC2 instances but the insta
 Cluster Placement Group:
 ------------------------
 A cluster placement group provides low latency and high throughput for instances deployed in a single AZ. 
-It is the best way to provide the performance required for this application
+It is the best way to provide the performance required for this application.
+
+It packs instances close together inside an Availability Zone. This strategy enables workloads to achieve the 
+low-latency network performance necessary for tightly-coupled node-to-node communication that is typical of 
+HPC applications
 
 Partition Placement Group:
 --------------------------
 A partition placement group is used for grouping instances into logical segments. It provides control and 
 visibility into instance placement but is not the best option for performance.
 
+It spreads your instances across logical partitions such that groups of instances in one partition do not 
+share the underlying hardware with groups of instances in different partitions. This strategy is typically 
+used by large distributed and replicated workloads, such as Hadoop, Cassandra, and Kafka
+
 Spread Placement Group:
 ----------------------
 A spread placement group is used to spread instances across underlying hardware. 
 It is not the best option for performance.
+
+It strictly places a small group of instances across distinct underlying hardware to reduce correlated failures.
+
+=============================================================================================
+Ec2 AutoScaling:
+================
+
+
+Simple-Scaling-Policy:
+---------------------
+It is used for making simple adjustments up or down based on a threshold value
+
+
+Step-Scaling-Policy:
+-------------------
+It is used for making step adjustments that vary based on the size of the alarm breach.
+
+
+Scheduled-Scaling-Policy:
+------------------------
+It is used for scheduling changes at specific dates and times.
+
+
+
 
 
 ==============================================================================================
@@ -251,6 +344,17 @@ Their are three type of life-cycle actions:  <- these "life-cycle" actions mean 
 5) GLACIER:
 ----------
 
+
+===============================================================================================
+EFS:
+---
+With EFS you can transition files to EFS IA after a file has not been accessed for a specified period 
+of time with options up to 90 days. 
+
+
+
+
+
 ==============================================================================================
 DLM (Amazon Data Lifecycle Manager )
 -------------------------------------
@@ -261,6 +365,71 @@ DLM is used for automating the process of taking and managing snapshots for EBS 
 AWS Shield: 
 ----------
 It is used to protect against DDoS attacks.
+
+
+
+================================================================================================
+Border Gateway Protocol (BGP):
+-----------------------------
+It is used for routing
+
+
+===============================================================================================
+AWS Direct Connect:
+------------------
+It  is used to connect from an on-premises data center to AWS.
+
+
+===============================================================================================
+AWS Direct Connect Gateway:
+--------------------------
+ An AWS Direct Connect Gateway is used to connect to VPCs across multiple AWS regions.
+
+
+===============================================================================================
+AWS Storgate Gateway:
+---------------------
+
+
+AWS Storage Gateway Volume gateway:
+----------------------------------
+A  volume gateway will create EBS snapshots
+
+
+=============================================================================================
+AWS Organizations API:
+---------------------
+You can create member accounts with the AWS Organizations API. However, you cannot use that API to 
+configure the account and create VPCs and subnets
+
+=============================================================================================
+AWS Management Console:
+----------------------
+
+
+=============================================================================================
+Amazon Inspector:
+-----------------
+Inspector is for identifying vulnerabilities and evaluating against security best practices.
+
+=============================================================================================
+Amazon Macie:
+-------------
+Macie is used for detecting and protecting sensitive data that is in Amazon S3.
+
+
+
+
+===========================================================================================
+VPN:
+----
+A virtual private gateway (VGW) is used with a VPN connection
+
+
+
+Virtual-Private-Gateway:
+-----------------------
+A virtual private gateway (VGW) is used with a VPN connection
 
 
 ##########################################################################################################
