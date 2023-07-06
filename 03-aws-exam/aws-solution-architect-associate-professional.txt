@@ -1,8 +1,16 @@
-A-AWS-Organization: 2.60
-P-AWS-Organization: 
+
+
+A-IAM: 1.38, 2.4, 2.5, 2.52, 2.53, 3.25, 3.26, 3.60,
+P-IAM:
+
+A-IAM-Organizations: 2.60, 3.64, 4.49(i)
+P-IAM-Organizations:
 
 A-Organization-Unit: 1.23
 P-Organization-Unit: 
+
+A-Organization: 4.15
+P-Organization: 
 
 A-Gloal Accelerator: 1.1
 P-Gloal Accelerator: 
@@ -10,29 +18,41 @@ P-Gloal Accelerator:
 A-Lmabda: 1.7, 2.24
 P-Lambda:
 
-A-Amazon-FSx: 1.49, 1.61
-P-Amazon-FSx:
-
-A-Amazon-FSx-Luster: 2.13, 2,14, 2.45, 3.31
+A-Amazon-FSx-Luster: 2.13, 2,14, 2.45, 3.31, 3.63
 P-Amazon-FSx-Luster:
 
 A-Amazon-FSx-Windows: 2.47, 2.57, 3.12(i), 3.24
 P-Amazon-FSx-Windows:
 
-A-Snowball-Edge: 1.12
+(For Windows Active Directory)
+A-Amazon-FSx: 1.49, 1.61, 4.32
+P-Amazon-FSx:
+
+A-Snowball-Edge: 1.12, 4.27
 P-Snowball-Edge:
+
+A-Snowball-Devices: 4.24
+P-Snowball-Devices:
+
+A-AWS-Snowmobile (truck): 
+P-AWS-Snowmobile (truck): 
 
 A-PrivateLink: 1.13, 2.29, 3.39(i)
 P-PrivateLink: 
 
-A-CloudFront: 1.16, 1.19, 1.33, 1.47, 1.60, 2.2, 2.25, 2.38, 2.39, 2.56, 3.40(i)
-P-CloudFront:
+A-CloudFront: 1.16, 1.19, 1.33, 1.47, 1.60, 2.2, 2.25, 2.38, 2.39, 2.56, 3.40(i), 3.58, 3.61, 4.20, 4.52
 
-A-CloudTrail: 2.48, 2.55, 3.33(i)
+A-CloudFront-Edge-Functions: 4.50
+P-CloudFront-Edge-Functions:
+
+A-CloudTrail: 2.48, 2.55, 3.33(i), 4.49(i)
 P-CloudTrail:
 
-A-CloudWatch: 3.3, 3.4
+A-CloudWatch: 3.3, 3.4, 4.4
 P-CloudWatch:
+
+A-Unified-CloudWatch-Agent: 4.45(i) 
+A-Unified-CloudWatch-Agent:
 
 A-DataSync: 1.20,1.39(i), 2.49, 3.48
 P-DataSync: 
@@ -49,7 +69,7 @@ P-EFA:
 A-Ec2: 1.10, 1.45, 1.63, 2.51, 3.16
 P-Ec2: 
 
-A-Ec2-price: 1.15, 1.30, 1.43, 1.53  
+A-Ec2-price: 1.15, 1.30, 1.43, 1.53, 4.56  
 P-Ec2-price:
 
 A-Ec2-AutoScaling: 2.32, 2.62, 3.2, 3.15, 3.32, 3.54
@@ -73,10 +93,7 @@ P-EBS-Price:
 A-EKS: 1.65
 P-EKS:
 
-A-IAM: 1.38, 2.4, 2.5, 2.52, 2.53, 3.25, 3.26
-P-IAM:
-
-A-EFS: 1.2, 1.18, 1.36, 2.11, 2.23, 2.50, 3.7 
+A-EFS: 1.2, 1.18, 1.36, 2.11, 2.23, 2.50, 3.7, 4.44 
 P-EFS
 
 A-NLB: 1.4
@@ -91,14 +108,26 @@ P-API-Gateway:
 A-WAF: 1.52, 2.33
 P-WAF:
 
+A-SNS: 4.43
+P-SNS:
+
 A-AWS-Network-Firewall: 2.65
 P-AWS-Network-Firewall:
 
-A-RDS: 1.5, 1.29, 1.34, 1.35, 1.37, 1.50, 2.7, 2.9, 2.27, 2.37, 2.42, 3.35
-P-RDS: 
+A-RDS-DB: 1.5, 1.29, 1.34, 1.35, 1.37, 1.50, 2.7, 2.9, 2.27, 2.37, 2.42, 3.35, 4.18, 4.51
+P-RDS-DB: 
 
 A-RDS-Proxy: 2.40
 P-RDS-Proxy:
+
+A-RDS-MySQL-DB-Instance: 3.55, 4.10
+P-RDS-MySQL-DB-Instance:
+
+A-Aurora-DB: 4.13(i)
+P-Aurora-DB:
+
+A-Aurora-Global-DB: 3.57(i), 4.14
+P-Aurora-Global-DB:
 
 A-Aurora MySQL: 2.44, 3.14
 P-Aurora MySQL:
@@ -109,17 +138,30 @@ P-Aurora-MySQL-Cluster:
 A-Aurora-Serverless: 3.41
 P-Aurora-Serverless:
 
-A-DynamoDB: 2.61, 3.8
+
+A-DynamoDB: 2.61, 3.8, 4.19                              (MongoDB)
 P-DynamoDB:
 
-A-S3: 1.6, 1.25, 1.32, 1.59, 1.64, 2.10, 3.22, 3.42, 3.53
+A-DocumentDB: 4.12
+P-DocumentDB:
+
+A-S3: 1.6, 1.25, 1.32, 1.59, 1.64, 2.10, 3.22, 3.42, 3.53, 4.5, 4.38, 
 P-S3:
 
-A-S3-Encryption: 2.63
+A-S3-Encryption: 2.63, 3.59, 4.41(i)
 P-S3-Encryption:
 
-A-S3-Lifecycle-policy: 2.36, 3.5, 3.51
+A-S3-Lifecycle-policy: 2.36, 3.5, 3.51, 4.3, 4.54(i)
 P-S3-Lifecycle-policy:
+
+A-S3-Access-Points: 4.46
+P-S3-Access-Points:
+
+A-S3-Data-Lake: 3.47
+P-S3-Data-Lake:
+
+A-KMS: 3.59, 3.62
+P-KMS:
 
 A-ECS: 1.62, 2.64
 P-ECS:
@@ -127,7 +169,10 @@ P-ECS:
 A-ECS-Fargate: 2.31, 2.41
 P-ECS-Fargate:
 
-A-VPC: 1.41, 2.3, 3.39(i), 3.44
+A-FahrGate-EKS: 4.12
+P-FahrGate-EKS:
+
+A-VPC: 1.41, 2.3, 3.39(i), 3.44, 4.15
 P-VPC:
 
 A-VPN: 3.19(i)
@@ -136,10 +181,10 @@ P-VPN:
 A-Virtual-Private-Gateway: 3.19(i)
 P-Virtual-Private-Gateway:
 
-A-SQS: 1.11, 1.14, 1.17(RBP), 1.42, 1.51, 2.19, 2.34, 3.30, 3.37, 3.45
-P-SQS:
+A-SQS-Standard-Queue: 1.11, 1.14, 1.17(RBP), 1.42, 1.51, 2.19, 2.34, 3.30, 3.37, 3.45
+P-SQS-Standard-Queue:
 
-A-SQS-FIFO: 3.1
+A-SQS-FIFO: 3.1, 4.40
 P-SQS-FIFO:
 
 A-MQ: 1.40
@@ -151,20 +196,31 @@ P-Stograge-Gateway:
 A-AWS Storage Gateway volume gateway: 
 P-AWS Storage Gateway volume gateway:
 
-A-VPC-Interface-Endpoint: 1.27(i)
-P-VPC-Interface-Endpoint: 
+A-AWS Storage Gateway File gateway: 4.2 
+P-AWS Storage Gateway File gateway:
 
-(VPC-Gateway-Endpoint is only for  S3 and DynamoDB)
-A-VPC-Gateway-Endpoint or (VPC-Endpoint): 1.27(i), 1.57, 2.30, 3.18, 3.36
-P-VPC-Gateway-Endpoint or (VPC-Endpoint): 
 
-A-Kinesis-Data-Stream & Firehose: 1.46, 2.8, 2.54
+
+VPC Endpoints are of two types: Interface-Endpoint and Gateway-Endpoint
+---------------------------------------------------
+A-VPC-Endpoint: 4.35
+P-VPC-Endpoint:
+
+A- VPC Interface Endpoint: 1.27(i)
+P- VPC Interface Endpoint: 
+
+(VPC Gateway Endpoint is only for  S3 and DynamoDB)
+A- VPC-Gateway-Endpoint : 1.27(i), 1.57, 2.30, 3.18, 3.36, 4.8
+P- VPC-Gateway-Endpoint : 
+
+---------------------------------------------------
+A-Kinesis-Data-Stream & Firehose: 1.46, 2.8, 2.54, 4.28
 P-Kinesis-Data-Stream & Firehose:
 
-A-Route-53: 1.55, 1.56(i), 3.6
+A-Route-53: 1.55, 1.56(i), 3.6, 3.58
 P-Route-53:
 
-A-Security-Group: 2.1
+A-Security-Group: 2.1, 4.33
 P-Security-Group:
 
 Â-Presigned-URL: 2.10
@@ -197,7 +253,7 @@ P-Glue:
 A-Cluster-Placement-Group: 2.26
 P-Cluster-Placement-Group:
 
-A-ElastiCache-Redis: 2.35, 3.13
+A-ElastiCache-Redis: 2.35, 3.13, 4.22, 4.23
 P-ElastiCache-Redis:
 
 A-RedShift: 2.46
@@ -212,10 +268,10 @@ P-Bastion-Host:
 A-CloudFormation: 3.20(i)
 P-CloudFormation:
 
-A-Global-Accelerator: 3.23(i), 3.52(i)
+A-Global-Accelerator: 3.23(i), 3.52(i), 4.48
 P-Global-Accelerator:
 
-A-GuardDuty: 3.27
+A-GuardDuty: 3.27, 4.37
 P-GuardDuty:
 
 A-Amazon Quantum Ledger Database (QLDB): 3.38
@@ -224,6 +280,66 @@ P-Amazon Quantum Ledger Database (QLDB)
 A-NatGateway: 3.47
 P-NatGateway:
 
+A-Lake Formation: 3.65
+P-Lake Formation:
+
+A-Redshift:
+P-Redshift:
+
+A-Redshift-Spectrum: 4.6
+P-Redshift-Spectrum:
+
+A-SageMaker: 4.7
+P-SageMaker:
+
+A-Data-Exchange: 4.7
+P-Data-Exchange:
+
+A-Disaster-Recovery: 4.9
+P-Disaster-Recovery:
+
+A-MQ: 4.16
+P-MQ:
+
+A-AWS-Compute-Optimizer: 4.17
+P-AWS-Compute-Optimizer:
+
+A-AWS-Config-Rule: 4.21
+P-AWS-Config-Rule:
+
+A-AWS-AppSync-(GraphQL-API): 4.25
+P-AWS-AppSync-(GraphQL-API):
+
+A-AWS-Private-5G: 4.26
+P-AWS-Private-5G:
+
+A-RAID-0: 4.30(i)
+P-RAID-0:
+
+A-RAID-1: 4.29(i)
+P-RAID-1:
+
+A-AWS-Batch: 4.34(i-HPC)
+P-AWS-Batch:
+
+A-AWS-License-Manager: 4.36
+P-AWS-License-Manager:
+
+A-AWS-Systems-Manager-Parameter-Store: 4.39
+P-AWS-Systems-Manager-Parameter-Store:
+
+A-AWS-Comprehend: 4.47
+P-AWS-Comprehend:
+
+A-AWS-Direct-Connect: 4.53(i)
+P-AWS-Direct-Connect:
+
+A-AWS-Athena: 4.55
+P-AWS-Athena:
+
+
+A-Use-Case: 4.1, 4.31, 4.42
+P-Use-Case: 
 
 ============================================================================================
 Some important questions:
@@ -236,21 +352,39 @@ Professional:
 
 
 
-============================================================================================
-i am on  3.
 
+============================================================================================
+i am on  4.57
+
+HPC:           High Performance Computing
 NAS:           Network Attached Storage
 RBP:           Resource-based-policy
-SMB:           Server Message Block (protocol)
-UDP:           User Datagram Protocol
+
 AWS DX:        Amazon Direct Connect
 AWS VIFs:      Aws Direct Connect Virtual Interface (public or private Virtural Interface)
+OLAP:          Online analytical processing
+OLTP:          Online Transaction Processing 
+
+Protocols:
+----------
+SMB:           Server Message Block (protocol)
+UDP:           User Datagram Protocol (Protocol)
+MPI:           Message Passing Interface (Protocol)
+
+Ports:
+------
+80:       <-- Browser
+80:       <-- HTTP
+443:      <-- HTTPS
+
+
+
 
 #############################################################################################################
 Important Points:
 -----------------
 EBS:   We can multi-attach an EBS volume to multiple EC2 instances but the instances must be in the same AZ.
-
+       You cannot attach EBS volumes in different AZs to an instance.
 
 Cluster Placement Group:
 ------------------------
@@ -277,28 +411,192 @@ It is not the best option for performance.
 
 It strictly places a small group of instances across distinct underlying hardware to reduce correlated failures.
 
+===========================================================================================
+TensorFlow AMI:
+---------------
+
+=======================================================================================
+Amazon Athena:
+-------------
+Amazon Athena is an interactive query service that makes it easy to analyze data in Amazon S3 using standard SQL. 
+Athena is serverless, so there is no infrastructure to setup or manage, and you can start analyzing data 
+immediately. While Amazon Athena is ideal for quick, ad-hoc querying, it can also handle complex analysis,
+ including large joins, window functions, and arrays.
+
+Athena is the fastest way to query the data in Amazon S3 and offers the lowest operational overhead 
+as it is a fully serverless solution.
+
+
+
+=================================================================================================
+Lambda @ Edge                 vs                             CloudFront Functions
+-------------                                             ----------------------
+It runs at the "CloudFront Regional Edge Cache:     |  Their are 218+  Edge Locations in the world, This "CloudFront Functions"
+Their are 13 "Regional Edge Caches" are available   |  can run on these "Edge Location" that is really close to the end user.
+so this Lambda can run on these 13 region Edges     |  So it takes less latency, and it is 6-times cheaper then "Lambda-@-Edge"
+
+
+
+https://www.google.com/search?client=firefox-b-d&sxsrf=AB5stBiTgy-tCG-SY5FNzExyGp0Yl2kADg:1688643753840&q=cloudfront+functions+vs+lambda%40edge&uds=G04A-MXytn38IJj124QiRKGo-tv_FNgwfUo041QkmThBmsWFXb0YMptKNu3mw5W9HmSiEzM-&tbm=isch&sa=X&ved=2ahUKEwjt3OWYgPr_AhXQ66QKHeI_BjwQ0pQJegQICxAB&biw=2061&bih=841&dpr=1.76#imgrc=OCY79Uzhgo7MvM
+
+
+=================================================================================================
+AWS Batch:
+An AWS Batch multi-node parallel job is compatible with any framework that supports IP-based, 
+internode communication, such as Apache MXNet, TensorFlow, Caffe2, or Message Passing Interface (MPI).
+
+===================================================================================================
+Cognito:
+--------
+You cannot use Cognito to connect S3 to Active Directory.
+
+======================================================================================================
+AWS Comprehend:
+----------------
+Amazon Comprehend is a natural-language processing (NLP) service that uses machine learning to uncover 
+valuable insights and connections in text.
+You could easily use Amazon Comprehend to detect customer sentiment and analyze customer interactions 
+and automatically extract insights from customer surveys to improve your products. An S3 Data Lake 
+also acts as an ideal data repository for Machine Learning data used by many different business units and applications.
+
+Amazon Textract:
+----------------
+Amazon Textract is a machine learning (ML) service that automatically extracts text, handwriting, 
+and data from scanned documents
+
+Amazon Kendra:
+-------------
+Amazon Kendra is a highly accurate intelligent search service powered by machine learning
+
+====================================================================================================
+Disaster Recovery Strategy:
+--------------------------
+
+1) Multi-site Strategy:
+-----------------------
+A multi-site solution runs on AWS as well as on your existing on-site infrastructure in an active- active configuration.
+
+
+2) Warm standby Strategy:
+--------------------------
+The term warm standby is used to describe a DR scenario in which a scaled-down version of a fully 
+functional environment is always running in the cloud.
+
+
+3) Pilot Light Strategy:
+------------------------
+In this DR approach, you simply replicate part of your IT structure for a limited set of core services so 
+that the AWS cloud environment seamlessly takes over in the event of a disaster.
+
+A small part of your infrastructure is always running simultaneously syncing mutable data 
+(as databases or documents), while other parts of your infrastructure are switched off 
+and used only during testing.
+
+Unlike a backup and recovery approach, you must ensure that your most critical core elements 
+are already configured and running in AWS (the pilot light). When the time comes for recovery, 
+you can rapidly provision a full-scale production environment around the critical core.
+
+4) Backup and restore Strategy:
+-------------------------------
+This is the lowest cost DR approach that simply entails creating online backups of all data and applications.
+
+
+============================================================================================
+Standard Queue                                                    FIFO Queue
+--------------                                                 ------------------
+1) Unlimited Throughput:                                  | 1) High Throughput: FIFO queues support up tp 300 message     
+Standard queues support a                                 |    per second (300 send, receive, or delete operations per second).
+nearly unlimited number of transactions per second        |When you batch 10 messages per operation(maximum). FIFO queues can support up to
+per API Action                                            | 3000 messages per second.
+                                                          |
+2) Best Effort Ordering occasionally, messages might      |2) First-In-First-Out Delivery. The order in which messages are sent and 
+be delivered in an order different from which they        |   received is strictly preserved.
+were sent                                                 |
+                                                          | 
+3) At-Least-Once Delivery:                                |3) Exactly-Once Processing: A message is delivered once and remains available
+A message is delivered at least once, but Ocassionally    |   until a consumer processes and deletes it, Duplicates are not introduced into
+more than one copy of a message is delivered              |   the queue
+
+
+
+
 =============================================================================================
+EC2:
+====
+
+On-Demand Capacity Reservations:
+-------------------------------
+On-Demand Capacity Reservations enable you to reserve compute capacity for your Amazon EC2 instances in a 
+specific Availability Zone for any duration. By creating Capacity Reservations, you ensure that you always 
+have access to EC2 capacity when you need it, for as long as you need it. When used in combination with 
+savings plans, you can also gain the advantages of cost reduction.
+
+
+
+
+---------------------------------------------------------
 Ec2 AutoScaling:
 ================
 
-
-Simple-Scaling-Policy:
+1) Simple-Scaling-Policy:
 ---------------------
 It is used for making simple adjustments up or down based on a threshold value
 
 
-Step-Scaling-Policy:
+2) Step-Scaling-Policy:
 -------------------
 It is used for making step adjustments that vary based on the size of the alarm breach.
 
 
-Scheduled-Scaling-Policy:
+3) Scheduled-Scaling-Policy:
 ------------------------
 It is used for scheduling changes at specific dates and times.
 
+=================================================================================================
+AWS SageMaker:
+--------------
+Amazon SageMaker allows you to build, train, and deploy machine learning models for any use case 
+with fully managed infrastructure, tools, and workflows
+
+
+====================================================================================================
+AWS Private 5G :
+----------------
+AWS Private 5G is a managed service that makes it easy to deploy, operate, and scale your own private 
+cellular network, with all required hardware and software provided by AWS.
+
+
+AWS Wavelength:
+--------------
+AWS Wavelength is incorrect. AWS Wavelength embeds AWS compute and storage services within 5G networks, 
+providing mobile edge computing infrastructure for developing, deploying, and scaling ultra-low-latency applications.
+
+
+===================================================================================================
+AWS CloudHSM:
+-------------
+AWS CloudHSM is a cloud-based hardware security module (HSM) that enables you to easily generate 
+and use your own encryption keys on the AWS Cloud.
 
 
 
+AWS Outposts:
+------------
+AWS Outposts is a family of fully managed solutions delivering AWS infrastructure and services to virtually 
+any on-premises or edge location for a truly consistent hybrid experience
+
+
+
+
+
+
+
+====================================================================================================
+AWS Data Echange:
+-----------------
+AWS Data Exchange allows you to gain access to third party data sets across Automotive, 
+Financial Services, Gaming, Healthcare & Life Sciences, Manufacturing, Marketing, Media & Entertainment,
+Retail, and many more industries
 
 ==============================================================================================
 S3
@@ -319,30 +617,95 @@ single AZ and costs 20% less than S3 Standard-IA.
 
 Their are three type of life-cycle actions:  <- these "life-cycle" actions mean that we can change the data from one tarif to another 
 
-1) INTELLIGENT_TIERING:
-----------------------
+1) S3_INTELLIGENT_TIERING:
+--------------------------
 
 
 
 
 
-2) STANDARD_IA:
----------------
+2) S3_STANDARD_IA:
+------------------
 
 
 
 
-3) ONEZONE_IA:
+3) S3_ONEZONE_IA:
+-----------------
+
+
+
+4) S3_REDUCED_REDUNDANCY:
+------------------------
+
+
+5) S3_GLACIER:
 --------------
 
+S3 Object Lock:
+--------------
+With S3 Object Lock, you can store objects using a write-once-read-many (WORM) model. In compliance mode, a protected 
+object version can't be overwritten or deleted by any user, including the root user in your AWS account
 
 
-4) REDUCED_REDUNDANCY:
-----------------------
+================================================================================================
+RedShift and RedShift spectrum:
+------------------------------
+RedShift and RedShift spectrum are suitable for running massive analytics jobs on both the 
+structured (RedShift data warehouse) and unstructured (Amazon S3) data.
 
 
-5) GLACIER:
-----------
+
+===============================================================================================
+KMS (Key Management System):
+---------------------------
+
+
+Customer Managed Keys (CMK):
+----------------------------
+Customer managed CMKs are CMKs in your AWS account that you create, own, and manage. You have full control 
+over these CMKs, including establishing and maintaining their key policies, IAM policies, and grants, 
+enabling and disabling them, rotating their cryptographic material, adding tags, creating aliases that 
+refer to the CMK, and scheduling the CMKs for deletion.
+
+
+
+
+
+
+================================================================================================
+VPC Endpoints:
+--------------
+VPC endpoints and are connected to by instances in subnets via route table entries or via ENIs (depending on which service).
+
+Their are two types of VPC Endpoints:
+
+
+Interface Endpoint                                           Gateway Endpoint:
+-----------------                                           -----------------
+a) Elastic Network interface with a Private IP     |a)  A gateway endpoint is a target for a specific route
+b) Uses DNS entries to redirect traffic            |b)  Uses prefix lists in the route table to redirect traffic
+c) API Gateway, CloudFormation , CloudWatch etc..  |c)  Amazon S3, DynamoDB
+d) Security Groups                                 |d)  VPC Endpoints Policies 
+
+Gateway Endpoint:
+----------------
+A gateway endpoint is a gateway that you specify in your route table to access Amazon S3 from your VPC over the AWS network.
+
+Interface Endpoint:
+------------------
+Interface endpoints extend the functionality of gateway endpoints by using private IP addresses to route requests 
+to Amazon S3 from within your VPC, on premises, or from a VPC in another AWS Region using VPC peering or AWS Transit Gateway.
+
+Note:
+----
+Using an Interface endpoint to grant access to your S3 bucket from your EC2 instance is a safe and reliable way of 
+traversing the AWS Global Backbone, instead of moving data over the public internet. Adding a resource policy to only 
+allow the EC2 instance IAM role will lockdown the access to this EC2 instance only.
+
+
+
+
 
 
 ===============================================================================================
@@ -352,7 +715,16 @@ With EFS you can transition files to EFS IA after a file has not been accessed f
 of time with options up to 90 days. 
 
 
+EFS Infrequent Access(IA) Storage:
+----------------------------------
+The solution uses Amazon EFS, and the files are only accessed for a few days. To reduce storage costs 
+the Solutions Architect can configure the AFTER_7_DAYS lifecycle policy to transition the files to 
+the IA storage class 7 days after the files are last accessed.
 
+You define when Amazon EFS transitions files an IA storage class by setting a lifecycle policy. 
+A file system has one lifecycle policy that applies to the entire file system. If a file is not 
+accessed for the period of time defined by the lifecycle policy that you choose, Amazon EFS transitions 
+the file to the IA storage class that is applicable to your file system.
 
 
 ==============================================================================================
@@ -418,6 +790,11 @@ Amazon Macie:
 Macie is used for detecting and protecting sensitive data that is in Amazon S3.
 
 
+===================================================================================================
+Amazon Macie:
+------------
+Amazon Macie cannot be used with RDS.
+
 
 
 ===========================================================================================
@@ -440,3 +817,29 @@ Open-Question:
 2) What is "Cluster Placement Group" and "Partition Placement Group" ?
 
 3) S3-bucket       "S3 Standard-IA"  or  "S3 One Zone-IA"
+
+
+
+##########################################################################################################
+DB
+--
+
+==============================================================================================
+Amazon RDS MySQL DB instance:
+----------------------------
+You cannot create a cross-region Multi-AZ deployment with RDS.
+You cannot read from the standby in an Amazon RDS database cluster (you can with Aurora though).
+
+
+
+RDS Disaster Recovery:
+----------------------
+RTO is a measure of how quickly can your application recover after an outage. 
+RPO is a measure of the maximum amount of data loss that your application can tolerate
+
+
+
+Amazon RDS: (cross-Region replica)
+----------------------------------
+A cross-Region replica for RDS cannot provide an RPO of 1 second as there is typically more latency. 
+You also cannot achieve a minute RPO as it takes much longer to promote a replica to a master.
