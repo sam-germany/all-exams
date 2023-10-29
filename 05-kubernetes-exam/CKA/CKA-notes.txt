@@ -1,0 +1,1569 @@
+i am on video: 169
+
+Lectures need to see again
+Node Selectors 62
+Node Affinity  63
+
+
+----------------------------------------------------
+In Master-Node
+---------------
+Kube-api-server            6443   Port
+coredns
+etcd                       2379   Ports 
+kube-proxy
+kube-scheduler             10251  Port 
+Kube-Controller-Manager    10252  Port 
+kube-flannel-ds
+Kubelet                    10250  Port          ( Kubelet can also be deployed on Master-node)
+
+In-Nodes
+-------
+kube-proxy
+Kubelet                    10250  Port 
+Kube-proxy                                      (watch in lecture 223  "Service Networking")
+Services                   30000 till 32767 Ports
+----------------------------------------------------------
+
+
+
+ETCD
+=====
+
+ETCD listen on default port  "2379"
+
+
+CRI:       <-- "Container-Runtime-Interface"   e.g, Docker, RKT, CRI-O 
+CNI:       <-- "Container-Network-Interface" 
+CSI:       <-- "Container-Storage-Interface"   e.g AWS-EBS, AWS-EFS, Azure-Disks
+
+
+Commands:
+---------
+
+> alias k=kubectl                 <-- it will set k as alias for "Kubectl" command
+
+> export ETCDCTL_API=3
+> etcdctl snapshot save 
+> etcdctl endpoint health
+> etcdctl get
+> etcdctl put
+
+> cat /etc/kubernetes/manifests/kube-apiserver.yaml       <-- to view "api-server" options where cluster is created with "kubeadm" tool     
+> ps -aus | grep kube-apiserver 
+
+> kubectl -n <pod-name> exec -it <sidecar-container-name> -- cat /log/app.log 
+
+> kubectl get nodes              <-- it also return the "Kubernetes version" which is installed.
+
+> kubectl replace --force -f /tmp/kubectl-edit-2345685343.yaml
+
+Imp Points:
+-----------
+-) Kubernetes Pod Network Ip-assign   10.32.0.0/12    it means   10.32.0.1  till 10.47.255.254  
+
+
+
+Declarative commands   <-- when we use .yaml files, it means we are declearing resources in a .yaml file
+Imperative commands  <-- wehn we try to create a resource directly through command line
+
+
+Difference between "kubectl apply" and "kubectl create" and "kubectl replace"
+----------------------------------------------------------------------------
+> "Kubectl apply" creates kubernetes objects through "Declarative commands"
+> "kubectl create" creates kubernetes objects through "Imperative commands"
+> "kubectl replace" creates kubernetes objects through "Imperative commands"
+
+
+Difference between  "kubectl replace" and "kubectl replace --force"  and "kubectl edit" commands
+------------------------------------------------------------------
+> "kubectl replace -f aby.yaml" replace kubernetes objects through "Declaratice commands", we first make change manually on .yaml file
+   after that with "kubectl replace -f abc.yaml" it will just change the changes that we make, it will not delete and recreate the object
+
+> "kubectl replace --force -f abc.yaml":   Wtih "--force" we are saying please delete the old object and then create the new object with the
+                                          new configuration that we made
+
+> "Kubectl edit" edits kubernetes objects through "Imperative commands", we can directly make the changes in live manifest, 
+   But changes will not be recorded.
+
+
+Note: 
+Secrets are only encoded
+Secrets are not encrypted in ETCD db of Kubernetes
+Certificates are Encrypted.
+
+Pod-Eviction-Timeout: 
+---------------------
+Kubernetes will wait for 5min by-default for a Pod if it goes offline, As the whole node goes down, if after 5min the pod does not 
+comes up then kubernetes declare it dead and create new pod on the other available node only if it is a part of a "ReplicaSet" if it is not
+a part of any "ReplicaSet" then the pod is completely deleted.
+By-default  in the "kube-controller-manager" it is set to   "--pod-eviction-timeout=5m0s" 
+
+If the Pod with the Node comes back inbetween 5min then it will be taken as live again and no process will be done further.
+
+=============================================================================================================
+Basic commands:
+---------------
+
+--dry-run=client  <-- this will not create the resource, instead, it will tell us weather the command is correct or not
+
+--dry-run=client -oyaml  <-- it will check if the command is correct and generate a .yaml file also
+
+> kubectl replace --force -f abc.yaml         <-- this command will delete the existing pod and create a new with this file
+                                              normally we need to write first "delete" then "apply" but this command do both
+                                              of the things in one time.
+
+
+
+> kubectl explain pods   or   replicase  or deployment
+> kubectl describe pods
+> kubectl create pods --help
+> kubectl create secret generic --help
+> kubectl explain secret 
+> kubectl run --help
+
+> kubectl replace --force -f abc.pod          <-- like this it will forcefully delete and recreate the pod
+
+> kubectl replace --force -f /tmp/kubectl-edit-3434343.yaml     <-- like this we can forcefully delete and recreate the pod
+
+----------------------------------------
+Pods :
+------
+> kubectl  run  mypod --image nginx -n my-namespace         <-- it will directly create a pod in "my-namespace"
+> kubectl run mypod --image redis:alpine --labels="tier=db"
+> kubectl run my-pod --image nginx --port=8080
+> kubectl run my-pod --image httpd:alpine --port 80 --expose true    <-- it create a "pod" and also a "Service" same time
+> kubectl get pods 
+> kubectl get pods -owide              <-- it also shows that on which node this pod is placed
+> kubectl describe pods 
+> kubectl get pods --all-namespaces
+> kubectl get pods -A
+> kubectl get pods --selector app-labele=myvlaue          <-- like this we can search for pods that has a lable "app-labele=myvlaue"
+> kubectl get pods --selector env=dev | wc -l             <-- the return the number of lines in the result, their is a HEADER in the result also
+                                                              this is the reason we have to do -1 from the resutle, if result is 8, then 8-1= 7 is answer
+> kubectl get pods --selector env=dev --no-headers | wc -l     <-- this will return a result with a number, in the result no HEADER is included 
+                                                                  so as the last obove command we can directly get 7 as result.
+
+> kubectl get all --selector env=prod --no-headers | wc -l   <-- return all the objects that has lable "env=prod"
+
+> kubectl get all --selector  env=prod,tier=db,app=p-app 
+
+> kubectl get pods --watch
+
+
+
+ReplicaSet:
+-------------
+> kubectl explain replicaset
+> kubectl edit rs my-set
+> kubectl scale rs my-set --replicase=5  
+
+> kubectl get all                        <-- it will print all the created objects Pods, ReplicaSet, Deplyoments ...
+
+> kubectl run nginx --image nginx         <-- directly create a pod 
+
+> kubectl run nginx --image nginx  -oyaml    <-- it generate a Pod and a .yaml file also
+
+> kubectl run nginx --image nginx --dry-run=client -o yaml          <-- generate a .yaml file  only
+
+> kubectl create deployment my-dep --image nginx --replicas=3
+
+> kubectl run nginx --image nginx --dry-run=client -o yaml
+
+> kubectl create deployment --image nginx nginx --dry-run=client -o yaml > nginx-deployment.yaml 
+
+> kubectl create deploy
+
+> kubectl expose deployment my-dep --port 80
+
+> kubectl scale deloyment my-dep --replicas=5
+
+> kubectl set image deployment my-deploy nginx=nginx:1.18
+
+
+
+> kubectl get service 
+> kubectl get svc
+> kubectl describe svc my-service
+
+Create a new Service
+-------------------
+> kubectl expose pod my-redis --port 6379 --name my-serice --dry-run=client -oyaml   <-- it will create a Serive and automatically exposes the port
+                                                                                   or generate lable connection with the Pod name "my-redis"
+                                                                                   it automatically uses the Pod lable and add in Service
+                                                                                   By-default it creates a "clusterip" service
+                                                                                   with this command we can not use --tcp=80:80 --node-port=30080 
+
+> kubectl create service clusterip my-redis --tcp=6379:6379 --dry-run=client -oyaml     <-- the main point is that we can not add any selector with this 
+                                                                                      command, it automatically only generate "app=my-redis" as tag
+                                                                                      we can not explicitly define any selector with "kubectl create" command
+                                                                                 
+> kubectl expose pod my-pod --type NodePort --port=80 --name my-service --dry-run=client -oyaml    <-- it will create a new service and as we have used
+                                                                                                    "kubectl expose" it will automatecally take the 
+                                                                                                    Pod tags and put in Service-Selector
+                                                                                                    with this command we can not use --tcp=80:80 --node-port=30080 
+
+> kubectl create service nodeport my-service --tcp=80:80 --node-port 30080 --dry-run=client -oyaml    <-- the main point is that we can not add any selector with this 
+                                                                                                       command, it automatically only generate "app=my-redis" as tag
+                                                                                                      we can not explicitly define any selector with "kubectl create" command                                                                                                                 
+
+---------------------------------------------------------------------------------
+Service:
+-------
+Assume we have two namespaces  Namespace "A"   and Namespace  "B"
+
+mysql.connect("db-service")          <-- if a web-app in Namespace "A" call a service in same namespace "A" then it directly use the service-name
+
+mysql-connect("db-service.dev.svc.cluster.local")    <-- if a web-app in Namespace "A" call a service in different Namespace "B" this it should use 
+                                                        this way, When we create a service a DNS name is created with this whole name "db-service.dev.svc.cluster.local"
+                                                        in the Kubernetes cluster, As Service is a cluster specific object so when we call this DNS it will route 
+                                                        request to this service
+
+db-service         <-- name of the Service
+dec                <-- name of the Namespace
+svc                <-- It is a subdomain added in DNS, as we are calling a Service
+cluster.local      <-- It is a subdomain for the cluster,As both of the Namespaces are in same cluster
+--------------------------------------------------------------------------------
+
+> kubectl config set-context $(kubectl config current-context) --namespace=dev          <-- like this we can set the config to "dev" namesapce
+                                                                                      it means when we do "k get pods" it will fetch pods details from "dev" namespace
+
+
+ResourceQuota for Namespace
+----------------------------
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: dev
+spec: 
+  hard:
+    pods: "10"
+    requests.cpu: "4"
+    requests.memory: 5Gi
+    limits.cpu: "10"
+    limits.memory: 10Gi  
+
+-------------------------------------------------------------------------------------------------------
+Taints:
+-------
+> kubectl describe node kubemaster | grep Taint         <-- this will show us the which "Taint" is applied on the Master-node
+
+> kubectl taint node <any-node-name> key:value:Taint-Type
+
+> kubectl taint node mynode  mykey22:myValue22:NoSchedule
+
+
+To remove the Taint from a node
+-----------------------------
+> kubectl taint node mynode  node-role.kubernetes.io/master:NoSchedule-     <-- first go check the whole value of the Taint from the "describe node" command
+                                                                            then put that value as above and at the end put "-" minus sign
+
+Note: 
+key       <-- it can be a string upto 253 characters
+value     <-- it can be a string upto 63 characters
+
+
+q) How to Taint a Node and define same Taint for the Pod ? 
+
+Taint    
+------
+
+their are 3 tyes of "Taint" values we can use in "effect" key
+1) NoSchedule                         <-- new pods that do not match the taint are not scheduled onto this node, But existing pods on the node remain running.
+2) PreferNoSchedule                   <-- new pods that do not match the taint might be scheduled onto the node,
+                                          but the existing pods on the node remain running.
+3) NoExecute                          <-- in this case only same "Tainted" pods will be placed on this Node, and also if any old another "Tainted" pods
+                                          are their then they will be removed from this Node
+
+Note: we can use two types of"opertaor" 
+1) Equal            <-- it means all   key,value,effect  all must be matched. (Imp:  this is a default parameter)
+2) Exist            <-- it means  key,effect parameters must match, you must leave a blank value parameter, which matches any
+
+
+> kubectl taint nodes node1 anyKeyName=blue:NoSchedule             <-- here we are "Tainting" a node, with  "key=app"   and "value= blue : NoSchedule" 
+                                                            Note: this command we use to "Taint" a node
+
+--------------------------------------------------
+Defining a pod with the same "Taint" as we define above for the "Node"
+
+apiVersion: v1                                                      
+kind: Pod
+metadata: 
+  name: myPod-color
+spec: 
+  containers: 
+  - name: nginx-container
+    image: nginx
+  tolerations:
+  - key: "mykey22"                    <-- this "anyKeyName" is the key defined above in the node command, we can put any name
+    operator: "Equal"                 <-- as in the above Node command we use  "="   so here we have to put "Equal"
+    value: "myvalue22"                <-- as in the above Node command we use Value = "blue" so here we are using blue
+    effect: "NoSchedule"              <-- their are 3 types of values we can use as above defined, so here we are using one of them           
+             
+ Note: all the 4 values must be put inside the double quotes            
+
+> kubectl describe node my-node 
+
+> kubectl label node my-node my-lable=my-value
+
+apiVersion: v1                                                      
+kind: Pod
+metadata: 
+  name: myPod-color
+spec: 
+  containers: 
+  - name: nginx-container
+    image: nginx
+  nodeSelector:
+    my-lable: my-value  
+
+---------------------------------------------------------------
+apiVersion: v1        
+kind: Pod             
+metadata:                 
+  name: myapp 
+  labels:              
+    app: mypod22
+    env: Prod-2                    
+spec:             
+  containers:                     
+    - name: myapp-frontend             
+      image: mydockerimage/1.0.0
+      resources:
+        requests:                         <--  "request" it means this pod must have minimum memory  
+          memory: "64Mi"
+          cpu: "0.5"          
+        limits:                           <-- "limits"  it means this pods can take only memory upto  "4GB"
+          memory: "4Gi"                      no more memory will be allocated to it.
+          cpu: "1"    
+
+Note: As laptops have 8-cores so it means 8 CPUs              
+
+e.g
+----
+limits:
+  cpu: 1             <- it means "1 CPU"  or "1 core" 
+
+----
+limits:
+  cpu: 500m   or  100m  or 0.1          <- these all  means half CPU
+
+
+e.g
+---
+limits:
+  memory: 1Gi             <- it means the memory of "1 GB"  or "1024 MegaByte"   or "1024 Mi"
+
+
+---
+limits:
+  memory: 512Mi             <- it means the memory of "512 MegaByte"    so we can say half of 1 GB
+
+---------------------------------------------------------------------
+ResourceQuota
+-------------
+apiVersion: v1
+kind: ResourceQuota
+metadata: 
+  name: compute-quota                     
+  namespace: dev                   
+spec: 
+  hard: 
+    pods: "10" 
+    requests.cpu: "4"
+    requests.memory: 5Gi
+    limits.cpu: "10"
+    limits.memory: 10Gi  
+
+
+Note: we can set "ResourceQuota" at Namespace-level, every Namespace can have its own "Resource-Quota"
+
+-------------------------------------------------------------------------------
+DaemonSet
+--------
+
+apiVersion: apps/v1   
+kind: DaemonSet
+metadata:
+  name: monitoring-daemon 
+spec:
+  selector:
+    matchLabels: 
+      app: monitoring-agent-a            
+  template:    
+    metadata:                     
+      labels:              
+        app: monitoring-agent-a         
+    spec:             
+      containers:                  
+        - name: monitoring-agent
+          image: mydockerimage/2.0.0   
+
+> kubectl get daemonsets
+
+> kubectl describe daemonsets my-daemonset
+
+
+
+How to create the path for the "Static-pod" in a Node ?
+
+Kubelet.service file
+---------------------
+
+Way-1) 
+------
+ExecStart=/usr/local/bin/kubelet  \\
+  --pod-manifest-path=/etc/Kubernetes/manifests \\           <-- here we are defining path for the Static-pod that is created in the Node
+
+
+Way-2) (when we create cluster with "cubeadmin tool" then it usese the "way-2")
+------
+ExecStart=/usr/local/bin/kubelet  \\
+  --config=kubeconfig.yaml \\                   <-- we can define the above path in a "kubeconfig.yaml" file and put the file name here 
+
+Note: in the "kubeconfig.yaml" file we can find this path "staticPodPath: /etc/kubernetes/manifests"
+
+
+
+#########################################################################################################################
+Multi Scheduler:
+================
+
+> kubectl get events -o wide          <-- under it we can see if the new Pod is running with a custom-scheduler or not
+
+> kubectl logs my-scheduler -n kube-system         <-- we can view logs of out scheduler
+
+
+
+
+kube-scheduler.service    (Default Scheduler)
+----------------------
+ExecStart=/usr/local/bin/kube-scheduler  \\
+  --config=/etc/kubernetes/config/kube-scheduler.yaml
+
+
+my-scheduler.service
+--------------------
+ExecStart=/usr/local/bin/kube-scheduler  \\
+  --config=/etc/kubernetes/config/my-scheduler.yaml
+
+
+----------------------------------------------------
+How to define a Custom Scheduler ?
+
+Step-1)
+--------
+my-scheduler.yaml
+--------
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+profiles:
+  - schedulerName: my-scheduler
+leaderElection:
+  leaderElect: true
+  resourceNamespace: kube-system
+  resourceName: lock-object-my-scheduler  
+
+
+Step-2) 
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-scheduler
+  namespace: kube-system
+spec:
+  containers: 
+    - command:
+      - kube-scheduler
+      - --address=127.0.0.1
+      - --kubeconfig=/etc/kubernetes/scheduler.conf
+      - --config=/etc/kubernetes/my-scheduler.yaml
+      image: k8s.gcr.io/kube-scheduler-amd64:v1.11.3
+      name: kube-scheduler    
+
+Step-3)
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-scheduler
+  namespace: kube-system
+spec:
+  containers:
+    - image: nginx
+      name: nginx
+  schedulerName: my-scheduler    
+
+
+--------------------------------------------------------------------------------------------
+PriorityClass:
+-------------
+
+How to create a PriorityClass ?
+
+Step-1)  
+Create a priorityClass file
+
+abc.file
+--------
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: my-high-priority
+value: 100000
+globalDefault: false
+
+
+Step-2)
+
+pod.yaml
+-------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-scheduler
+spec:
+  priorityClassName: my-high-priority
+  containers:
+    - name: nginx
+      image: nginx
+      resources: 
+        request: 
+          memory: "1Gi"
+          cpu: 10
+
+########################################################################################################################
+Monitoring
+----------
+
+> kubectl top node            <-- to get the metrics of all the Nodes
+> kubectl top pod             <-- to get the metrics of all the pods
+
+> kubectl logs -f my-pod           <-- it will return the logs of my-pod
+
+
+> kubectl logs -f my-pod container-1       <-- if we have two container running in a pod, e.g one service and other sidecar contianer
+                                               then we have to give the name in the command
+> kubectl logs -f my-pod sidecar-container                               
+
+
+
+######################################################################################################################
+Rollout:
+-------
+
+Note: Rolling-update is the default deployment strategy.
+
+Rolling-update Strategy:
+---------------
+In Rolling-update if we have 5 pods are already their, and we want to update them with new version, then while doing
+deployment, it delete one pod and bring one new, in this way it goes.
+
+Recreate Strategy:
+In this case it first delete all the pods and after that it create all new pods at once, this strategy can have downtime 
+because at the time of first delete all the pods are deleted.
+
+
+> kubectl get deployments 
+
+> kubectl create -f abc.yaml          <-- with this command we can create a deployment first time
+
+> kubectl apply -f abc.yaml           <-- As a deployment is already create, with this command it will update the Deployment
+                                         If their is no deployment then with this command we can also deploy it first time
+
+> kubect set image   my-deployment my-container=nginx:1.9.1    <-- like this we can change the image of current running deployment   
+                                                                 my-deploment is the name of the Deployment
+                                                                 my-container is the name of the Container                                      
+
+> kubectl rollout status my-deployment      <-- with this we will get the status of the deplyoment
+
+> kubectl rollout history my-deployment   
+
+> kubectl rollout undo my-deployment          <-- with this we can rollback the changes to last deployed deployment.
+ 
+
+###############################################################################
+Docker Commands:
+---------------
+
+Note:  ENTRYPOINT ["sleep"]   or  CMD ["sleep"]     <-- in the both commands the first argument must be a executable
+                                                        it means we must put ["sleep"]   if we put ["10"]  then we will get error
+                                                        but if we use ENTRYPOINT and CMD then in the second place CMD can have 
+                                                        CMD ["10"]  as argument.
+
+Case-1) 
+-------
+
+dockerfile-a.yaml
+-----------------
+FROM Ubuntu
+CMD sleep 5
+
+> docker run dockerfile-a                     <-- in this case the Ubuntu pod execute for 5sec after that it destroys
+
+
+
+Case-2) 
+-------
+
+dockerfile-a.yaml
+-----------------
+FROM Ubuntu
+CMD sleep 5
+
+> docker run dockerfile-a    sleep 10           <-- As we have used "CMD", then in this case which argument we pass while doing
+                                                 "docker run dockerfile-a"  the whole argument will be replaced
+                                                 "CMD sleep 5"   will be replaced to "CMD 10"   at the run time
+                                                 if we just pass  "docker run dockerfile-a 10"  then we will get error 
+                                                 as with the CMD the whole argumes will be replaced
+
+
+Case-3) 
+
+dockerfile-a.yaml
+-----------------
+FROM Ubuntu
+ENTRYPOINT ["sleep"]                         
+
+> docker run dockerfile-a 10           <-- as we use "ENTRYPOINT" then any argument what we put in the command will be added at 
+                                         the execution time. at the end as we pass "10" it will be "ENTRYPOINT sleep 10"
+
+
+Case-4) 
+
+dockerfile-a.yaml
+-----------------
+FROM Ubuntu
+ENTRYPOINT ["sleep"]                         
+
+> docker run dockerfile-a         <-- in this case we forget to write the argument in the command so in this case 
+                                 it throws error as at the end it rund "ENTRYPOINT sleep" only
+
+
+
+Case-5) 
+
+dockerfile-a.yaml
+-----------------
+FROM Ubuntu
+ENTRYPOINT ["sleep"]                         
+CMD["10"]
+
+> docker run dockerfile-a            <--in this case as we forget to put an argument then by-default it take 10 from CMD
+
+
+
+
+
+
+Case-6) 
+
+dockerfile-a.yaml
+-----------------
+FROM Ubuntu
+ENTRYPOINT ["sleep"]                         
+CMD["10"]
+
+> docker run dockerfile-a   20              <-- AS which argument we put at the run time it totally override the "CMD"
+                                               so  "20" will override with CMD["20"] 
+
+Case-7) 
+
+dockerfile-a.yaml
+-----------------
+FROM Ubuntu
+ENTRYPOINT ["sleep"]                         
+CMD["10"]
+
+> docker run --entrypoint sleepAA dockerfile-a 20           <-- like this we can change the "ENTRYPOINT" argument from
+                                                            "ENTRYPOINT ["sleep"]"   to "ENTRPOINT ["sleepA"]"
+                                                            At the runtime it become  "sleepA 20"
+                                                            Note: Their is not "sleepA" command, it is just for example i am showing
+
+
+Case-8)
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-scheduler
+spec:
+  containers:
+    - name: my-ubuntu-sleeper
+      image: ubuntu-sleep
+      command: ["sleep"]             <-- as in the above example "command" is same as "ENTRYPOINT"
+      args: ["10"]                   <-- as in the above example "args" is same as "CMD"
+ 
+
+
+
+Case-9)
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-scheduler
+spec:
+  containers:
+    - name: my-ubuntu-sleeper
+      image: ubuntu-sleep
+      command: ["sleep" ,"10"] 
+
+
+or
+
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-scheduler
+spec:
+  containers:
+    - name: my-ubuntu-sleeper
+      image: ubuntu-sleep
+      command:
+      - "sleep"
+      - "10"
+
+or 
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-scheduler
+spec:
+  containers:
+    - name: my-ubuntu-sleeper
+      image: ubuntu-sleep
+      command: ["sleep"]
+      args: ["10"]
+
+
+> kubectl run my-pod --image-nginx --command -- sleepA     <-- like this we can override the "command: ["sleepA"]" argument 
+> kubectl run my-pod --image=nginx -- 15                   <-- like this we can override the "args: ["15"]" argument
+or
+> kubectl apply -f pod.yaml -- 15             <-- this is just my try example, but not sure if it works
+
+
+
+###################################################################################################################
+Environment Variables  with ConfigMap and secret
+-------------------------------------
+
+Case-1) 
+Environment varibale directly in the Pod
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-pod
+spec:
+  containers:
+    - name: my-ubuntu
+      image: ubuntu
+      ports:
+        - containerPort: 8080
+      env:                                      <-- like this we can define an "Environment variable", it will be then placed in the container 
+        - name: my-key-a                            so the service can call directly from code the Environment variable
+          value: my-val-a   
+        - name: my-key-b
+          value: my-val-b   
+
+--------------------------------------------------------------------------------
+Case-2) 
+ConfigMap  & Secret
+-------------------
+
+Environemnt variable adding in pod through configMap
+
+> kubectl get configmap
+> kubectl describe configmap
+
+> kubectl create configmap my-configmap --from-literal=my_key_AA=my_value_AA --from-literal=my_key_BB=my_value_BB 
+
+> kubectl create configmap my-configmap --from-file=abc.properties                   <-- write the key-value in a file and put the file name here
+
+> kubectl get secret 
+> kubectl create secret my-secret --from-literal=my_key_AA=my_value_AA --from-literal=my_key_BB=my_value_BB 
+
+> kubectl create secret my-secret --from-file=abc.properties                    <-- write the key-value in a file and put the file name here
+
+
+> echo -n "my-pass | base64
+> echo -n "cm9cdA==" | base64 --decode
+
+
+Step-1)
+configMap.yaml
+--------
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+  name: my-configmap-A
+data:
+  APP_COLOR: blue
+  APP_MODE: prod
+
+Step-2)
+secret.yaml
+--------
+apiVersion: v1
+kind: Secret
+metadata: 
+  name: my-secret
+data:
+  my-username: dxNlcm5hbWU=
+  my-password: cGFzc3dvcmQ=
+
+Step-3)
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-pod
+spec:
+  containers:
+    - name: my-ubuntu
+      image: ubuntu
+      ports:
+        - containerPort: 8080     
+      envFrom:
+        - configMapRef:
+            name: my-configmap-A                   <-- here we are putting the above define configmap
+      envFrom:
+        - secretRef:
+            name: my-secret 
+
+--------------------------------------------------------------------------
+Case-3) 
+Environment variable in ConfigMap or Secret in a Volume for Pod 
+---------------------------------------------
+
+
+Step-1)
+configMap.yaml
+--------
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+  name: my-configmap-A
+data:
+  db-host: my-db-pass
+
+
+Step-2)
+secret.yaml
+--------
+apiVersion: v1
+kind: Secret
+metadata: 
+  name: my-secret
+data:
+  my-username: dxNlcm5hbWU=
+  my-password: cGFzc3dvcmQ=
+
+
+Step-3)
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-pod
+spec:
+  containers:
+    - name: my-ubuntu
+      image: ubuntu
+      ports:
+        - containerPort: 8080     
+      env:
+        - name: MY_DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: my-username
+        - name: MY_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: my-password
+        - name: MY_CONFIGMAP
+          valueFrom:
+            configMapKeyRef:
+              name: my-configmap-A
+              key: db-host
+
+---------------------------------------------------------------------------------------------------
+ConfigMap and Secret as a file
+-----------------------------
+
+Step-1) 
+configMap.yaml
+--------
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+  name: my-configmap-B
+data:
+  mydata.conf: |               <-- this is a type of a file
+    data_ aaaa
+    data_ bbbb
+    data_ cccc
+
+
+Step-2)
+secret.yaml
+--------
+apiVersion: v1
+kind: Secret
+metadata: 
+  name: my-secret-B
+type: Opaque
+data:
+  secret.file |                                          <-- like this it is used as a file
+    dfdjdkfjekERDF435454DFEjkgjkgRDLOIGME=    
+
+
+Step-3)
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-pod
+spec:
+  containers:
+    - name: my-ubuntu
+      image: ubuntu
+      ports:
+        - containerPort: 8080
+      volumeMounts:
+        - name: my-confg-map-volume-DD 
+          mountPath: /tmp/configmap/new-folder-in-container         <--with this we are creating a new container in the pod and the file in the configMap 
+                                                                       "mydata.conf" will be placed in this newely created folder
+        - name: my-secret-volume-DD
+          mountPath: /tmp/secret/new-folder-in-container
+  volumes:
+    - name: my-confg-map-volume-DD                  <--- here we can give any name, it will just show in the container
+      configMap:
+        name: my-configmap-B                     <-- here we need to correct name for the mapping the above create config-map
+    - name: my-secret-volume-DD
+        secret:
+          secretName: my-secret-B
+
+##########################################################################################################
+Multicontainer pods,  Sidecar
+-----------------------------
+> kubectl logs <pod-name> -c <container-name>       <--like this we can give the continer-name and see the logs
+
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-pod
+spec:
+  containers:
+    - name: my-ubuntu
+      image: ubuntu
+      ports:
+        - containerPort: 8080
+    - name: my-sidecar-pod
+      image: nginx    
+
+
+----------------------------------------------------------------------
+Attach only a "Volume" to containers in a Pod
+---------------------------------------------
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-pod
+spec:
+  containers:
+    - name: my-ubuntu
+      image: ubuntu
+      ports:
+        - containerPort: 8080
+      volumeMounts:
+        - mountPath: /var/log/event-simulator/
+          name: my-ubunut-volume
+    - name: my-sidecar-pod
+      image: nginx   
+      volumeMounts:
+        - mountPath: /log
+          name: my-sidecar-volume
+
+####################################################################################################
+InitContainers:
+-------------
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-pod
+spec:
+  containers:
+    - name: my-ubuntu
+      image: ubuntu
+      ports:
+        - containerPort: 8080
+  initContainers:
+    - name: my-init-container
+      image: busybox
+    - name: second-init-container
+      image: nginx  
+
+
+######################################################################################################
+Node:
+----
+
+
+> kubectl drain my-node-1          <-- if we want to delete all the pods on the node, after this command no pod will be available on the node
+                                       and the "kube-scheduler" will not place new node on this node, Internally it do "kubectl cordon" that 
+                                       so that no new node will be placed on the Node
+
+> kubectl uncordon my-node-1      <-- Only after doing "uncordon" the Node come online again and the "kube-scheduler" will start placing 
+                                      Pods on this Node again.
+
+> kubectl cordon my-node-1        <-- It marks the Node as unscheudable, After this command no new Pods will be place on this node,
+                                      But the old Pods will still remain running on this Node, Only after "kubectl uncordon" the 
+                                      Kube-scheduler is alloweed to place the pods again on this Node.
+
+> kubectl drain node --ignore-daemonsets
+> kubectl drain node --force 
+
+#############################################################################################################
+Cluster Upgrade
+----------------
+
+> kubeadm upgrade plan
+
+> kubeadm upgrade apply
+
+Upgrading process with kubeadm tool
+
+Step-1)  
+> apt-get upgrade -y kubeadm=1.12.0-00            <-- First upgrade the "kubeadm" itself
+
+Step.2) 
+> kubeadm upgrade apply v1.12.0                   <-- After that upgrade the cluster
+
+Step-3) 
+Upgrade "Kubelet" on the Master-Node, Note: we do not need to upgrade the "Kubeadm" on the Master-node
+
+> apt-get upgrade -y kubelet=1.12.0-00            <-- After upgrading the Control-plane on Master node, we have to upgrade the "Kubelet" first on the "Master" only
+> systemctl restart kubelet                       <-- After upgrading the "Kubelet on the node, we have to restart the "Kubelet" then only the upgrade effects
+
+Step-4) 
+Upgrade "Kubeadm" and "Kubelet" on Worker Node
+
+> kubectl drain my-node-1
+
+> apt-get upgrade -y kubeadm=1.12.0-00
+> apt-get upgrade -y kubelet=1.12.0-00
+> kubeadm upgrade node config --kubelet-version v1.12.0
+> systemctl restart kubelet 
+
+> kubectl uncorden my-node-1
+
+
+##########################################################################################################################################
+Certificates
+-------------
+
+
+.pem , .crt             <--  Those end with these are "Public Key" or "Public Certificates"
+.key, "-key"            <-- Those have in the name ".key" or "-key" are "Private Key"
+
+
+
+CERTIFICATE AUTHORITY ( CA )
+----------------------------
+
+> openssl genrsa --out ca.key 2048                                              <-- ca.key     it Generatey-key
+> openssl req -new -key ca.key -subj "/CN=KUBERNETES-CA"  -out ca.csr           <-- ca.csr     It generate "Certificate-Signing-Request"
+> openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt                      <-- ca.crt     It generate "Sign-Certificates"
+
+
+ADMIN USER:
+-------------
+> openssl genrsa -out admin.key 2048                                            <-- admin.key  It "Generate-Key"
+> openssl req -new -key admin.key -subj "CN=kube-admin" -out admin.csr          <-- admin.csr  It generate "Certificate-Signing-Request"
+> openssl x509 -req -in admin.csr -CA ca.crt -CAkey  -out ca.key                <-- ca.crt     It generate "Sign-Certificates"
+
+KUBE SCHEDULER
+-------------
+> openssl genrsa -out scheduler.key 2048                                            <-- scheduler.key  It "Generate-Key"
+> openssl req -new -key admin.key -subj "CN=kube-admin" -out scheduler.csr          <-- scheduler.csr  It generate "Certificate-Signing-Request"
+> openssl x509 -req -in admin.csr -CA ca.crt -CAkey  -out scheduler.key             <-- scheduler.crt  It generate "Sign-Certificates"
+
+
+KUBE CONTROLLER MANAGER
+-----------------------
+> openssl genrsa -out controller-manager.key 2048                                      <-- controller-manager.key  It "Generate-Key"
+> openssl req -new -key admin.key -subj "CN=kube-admin" -out controller-manager.csr    <-- controller-manager.csr  It generate "Certificate-Signing-Request"
+> openssl x509 -req -in admin.csr -CA ca.crt -CAkey  -out controller-manager.key       <-- controller-manager.crt  It generate "Sign-Certificates"
+
+KUBE PROXY
+----------
+> openssl genrsa -out kube-proxy.key 2048                                      <-- kube-proxy.key  It "Generate-Key"
+> openssl req -new -key admin.key -subj "CN=kube-admin" -out kube-proxy.csr    <-- kube-proxy.csr  It generate "Certificate-Signing-Request"
+> openssl x509 -req -in admin.csr -CA ca.crt -CAkey  -out kube-proxy.key       <-- kube-proxy.crt  It generate "Sign-Certificates"
+
+
+---------------------------------------------------------------------------------------------------------
+How we can make a REST call to "KUBE-API" server with these admin Certificates and keys ? 
+
+> curl https://kube-apiserver:6443/api/v1/pods --key admin.key --cert admin.crt --cacert ca.crt    <-- This is the example of REST-Api call that we make 
+                                                                                                       to the "KUBE-API" server.
+  
+
+
+
+
+> openssl x509 -in /etc/kubernetes/oki/apiserver.crt -text -noout                <-- like this we can get all the info about the cretificate.
+                                                                                   With "-noout" it will not create a new file with the Certificate 
+                                                                                   it will just print the Certificate info on the console  
+  
+
+#######################################################################################################
+kubeconfig
+----------
+
+> kubectl config -h                                   <-- like this we can list all the commands  for "config"
+
+> kubectl config view                                 <-- with this we can view the config 
+
+>> kubectl config use-context abc@production          <-- like this we are setting the default config to "abc@production" 
+
+> kubectl config --kubeconfig=my-base-config use-contexts dev-frontend   <-- if we have two "./kube/config" files then we can add 
+                                                                            the file name like this "--kubeconfig=my-base-config"
+
+Steps to create Context file
+----------------------------
+
+Step-1) Add Cluster details
+> kubectl config --kubeconfig=base-config set-cluster development --server=https://1.2.3.4           <--"my-base-config" is the file name for config
+
+Step-2) Add user details
+------------------------
+> kubectl config --kubeconfig=base-config set-credentials my-user-a --username=dev --password=my-pass       <-- "my-user-a" is the name of the user for this config file.
+
+Step-3) Setting Context 
+> kubectl config --kubeconfig=base-config set-context dev-frontend --cluster=development --namespace=frontend --user=my-user-a
+
+
+
+
+###################################################################################################################
+RBAC    Role, Rolebinding, ClusterRole, ClusterRolebinding
+----
+
+> kubectl auth can-i  create deployments             <-- like this we can check if the current user is alloweed to "Create Deployments"
+
+> kubectl auth can-i create pods                     <-- like this we can check if the current user is alloweed to "Create Pod"       
+
+> kubectl auth can-i create pods --as dev-user       <-- like this we can check the permission for "dev-user" if he is alloweed or not 
+
+> kubectl auth can-i create pods --as dev-user --namespace  my-ns-a  <-- like this we can check it "dev-user" has permission to create pod in the
+                                                                             "my-ns-a" Namespace
+
+> kubectl create role my-role --verb=list,create,delete --resources=pods --resourceNames=pod-a,pod-b   <-- this role is applied only for "pod-a" and "pod-b"
+
+> kubectl create rolebinding my-rolebinding --role=my-role --user=dev-user
+
+
+
+--------------------------------------------------------------------------------------
+ServiceAccount 
+--------------
+
+
+> kubectl create serviceaccount my-sashboard-sa
+
+> kubectl get sa
+
+
+
+
+
+
+
+
+
+
+######################################################################################################################
+Storage:
+-------
+
+
+
+====================================================================================================
+Volume Examples:
+----------------
+
+1) Storing Data directly from Pod in the 
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-pod
+spec:
+  containers:
+    - image: alpine
+      name: alpine
+      command: ["/bin/sh", "-c"]
+      args: ["shuf -i 0-100 -n l >> /my-storage-path/endnumber.out;"]
+      volumeMounts:
+        - mountPath: /my-storage-path        <-- (1) we are creating a "Volume" with path "/my-storage-path" in the container. 
+          name: my-data-volume                       The service running on the pod will send logs to /my-storage-path folder.
+  volumes:                                           Note: we can have two different path names but the "Volume" name must be same
+    - name: my-data-volume
+      hotstPath:
+        path: /data                <--(2) Any data that comes from Pod in the "/my-storage-path" that will be stored at the end in the 
+        type: Directory                    "/data" folder on the Node, as we defined "type: Director" so it create a folder on the Node
+
+
+
+2) Create a Storage with AWS-EBS
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-pod
+spec:
+  containers:
+    - image: alpine
+      name: alpine
+      command: ["/bin/sh", "-c"]
+      args: ["shuf -i 0-100 -n l >> /my-storage-path/endnumber.out;"]
+      volumeMounts:
+        - mountPath: /my-storage-path        <-- (1) we are creating a "Volume" with path "/my-storage-path" in the container. 
+          name: my-data-volume                       The service running on the pod will send logs to /my-storage-path folder.
+  volumes:                                           Note: we can have two different path names but the "Volume" name must be same
+    - name: my-data-volume
+      awsElasticBlockStore:
+        volumeID: <ID-Nummber>                <--(2) Any data that comes from Pod in the "/my-storage-path" that will be stored at the end in the 
+        fsType: ext4                          "/data" folder on the Node, as we defined "type: Director" so it create a folder on the Node
+
+
+=====================================================================================================================
+Persistent Volume:
+-----------------
+
+Commands:
+
+> kubectl get pv
+> kubectl get pvc
+> kubectl delete pcc my-claim-name
+> 
+
+
+-) Their are three types of "PersistentVolume" modes
+   - RWO--ReadWriteOnce        <-- the volume can be mounted as read-write by a single node. ReadWriteOnce access mode still can    
+                                    allow multiple pods to access the volume when the pods are running on the same node.
+   - ROX--ReadOnlyMany         <-- the volume can be mounted as read-only by many nodes.
+   - RWX--ReadWriteMany        <-- the volume can be mounted as read-write by many nodes.
+     RWOP--ReadWriteOncePod    <-- 
+
+-) The "accessModes" of both PV and PVC should be match, then only PVC can claim a PV 
+
+>) persistentVolumeReclaimPolicy: Retain   <-- After we delete a PVC, the attached PV will be remain their till we manually delete it, 
+                                               It can not be re-used by any other Claims.
+>) persistentVolumeReclaimPolicy: Delete   <-- when we delete the PVC the attached PV will also be delete at the same time
+
+>) persistentVolumeReclaimPolicy: Recycle   <-- when we delete the PVC the data in the attached PVC will be deleted, After that 
+                                               with no-data available this PV can be claimed by any other PVC
+
+Step-1) Create "Persistent Volume"
+
+pv.yaml
+--------
+apiVersion: v1
+kind: PersistentVolume
+metadata: 
+  name: my-per-volume
+  labels:
+    name: my-pv
+spec:
+  accessModes:
+    - ReadWriteOnce        
+  capacity:
+    storage: 1Gi
+  persistentVolumeReclaimPolicy: Retain  
+  hotstPath:
+    path: /data     
+    type: Directory                    <-- "type: Directory" it is optional, if we use "hostPath" then it is automatically taken
+
+
+
+pv.yaml
+--------
+apiVersion: v1
+kind: PersistentVolume
+metadata: 
+  name: my-per-volume
+  labels:
+    name: my-pv                    <-- here we can define a lable in the PV
+spec:
+  accessModes:
+    - ReadWriteOnce        
+  capacity:
+    storage: 1Gi
+  persistentVolumeReclaimPolicy: Delete  
+  awsElasticBlockStore:
+    volumeID: <ID-Nummber>  
+    fsType: ext4 
+
+
+Step-2) Create "Presistent Volume Claim"
+
+pvc.yaml
+--------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: 
+  name: my-claim-aaaa
+spec:
+  selector:
+    matchLabels:
+    name: my-pv                       <-- As we have define the "Selector" then it search for "PV" with this lable and attach to it
+  accessModes:
+    - ReadWriteOnce        
+  resources:
+    request:
+      storage: 500Mi
+
+
+
+Step-3) Attach the above created "PVC" in the Pod.yaml below
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: myclaim-aaaa
+
+----------------------------------------------------------------------------------------------------------
+StorageClass:
+------------
+
+StorageClass can use three type of Disks that we define under "Parameters"
+
+Silver StorageClass:               Gold StorageClass:          Platinum StorageClass:
+-------------------                -----------------           ----------------------
+type: pd-standard                  type: pd-standard           type: pd-ssd
+replication-type: none             replication-type: none      replication-type: none 
+
+
+Note:
+volumeBindingMode: WaitForFirstConsumer  or  Immediate
+
+Step-1) Create a "StorageClass"
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: my-storage-class-bb
+provisioner: ebs.csi.aws.com
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer 
+parameters:
+  type: pd-standard 
+  replication-type: none  
+
+
+Step-2) Create PVC 
+
+pvc.yaml
+--------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: 
+  name: my-claim-aaaa
+spec:
+  storageClassName: my-storage-class-bb
+  accessModes:
+    - ReadWriteOnce        
+  resources:
+    request:
+      storage: 500Mi
+
+
+Step-3) Attach the above created "PVC" in the Pod.yaml below
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: myclaim-bb
+
+
+#################################################################################################################################
+Networking:
+----------
+
+
+> route  
+
+> ip link    <-- to list and modify interface on the host.
+
+> ip addr    <-- to see the ip-addresses link to above interfaces.
+
+> ip addr add 192.168.1.10/24 dev eth0         <-- like this we can set ip-address on a Interface.
+                                                  Note: all the changes made above are valid only till a new re-start. All will be deleted.
+                                                  If we want to presist the changes, then we have to put then in the Network-interface file.
+
+> i route add 192.168.2.0/24  via  192.168.1.1
+
+> ip route add default via  192.168.2.1
+
+> pin <any ip>                         <-- if the ip address is reachable then it return result,
+
+Node-A             Node-B           Node-C      
+Network-A  -->   Network-B  -->   Network-C          <-- these are the networks created on every Node.
+
+> echo 1 > /proc/sys/net/ipv4/ip_forward        <-- Execute this command on the Node-B, after doing this we can send a packet from 
+                                                    Node-A to Node-c  through the Node-B, As we have done the "ip_forward" 
+                                                    this command will make in the file "/etc/sysctl.conf = 1" file 
+
+> cat /proc/sys/net/ipv4/ip_forward             <-- if it return  "0" it means no ip_forward is set for this Node or linux machine.
+
+
+
+> cat >> /etc/hosts    <-- in this file add   ->   192.168.1.11  db      <-- this is file is placed on every linux machine.
+
+
+-------------------------------------------------------------------------------------
+DNS Server:
+----------
+
+Assume we have a DNS service with ip - 192.168.1.100
+
+> /etc/resolv.conf     <-- on every Linux machine have a file "resolv.conf" in it just add the "DNS" server ip, then when we do a ping then 
+                           it just check the ip in DNS server and return the result.
+
+
+--------------------------------------------------------------------------------------------
+Domain Names 
+-------------
+
+below is example of "www.google.com" 
+
+.                             <-- Root 
+.com, .net, .edu, .de         <-- these are Top Level Domain Name
+google                        <-- This is domain name assign to google
+www                           <-- Subdomain
+
+
+
+-----------------------------------------------------------------------------------------------
+Record Types  in Route 53:
+-------------------------
+
+A-Records           <-- mapping ipv4  
+AAAA                <-- mapping ipv6
+CNAME               <-- mapping  food.web  to  my-web.com, It is name-to-name mapping
+
+
+--------------------------------------------------------------------------------
+> ps aux                                        <-- when we we run this command on the pod, then it will show the process running on the pod
+> ps aus                                        <-- when we run this command on the node, then it show all the process running on the whole node.
+
+
+> ip netns add my-interface-a                   <-- like this we can add a new Network-namespace on the pod container
+> ip netns                                      <-- like this we can list all the Network-namespace available on the pod
+
+> ip link                                                <-- to like all the interfaces on the Node.
+
+> ip address                                     <-- we can get the "Network-interface" and "MAC-address" that is attached to pod or Node
+
+> ip address show <interface-name>             <-- e.g  eth0  <-- it can be a interface name, then it will give us the info about it.
+
+> ip address show type bridge                  <-- it can show us all the "Bridge-network-interface" on the Machine, Node or Pod.
+
+> ip netns exec <network-namespace-name> ip link         <-- like this we can see which Network interface^
+
+> ip route                                      <-- it will give info about all the routes that are defined.
+
+> ip route add 192.168.1.0/24  via 192.168.2.2
+
+> netstat -plnt 
+
+> route 
+
+> netstat  --help 
+
+##########################################################################################################
+Services & kube-api-server & Kube-proxy   (Vid  223: Service-Networking)
+----------------------------------------
+
+kube-api-server --service-cluste-ip-range ipNet (Default: 10.0.0.0/24)
+
+> ps aux | grep kube-api-server               <-- with this we get a output that from-till which range "kube-proxy" alloweed
+                                                 to set ip ranges for Services.
+                                        Output: kube-apiserver --authorization-mode=Node,RBAC --service-cluster-ip-range=10.96.0.0/12   
+
+> iptables -L -t nat | grep my-db-service        <-- this commmand outputs the ip-address defined for the service and it also shows
+                                                    the ip address that is for the pod that is mapped to this service 
+
+> cat /var/log/kube-proxy.log                 <-- it will give us all the logs, how the kube-proxy assign all the ip to service and to pod 
+                                                  and mapping them.
+
+
+########################################################################################################
+CoreDNS
+-------
+
+-) When a Service is created, then a ip-address is assigned to it, After Service is created then a entry in the CoreDNS table
+   is made with the Name of the service map to ip of the service, so when any pod send a request to the Name of the service then
+   the request is forwarded to the ip of the service.
+   

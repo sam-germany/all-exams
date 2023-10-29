@@ -1,499 +1,646 @@
+https://tutorialsdojo.com/
 
 Importan Exam topics:
 ---------------------
 Niels Course -- Associate Level Question numbers are from "2 Attempt"  Professional level Questions are from "1 Attempt"
-
+Jon Donso Course -- Professional level Questions are from "3 Attempt" of all 4 practise teste
 ########################################################
 Topics need to revise:   Cloud-HSM, Cognito, 
 
 Question not understand:
 ------------------------
-P: 2.11, 3.26, 4.1 
+P: 2.11, 3.26, 4.1, 4.30(in explanation third option) 
+DJ: 2.22, 2.27, 2.70
+
 ########################################################
 
-P-AWS-CDK (Cloud-Development-Kit): 3.21(i)
+P-AWS-CDK (Cloud-Development-Kit): 3.21
 
-P-Ci/CD: 3.25, 4.6(i)
+P-CI/CD: 3.25, 4.6, 4.27, 6.4, 6.7, 6.10
 
-IoT: 
+P-Security: 3.11, 3.13
 
-P-Security: 3.11(i), 3.13(i)
+A-IAM: 1.38, 2.4, 2.5, 2.52, 2.53, 3.25, 3.26, 3.60, 5.33, 5.49
+P-IAM: 2.9, 2.20, 4.10, 6.17, 6.26
+DJ-IAM: 2.25, 3.6, 3.11(External-ID), 3.13, 3.28, 
 
-A-IAM: 1.38, 2.4, 2.5, 2.52, 2.53, 3.25, 3.26, 3.60, 5.33, 5.49(i)
-P-IAM: 2.9(i), 2.20(i), 4.10
+DJ-Ec2-Instance-Profile(IAM-Role): 4.1
+DJ-Ec2-Instance-Role: 4.22
 
-A-IAM-Organizations: 2.60, 3.64, 4.49(i)
-P-IAM-Organizations: 1.23(i)
+DJ-IAM-Resoure-Based-Policy: 1.1, 2.10
+
+DJ-IAM-Service-Linked-Role: 1.64
+
+DJ-IAM-for-CROSS-Account-Access: 4.33
+
+DJ-Service-Control-Policies (SCP): 1.30, 1.51, 3.42, 3.62(Tag Editor, & A SCP can also define a "Deny-rule")
+
+A-IAM-Organizations: 2.60, 3.64, 4.49
+P-IAM-Organizations: 1.23,
 
 A-Organization-Unit: 1.23, 
-P-Organization-Unit: 1.2(i), 1.7, 1.27(i), 4.23(i)
+P-Organization-Unit: 1.2, 1.7, 1.27, 4.23, 6.9
+DJ-Organization-Unit: 1.21, 1.30, 2.55, 2.67
 
-A-Organization: 4.15, 5.45(i)
-P-Organization: 
+A-Organization: 4.15, 5.45
+P-Organization: 6.28
+DJ-Organization: 2.47, 3.30, 3.68
 
-P-AWS-Budgets: 1.2(i), 2.27(i), 4.14(i)
+P-AWS-Budgets: 1.2, 2.27, 4.14
 
-P-Cost-Allocation-Tags: 2.25(i)
+P-Cost-Allocation-Tags: 2.25,
+DJ-Cost-Allocation-Tags: 3.62 (Tag Editor), 3.67, 4.15
 
-P-AWS-QuickSight-Dashboard: 2.16(i)
-
-A-Gloal Accelerator: 1.1, 5.53
-P-Gloal Accelerator: 
+P-AWS-QuickSight-Dashboard: 2.16
 
 A-Lmabda: 1.7, 2.24
-P-Lambda: 1.11(i), 1.15(i), 3.8(i), 4.21(imp)
+P-Lambda: 1.11, 1.15, 3.8, 4.21(imp), 5.7, 5.9, 6.1
+DJ-Lambda: 2.53
 
-P-Lambda@Edge: 3.20(i)
+P-Lambda@Edge: 3.20
+DJ-Lambda@Edge: 2.63(User-Agent HTTP Header), 3.46
+
+P-Step-Functions: 6.1
+DJ-Step-Functions: 2.21
 
 A-Amazon-FSx-Luster: 2.13, 2,14, 2.45, 3.31, 3.63
-P-Amazon-FSx-Luster:
+DJ-FSx-Lustre: 3.49
 
-A-Amazon-FSx-Windows: 2.47, 2.57, 3.12(i), 3.24, 5.7, 5.19, 5.26
-P-Amazon-FSx-Windows:
+A-Amazon-FSx-Windows: 2.47, 2.57, 3.12, 3.24, 5.7, 5.19, 5.26
+DJ-Amazon-FSx-Windows: 3.50
 
 (For Windows Active Directory)
 A-Amazon-FSx: 1.49, 1.61, 4.32, 5.28
-P-Amazon-FSx:
 
 A-AWS-Directory-Service-For-Microsoft-Active-Directory: 5.47
 P-AWS-Directory-Service-For-Microsoft-Active-Directory:
+DJ-AWS-Directory-Service-For-Microsoft-Active-Directory: 2.61
 
 A-AWS IAM Identity Center: 5.47
-P-AWS IAM Identity Center:
 
+A-SnowBall: 2.12, 2.16, 3.50 
+P-SnowBall: 2.30
+DJ-SnowBall: 2.2, 4.6
+
+(Snowball-Edge-Device-can-store-upto-80TB)
 A-Snowball-Edge-Device: 1.12, 4.27, 4.59
-P-Snowball-Edge-Device:
+DJ-Snowball-Edge-Device: 1.4, 2.39
 
 A-Snowball-Devices: 4.24
-P-Snowball-Devices:
 
 A-AWS-Snowmobile (truck): 
 P-AWS-Snowmobile (truck): 
 
-A-PrivateLink: 1.13, 2.29, 3.39(i)
-P-PrivateLink: 
+------------------------------------------------------------
+https://www.youtube.com/watch?v=JIW_pV3zau8
 
-A-CloudFront: 1.16, 1.19, 1.33, 1.47, 1.60, 2.2, 2.25, 2.38, 2.39, 2.56, 3.40(i), 3.58, 3.61, 4.20, 4.52, 5.41, 5.42
-P-CloudFront: 1.20(i), 1.25(i), 2.12(i), 3.20, 3.27
+CloudFront Signed URLS(PrivateLink)  <-- it is used when we want to give permission only to one file
+CloudFront Signed cookies            <-- it is used when we want to give permissions to many files.
+--------------------------------------------------------
 
-P-AWS-DX (Direct connect): 1.5(i) (Transit gateway if all VPCs are in same region, DX gateway if VPCs are in different regions)
+A-CloudFront-PrivateLink: 1.13, 2.29, 3.39
 
+DJ-CloudFront-PrivateLink: 2.4
+
+A-CloudFront: 1.16, 1.19, 1.33, 1.47, 1.60, 2.2, 2.25, 2.38, 2.39, 2.56, 3.40, 3.58, 3.61, 4.20, 4.52, 5.41, 5.42
+P-CloudFront: 1.20, 1.25, 2.12, 3.20, 3.27, 6.15, 6.16
+DJ-CloudFront: 1.18, 1.23, 1.27, 2.12, 2.18, 2.33(https://www.youtube.com/watch?v=9TlWF0-Ah8Q)
+               2.38, 2.69(steady-state usage), 3.10, 3.15, 3.17, 3.20, 3.41, 3.72
+               4.4, 4.35
 
 A-CloudFront-Edge-Functions: 4.50
-P-CloudFront-Edge-Functions:
 
-A-CloudTrail: 2.48, 2.55, 3.33(i), 4.49(i), 5.32, 5.39
-P-CloudTrail:
+DJ-Single-CloudFront-web-distribution-Multiple-Origins: 4.35
+
+A-CloudTrail: 2.48, 2.55, 3.33, 4.49, 5.32, 5.39
+DJ-CloudTrail: 1.29, 1.32, 1.73, 2.7, 3.56, 4.5
+
+DJ-Organization-Trails: 3.56
+
 
 A-CloudWatch: 3.3, 3.4, 4.4, 5.55
-P-CloudWatch:
+DJ-CloudWatch: 1.33
 
-A-Unified-CloudWatch-Agent: 4.45(i) 
-A-Unified-CloudWatch-Agent:
+P-CloudWatch-Logs: 5.23
 
-A-DataSync: 1.20,1.39(i), 2.49, 3.48, 5.19
-P-DataSync: 1.15(i)
+A-Unified-CloudWatch-Agent: 4.45 
+DJ-Unified-CloudWatch-Agent: 1.58
+
+A-DataSync: 1.20,1.39, 2.49, 3.48, 5.19
+P-DataSync: 1.15
 
 A-Direct-Connect: 1.39
-P-Direct-Connect:
-
+DJ-Direct-Connect: 1.52, 1.53
 
 A-EFA: 1.9
-P-EFA: 
+P-EFA:
 
 A-Ec2: 1.10, 1.45, 1.63, 2.51, 3.16, 6.5
-P-Ec2: 
+P-Ec2: 5.15
 
 A-Ec2-Capacity: 5.36
-P-Ec2-Capacity:
 
 A-Ec2-price: 1.15, 1.30, 1.43, 1.53, 4.56, 6.1
-P-Ec2-price: 2.3(i), 4.14(imp)
+P-Ec2-price: 2.3, 4.14
+DJ-Ec2-price: 1.41, 1.57, 1.63, 3.2
 
 A-Ec2-AutoScaling: 2.32, 2.62, 3.2, 3.15, 3.32, 3.54, 6.4
-P-Ec2-AutoScaling: 4.24(i), 
+P-Ec2-AutoScaling: 4.24, 
+DJ-Ec2-AutoScaling: 3.73(steady-state-load)
+Note: "Steady-state-load" means that some traffic is stable, e.g that an EC2 instance get a regularly same amount of traffic, 
+       it means "steady-state-load", in this case we can use "Reserver-Instances" as we know that this amount of load is comming regularly
+       so "On-Demand" or "Spot-Instance" are not suitable in this use-case.
 
 A-Ec2-Instance-Store: 3.10
-P-Ec2-Instance-Store:  
 
-A-Ec2-Cluster-Placement-Group: 3.49, 5.40(all-info)
-P-Ec2-Cluster-Placement-Group:
+A-Ec2-Cluster-Placement-Group: 2.26, 3.49, 5.40(all-info)
+P-Cluster-Placement-Group: 2.4, 5.2
+DJ-Ec2-Cluster-Placement-Group: 3.60, 4.26
 
-A-Spread-Placement-Group:
-P-Spread-Placement-Group:
-
-A-Partition-Placement-Group: 
-P-Partition-Placement-Group:
+DJ-Ec2Rescue: 4.27
 
 A-ECS: 1.22, 2.64, 3.29
-P-ECS: 1.10
+P-ECS: 1.10, 5.19, 5.29
+JD-ECS: 1.2, 1.9, 1.63
 
 A-EBS: 5.9, 5.54, 5.64
-P-EBS:
+P-EBS: 6.13
+DJ-EBS: 3.25
 
-A-EBS-Encryption: 5.3, 5.38(i)
-P-EBS-Encryption:
+A-EBS-Encryption: 5.3, 5.38
 
-A-EBS-Price: 1.44(i), 3.28
-P-EBS-Price: 2.3(i)
+A-EBS-Price: 1.44, 3.28
+P-EBS-Price: 2.3
+
+P-AWS-Data-Lifecycle-Manager (AWS-DLM): 6.13
 
 A-EKS: 1.65
-P-EKS:
 
 A-EFS: 1.2, 1.18, 1.36, 2.11, 2.23, 2.50, 3.7, 4.44, 5.8, 5.63
-P-EFS:
 
 A-NLB: 1.4
 P-NLB: 3.19(imp)
+DJ-NLB: 2.22 (https://www.youtube.com/watch?v=0bHXWIM4_0o), 4.30
 
 A-ALB: 1.28,
-P-ALB:
+P-ALB: 6.14, 6.21
+DJ-ALB: 1.46, 2.16, 2.51, 3.47, 3.72, 4.28
 
 A-API-Gateway: 2.58, 3.21, 3.43, 5.6, 5.30, 5.65(caching-response)
-P-API-Gateway: 1.1, 1.13(i), 4.7(i), 4.13(i)
+P-API-Gateway: 1.1, 1.13, 4.7, 4.13, 5.11, 5.24
+DJ-API-Gateway: 2.11, 3.55
+
+DJ-API-Gateway-Lambda-Proxy-Integration: 2.9
 
 A-Internet-Gateway: 5.50
-P-Internet-Gateway:
 
 A-SNS: 4.43
-P-SNS:
 
 A-AWS-Network-Firewall: 2.65
-P-AWS-Network-Firewall:
+
+Disaster-Recovery  -  PITR - (Point-in-time-recovery)
+DJ-RDS (RTO-RPO-PITR): 2.68, 4.11
+DJ-Aurora-Read-Replica-RTO-RPO: 3.70,
+
 
 A-RDS-DB: 1.5, 1.29, 1.34, 1.35, 1.37, 1.50, 2.7, 2.9, 2.27, 2.37, 2.42, 3.35, 4.18, 4.51
-P-RDS-DB: 4.12(i)
+P-RDS-DB: 4.12
+DJ-RDS-DB: 1.47, 2.29, 2.71, 3.14, 3.19
 
 A-RDS-Proxy: 2.40
-P-RDS-Proxy:
+DJ-RDS-Proxy: 4.21
 
 A-RDS-MySQL-DB: 5.35
-P-RDS-MySQL-DB: 1.18(i)
+P-RDS-MySQL-DB: 1.18
+
+DJ-RDS-Oracle: 2.46
+DJ-Oracle: 2.31
 
 A-RDS-MySQL-DB-Instance: 3.55, 4.10
-P-RDS-MySQL-DB-Instance: 1.9
+P-RDS-MySQL-DB-Instance: 1.9, 6.12
+DJ-RDS-MySQL-DB-Instance: 2.15, 4.32
 
 A-AWS-RDS-Microsoft-SQL: 4.64
-P-AWS-RDS-Microsoft-SQL:
 
-A-Aurora-DB: 4.13(i)
-P-Aurora-DB:
+A-Aurora-DB: 4.13
+DJ-Aurora-DB: 1.57
 
-A-Aurora-Global-DB: 1.21, 3.57(i), 4.14
-P-Aurora-Global-DB: 1.16(i)
+A-Aurora-Global-DB: 1.21, 3.57, 4.14
+P-Aurora-Global-DB: 1.16
+DJ-Aurora-Global-DB: 3.4
 
-A-Aurora MySQL: 2.44, 3.14
-P-Aurora MySQL: 1.19, 2.7(i), 4.2(i)
+A-Aurora-MySQL: 2.44, 3.14
+P-Aurora-MySQL: 1.19, 2.7, 4.2
 
-A-Aurora-MySQL-Cluster: 3.46(i)
-P-Aurora-MySQL-Cluster:
+A-Aurora-MySQL-Cluster: 3.46
+DJ-Aurora-MySQL-Cluster: 4.21 
 
 A-Aurora-Serverless: 3.41
-P-Aurora-Serverless:
+
+DJ-Aurora-Autoscaling: 3.28
+
 
 
 A-DynamoDB: 2.61, 3.8, 4.19, 5.25, 5,57           (MongoDB) (RCU  read-capacity-unit) (WCU write-capacity-unit)
-P-DynamoDB: 2.19(i), 3.17(i), 3.18(i), 3.22(i), 3.24
+P-DynamoDB: 2.19, 3.17, 3.18, 3.22, 3.24, 5.27, 5.28, 6.20
+DJ-DynamoDB: 1.12, 1.19, 1.61, 2.14, 3.9, 4.19, 4.34
 
 A-DynamoDB-Streams: 4.65
-P-DynamoDB-Streams: 3.23(i), 4.3(i)
+P-DynamoDB-Streams: 3.23, 4.3
+DJ-SynamoDB-Streams: 3.26
 
 A-DynamoDB-Accelerator: 5.27, 5.42
 P-DynamoDB-Accelerator: 1.3
 
 A-DocumentDB (it store JSON data): 4.12    
-P-DocumentDB:
 
 A-RedShift: 2.46, 5.5
-P-RedShift:
 
-A-S3: 1.6, 1.25, 1.32, 1.59, 1.64, 2.10, 3.22, 3.42, 3.53, 4.5, 4.38, 5.18(i), 5.51, 5.58,
-P-S3: 2.9(i), 3.9(i)
+A-S3: 1.6, 1.25, 1.32, 1.59, 1.64, 2.10, 3.22, 3.42, 3.53, 4.5, 4.38, 5.18, 5.51, 5.58,
+P-S3: 2.9, 3.9, 4.25, 4.26, 5.3(imp), 5.6, 5.6, 5.14, 5.16, 5.20, 5.26, 6.20, 6.27, 6.30
+DJ-S3: 1.28, 1.38, 1.42, 1.54, 2.4, 2.5, 2.20, 2.37, 2.48, 2.52, 2.74, 3.6, 3.18, 3.29, 3.36
+       3.51, 3.54, 4.17
 
-A-S3-Encryption: 2.63, 3.59, 4.41(i), 5.61
-P-S3-Encryption: 4.11(i)
+DJ-S3-Cross-Account: 4.10
+
+A-S3-Encryption: 2.63, 3.59, 4.41, 5.61
+P-S3-Encryption: 4.11, 5.16,
+DJ-S3-Encryption: 1.65, 2.75, 3.5, 3.35, 3.74
 
 A-S3-policy: 5.43, 5.45
-P-S3-policy: 2.23(i)
+P-S3-policy: 2.23
 
-A-S3-Lifecycle-policy: 2.36, 3.5, 3.51, 4.3, 4.54(i), 4.57(i), 3.60, 6.6
+A-S3-Lifecycle-policy: 2.36, 3.5, 3.51, 4.3, 4.54, 4.57, 3.60, 6.6
 P-S3-Lifecycle-policy: 1.8
 
 A-S3-Access-Points: 4.46
-P-S3-Access-Points:
 
 A-S3-Data-Lake: 3.47
-P-S3-Data-Lake:
 
-P-S3-Transfer-Acceleration (it is for uploading data to S3): 2.17
+P-S3-Transfer-Acceleration (it is for uploading data to S3): 2.17, 6.29
+DJ-S3-Transfer-Acceleration: 2.58
+
+A-Gloal Accelerator: 1.1, 3.23, 3.52, 4.48, 5.53
+DJ-Global Accelerator: 1.26
 
 A-KMS: 3.59, 3.62, 5.61
-P-KMS:
+P-KMS: 4.28
 
 A-ECS: 1.62, 2.64
-P-ECS:
+P-ECS: 6.22
+DJ-ECS: 1.17
+
+DJ-Fargate: 1.7
 
 A-ECS-Fargate: 2.31, 2.41
-P-ECS-Fargate:
+DJ-ECS-Fargate: 3.9
 
 A-FahrGate-EKS: 4.12
-P-FahrGate-EKS: 2.18(i)
-
-A-VPC: 1.41, 2.3, 3.39(i), 3.44, 4.15
-P-VPC:
-
-A-VPN: 3.19(i)
-P-VPN:
-
-A-Virtual-Private-Gateway: 3.19(i), 5.12
-P-Virtual-Private-Gateway:
+P-FahrGate-EKS: 2.18
 
 A-SQS: 5.15, 5.31, 5.52,
-P-SQS: 1.4, 1.14, 1.28, 2.1(i), 3.2
+P-SQS: 1.4, 1.14, 1.28, 2.1, 3.2, 6.6
+DJ-SQS: 1.45, 2.32, 2.43, 3.1, 3.31, 3.34, 3.38, 4.29
 
 A-SQS-Standard-Queue: 1.11, 1.14, 1.17(RBP), 1.42, 1.51, 2.19, 2.34, 3.30, 3.37, 3.45, 4.63, 5.2
-P-SQS-Standard-Queue:
 
 A-SQS-FIFO: 3.1, 4.40
-P-SQS-FIFO:
 
 A-MQ: 1.40, 4.16
-P-MQ:
 
-A-Stograge-Gateway: 1.24(I), 1.31, 1.54(i), 2.6, 2.22, 3.17
-P-Stograge-Gateway:
+A-Stograge-Gateway: 1.24, 1.31, 1.54, 2.6, 2.22, 3.17
+DJ-Storage-Gateway: 2.73, 3.22, 3.39, 3.53
 
-A-AWS Storage Gateway volume gateway: 
-P-AWS Storage Gateway volume gateway:
+DJ-File-Gateway: 1.36
+
+
 
 A-AWS Storage Gateway File gateway: 4.2, 5.60 
-P-AWS Storage Gateway File gateway:
 
 
 VPC Endpoints are of three types: Interface-Endpoint , Gateway-Endpoint , GatewayLoadBalancer-Endpoint
 ---------------------------------------------------
-A-VPC-Endpoint: 4.35, 5.48
-P-VPC-Endpoint: 4.22(i)
+https://www.youtube.com/watch?v=jo3X_aay4Vs     <-- main points explained here for "VPC-Endpoint"
+https://www.youtube.com/watch?v=PuFGvU3jbtk     <-- Endable DNS Hostname
 
-A- VPC Interface Endpoint: 1.27(i)
-P- VPC Interface Endpoint: 4.22(i) 
+A-VPC-Endpoint: 4.35, 5.48
+P-VPC-Endpoint: 4.22
+DJ-VPC-Endpoint-Policy: 3.51 
+
+A- VPC Interface Endpoint: 1.27
+P- VPC Interface Endpoint: 4.22, 5.1(i https://www.youtube.com/watch?v=jo3X_aay4Vs) 
 
 A-Virtual-Interface: 5.48(given all info about the all types of Virtual-Interfaces )
-P-Virtual-Interface:
 
 (VPC Gateway Endpoint is only for  S3 and DynamoDB)
-A- VPC-Gateway-Endpoint: 1.27(i), 1.57, 2.30, 3.18, 3.36, 4.8
-P- VPC-Gateway-Endpoint: 
+A- VPC-Gateway-Endpoint: 1.27, 1.57, 2.30, 3.18, 3.36, 4.8
 
+A-VPC: 1.41, 2.3, 3.39, 3.44, 4.15
+DJ-VPC: 1.16, 2.56
+
+DJ-VGW-Virtual-private-Gateway: 3.7
+
+DJ-VPC-Flow-Logs: 1.16
+
+DJ-IP-Address-Block: 1.75
+
+A-VPN: 3.19
+DJ-VPN: 3.63
+
+P-Subnet: 5.25
+DJ-Subnet: 2.22
+
+DJ-Network-Interface: 2.50
+
+A-Virtual-Private-Gateway: 3.19, 5.12
 ---------------------------------------------------
 A-Kinesis-Data-Stream & Firehose: 1.46, 2.8, 2.54, 4.28
-P-Kinesis-Data-Stream & Firehose: 1.11, 3.7(i)
+P-Kinesis-Data-Stream & Firehose: 1.11, 3.7
+DJ-Kinesis: 1.74, 2.44, 3.23
 
 A-Kinesis-Data-Firehose: 5.24
-P-Kinesis-Data-Firehose:
+DJ-Kinesis-Data-Firehose: 4.8, 4.16
 
-A-Route-53: 1.55, 1.56(i), 3.6, 3.58
-P-Route-53: 1.30, 3.10(i)
+A-Route-53: 1.55, 1.56, 3.6, 3.58
+P-Route-53: 1.30, 3.10, 6.5, 6.8
+DJ-Route-53: 1.8, 1.13, 1.14, 1.25, 1.46, 1.59, 2.8(Alias-record)
+
+DNS-Resolver:
+DJ-Route-53 (outbound-resolver): 2.59, 3.21
+
+DJ-ACM-Amazon-Certificate-Manager: 1.67, 
 
 A-Route-Table: 5.50(see-pic)
-P-Route-Table:
 
 Â-Presigned-URL: 2.10
-P-Presigned-URL: 
 
-A-SnowBall: 2.12, 2.16, 3.50 
-P-SnowBall: 2.30(i)
-
+https://www.stormit.cloud/blog/aws-direct-connect/
+https://docs.aws.amazon.com/de_de/whitepapers/latest/aws-vpc-connectivity-options/aws-direct-connect.html
+(Transit gateway if all VPCs are in same region, DX gateway if VPCs are in different regions)
 A-Direct-Connect (DX): 2.17
-P-Direct-Connect (DX): 3.18(i)
+P-Direct-Connect (DX): 1.5, 3.18, 6.2, 6.11, 6.23
+DJ-Direct-Connect (DX): 1.24, 3.71
 
 A-Direct-Connect-Link: 2.15
-P-Direct-Connect-Link:
 
 A-Transit-Gateway: 2.18, 5.22
 P-Transit-Gateway: 2.10
+DJ-Transit-Gateway: 2.40
 
 A-AMI: 2.20
-P-AMI:
 
-A-Network-ACLs: 3.34(i)
-P-Network-ACLs:
+A-Network-ACLs (NACL): 3.34
+DJ-Network-ACLs (NACL): 4.20, 4.30
 
-A-Security-Group: 2.1, 3.34(i), 4.33, 4.58(i), 5.21
+A-Security-Group: 2.1, 3.34, 4.33, 4.58, 5.21
 P-Security-Group: 2.29
+DJ-Security-Group: 2.54, 3.45
 
 A-Glue: 2.21, 5.16
-P-Glue: 1.12
+P-Glue: 1.12, 5.13, 5.22
 
-A-Cluster-Placement-Group: 2.26
-P-Cluster-Placement-Group: 2.4(i)
+
 
 A-ElastiCache: 5.34(all-explained)
-P-ElastiCache
+DJ-Elasticache: 3.24
 
 A-ElastiCache-Redis: 2.35, 3.13, 4.22, 4.23, 5.23
-P-ElastiCache-Redis:
 
 
 A-QuickSight-Dashboard: 2.55
-P-QuickSight-Dashboard:
 
 A-Bastion-Host: 2.9
-P-Bastion-Host:
 
-A-CloudFormation: 3.20(i)
-P-CloudFormation: 1.29
-
-A-Global-Accelerator: 3.23(i), 3.52(i), 4.48
-P-Global-Accelerator:
+A-CloudFormation: 3.20
+P-CloudFormation: 1.29, 5.4
+DJ-CloudFormation: 1.35, 2.1, 2.15, 2.26, 2.35, 2.64, 2.66, 3.27, 4.1
 
 A-GuardDuty: 3.27, 4.37
-P-GuardDuty:
 
 A-Amazon Quantum Ledger Database (QLDB): 3.38
-P-Amazon Quantum Ledger Database (QLDB)
 
 A-NatGateway: 3.47, 5.14, 5.50
-P-NatGateway:
+P-NatGateway: 6.19
+DJ-NatGateway: 1.10, 2.24, 3.16
+
+DJ-Proxy-Server: 2.45
+
+DJ-Forward-Proxy-Server: 2.49
+
 
 A-Lake Formation: 3.65
-P-Lake Formation:
 
-A-Redshift:
-P-Redshift: 2.27(i)
 
 A-Redshift-Spectrum: 4.6
-P-Redshift-Spectrum:
+
+P-Redshift: 2.27
+DJ-Redshift: 3.59
 
 A-SageMaker: 4.7
-P-SageMaker:
+DJ-SageMaker: 2.35
 
 A-Data-Exchange: 4.7
-P-Data-Exchange:
 
 A-Disaster-Recovery: 4.9, 5.1(i-Diagram), 5.62
-P-Disaster-Recovery: 3.12(i), 3.16(i)
-
+P-Disaster-Recovery: 3.12, 3.16, 6.25
+DJ-Disaster-Recovery: 1.60, 1.66, 2.13, 2.27, 2.65, 3.70
 
 A-AWS-Compute-Optimizer: 4.17
-P-AWS-Compute-Optimizer:
 
 A-AWS-Config-Rule: 4.21, 5.32, 5.39, 5.44
-P-AWS-Config-Rule:
+DJ-AWS-Config: 1.1, 1.29, 1.44, 3.43
+DJ-AWS-Config-Manager-Rule: 4.9
+
+P-AWS-Config-Auto-Remediation: 5.20,
 
 A-AWS-AppSync-(GraphQL-API): 4.25
-P-AWS-AppSync-(GraphQL-API): 4.9(i)
+P-AWS-AppSync-(GraphQL-API): 4.9
+DJ-AWS-AppSync-(GraphQL-API): 4.25
 
 A-AWS-Private-5G: 4.26
-P-AWS-Private-5G:
 
-A-RAID-0: 4.30(i)
-P-RAID-0:
+A-RAID-0: 4.30
 
-A-RAID-1: 4.29(i)
-P-RAID-1:
+A-RAID-1: 4.29
+DJ-3.60(just in option he adds RAID)
 
-A-AWS-Batch: 4.34(i-HPC), 6.2
-P-AWS-Batch:
+A-AWS-Batch-Job: 4.34(i-HPC), 6.2
+DJ-AWS-Batch-Job: 1.38
 
 A-AWS-License-Manager: 4.36
-P-AWS-License-Manager:
+
+P-Systems-Manager: 5.30
+
+DJ-Systems-Manager-Session-Manager: 1.3
+
+A-Systems-Manager-Run-Command: 5.13, 6.3
+
+A-Systems-Manager-Patch-Manager: 5.17
+P-Systems-Manager-Patch-Manager: 2.14
+DJ-Systems-Manager-Patch-Manager: 1.39, 1.44, 1.55, 2.30, 3.32
+
+DJ-Systems-Manager-Maintence-Windows: 2.30
 
 A-AWS-Systems-Manager-Parameter-Store: 4.39
-P-AWS-Systems-Manager-Parameter-Store:
+DJ-AWS-Systems-Manager-Parametr-Store: 1.43
 
 P-AWS-Systems-Manager-Agent: 2.21
 
 A-AWS-Systems-Manager-Automation-Documents: 5.44
-P-AWS-Systems-Manager-Automation-Documents:
+DJ-AWS-Systems-Manager-Automation: 3.58
 
 A-AWS-Comprehend: 4.47
-P-AWS-Comprehend:
 
-A-AWS-Direct-Connect: 4.53(i)
-P-AWS-Direct-Connect:
+A-AWS-Direct-Connect: 4.53
 
 A-AWS-Athena: 4.55, 4.61, 5.16
-P-AWS-Athena:
 
 A-AWS-Control-Tower: 4.62
-P-AWS-Control-Tower:
 
 A-AWS-Keyspaces: 4.64
-P-AWS-Keyspaces:
 
 A-WAF: 1.52, 2.33
-P-WAF: 4.15(i)
+P-WAF: 4.15
+DJ-WAF: 1.31, 3.3
+
+
+(AWS Shield Standard is included automatically and transparently to your Elastic Load Balancing load balancers, Amazon CloudFront distributions, and Amazon Route 53 resources at no additional cost.)
+DJ-AWS-Shield: 1.50, 2.17, 3.57
+
 
 A-AWS-Firewall-Manager: 5.4
-P-AWS-Firewall-Manager:
 
 A-Gateway-Load-Balancer: 5.10
-P-Gateway-Load-Balancer:
 
 A-EventBridge: 5.11
-P-EventBridge:
-
-A-Systems-Manager-Run-Command: 5.13, 6.3
-P-Systems-Manager-Run-Command: 
-
-A-Systems-Manager-Patch-Manager: 5.17
-P-Systems-Manager-Patch-Manager: 2.14(i)
+DJ-EventBridge: 4.5
 
 A-SageMaker: 5.18
-P-SageMaker:
 
 A-Amazon-Transcribe: 5.20
-P-Amazon-Transcribe:
+DJ-Amazon-Transcribe: 2.37
 
 A-Spot-Instances: 5.29
-P-Spot-Instances:
+DJ-Spot-Instances: 1.71, 2.3
 
 A-EKS: 5.29
-P-EKS:
 
 A-AWS-Penetration-Test: 5.46
-P-AWS-Penetration-Test:
 
 A-OpenSearch: 5.56
-P-OpenSearch:
+DJ-OpenSearch: 4.8
+
+DJ-CloudSearch: 2.5, 3.36(search-in-s3)
 
 P-Code-Pipeline: 2.22
 
 P-AWS-Inspector: 1.6
+Dj-AWS-Inspector(CVE-scan): 3.58
 
-P-AWS-Application-Discovery-Service: 1.17, 1.26(i), 2.8(i), 4.18(imp)
 
-P-AWS-Service-Catalog: 1.21, 2.13
+P-AWS-Application-Discovery-Service: 1.17, 1.26, 2.8, 4.18(imp)
+DJ-All-Discovery-Services: 2.36, 3.40
 
-P-SAML: 1.22(i), 3.6(i) 
+DJ-CART-Cloud-Adopation-Teadiness-Tool: 2.36
 
-P-Egress: 2.10(i)
+P-AWS-Service-Catalog: 1.21, 2.13, 6.3
 
-P-Code-Deploy: 2.26(i)
+P-SAML: 1.22, 3.6, 6.24
+DJ-SAML: 2.34, 2.57
 
-P-AWS-AMS-(Application-Migration-Service): 3.1, 3.24(i)
+DJ-Web-Identity-Federation: 3.52
 
-P-DMS-(Data-Migration-Service): 4.18(imp)
+DJ-Custom-Identity-Broker: 3.44
+DJ-Custom-Identity-Provider: 4.7
 
-P-VMware-Import/Export: 4.19(i)
+DJ-LDAP: 2.41
 
-P-High-Performance-Computing(HPC): 3.4(i)
+P-Egress: 2.10
 
-P-AWS-Elastic-Beanstalk: 3.5(i), 4.4(i)
+DJ-Code-Build: 3.69
 
-P-OpsWorks: 3.28(i)
+P-Code-Deploy: 2.26
+DJ-Code-Deploy: 1.49, 3.75
+
+P-Migration-All: 6.18
+DJ-Migration-All: 1.4, 1.37, 1.47, 1.59, 2.2, 2.28. 2.36
+
+P-AWS-Application-Migration-Service (MGN): 3.1, 3.24
+DJ-AWS-Application-Migration-Service (MGN): 1.11, 3.31
+
+P-AWS-SMS (Server Migration Service): 4.5, 4.18
+
+P-DMS-(Data-Migration-Service): 4.18, 
+DJ-DMS-Data-Migration-Sercice: 2.6
+
+DJ-Schema-Conversion-Tool (SCT): 1.4
+
+P-VMware-Import/Export: 4.19
+
+P-High-Performance-Computing(HPC): 3.4
+
+P-AWS-Elastic-Beanstalk: 3.5, 4.4
+DJ-Elastic-Beanstalk: 3.12, 3.48
+
+P-OpsWorks: 3.28, 5.4
+DJ-OpsWorks: 1.49, 2.23, 4.18
 
 P-CloudHSM (Cloud HSM): 4.1(i co -> Crypto officers)
+DJ-CloudHSM: 1.65, 2.42
 
-P-AWS-SMS (Server Migration Service): 4.5(i)
+
+
+P-AWS-(RAM)-Resource-Access-Manager: 4.30, 5.7
+DJ-AWS-(RAM)-Resource-Access-Manager: 1.64
+
+P-AWS-Secret-Manager: 5.5
+DJ-AWS-Secret-Manager: 1.2, 2.15
+
+DJ-AWS-Systems-Manager-Parameter-Store: 1.15
+
+P-AWS-CodeCommit: 5.12,
+DJ-AWS-CodeCommit: 1.48
+
+P-AWS-Compute-Optimizer: 5.17
+
+P-AWS-Trust-Advisor: 5.21
+
+P-EMR-Cluster: 6.30
+
+DJ-AWS-Serverless-Application-Model(SAM): 1.5
+
+DJ-AWS-Textract: 1.22, 3.8
+DJ-AWS-Comprehend: 3.8
+
+DJ-AWS-Connect: 1.56, 4.13
+DJ-AWS-LEX:     1.56, 4.13
+
+DJ-AWS-Macie: 1.60, 2.62
+
+DJ-AWS-IOT: 3.61
+
+DJ-IOT-Greengrass: 2.60
+
+DJ-Elastic-MapReduce: 3.2, 3.64
+
+DJ-Traffic-Mirroring(for-ec2-logs): 3.33
+
+DJ-AWS-Workspaces: 3.37, 3.66
+
+DJ-AWS-AppStream: 3.65
 
 A-AWS-Cost-Explorer: 5.59(comparision in "Billing dashboard", "AWS Cost Explorer", "Cost and Usage Report")
-P-AWS-Cost-Explorer:
 
 A-Use-Case: 4.1, 4.31, 4.42, 4.64, 5.18, 5.28, 5.37, 5.50
-P-Use-Case: 2.2, 2.5(i), 2.6(i), 2.24(i), 3.4(i), 3.16(i), 3.23(i), 3.27(i), 3.29(i), 3.30, 4.8, 4.9(i), 4.15(i), 4.17(i),
-            4.20(i)
+P-Use-Case: 2.2, 2.5, 2.6, 2.24, 
+            3.4, 3.16, 3.23, 3.27, 3.29, 3.30, 
+            4.8, 4.9, 4.15, 4.17,4.20, 4.29, 
+            5.8, 5.10, 5.28, 
+            6.16, 6.20
+DJ-Use-Case: 1.20, 1.34, 1.35, 1.38, 1.40, 1.43, 1.44, 1.46, 1.59, 1.62, 1.63, 1.68, 1.69, 1.70, 1.72, 
+             2.9, 2.19, 2.72, 3.47, 4.2, 4.12, 4.14, 4.23, 4.24
+             
+
 
 ============================================================================================
 Some important questions:
@@ -508,10 +655,103 @@ AWS Outposts:          <-- Niels Professinal - (Advanced Amazon VPC -vid 43)
 AWS Wavelength Zone:   <-- Niels Professinal - (Advanced Amazon VPC -vid 43)
 AWS Local Zone:        <-- Niels Professinal - (Advanced Amazon VPC -vid 43)
 
+-) Difference between CloudFormation "ChangeSet" and "StackSets" ? 
+-) Difference between "AWS AppStream 2.0"  and "AWS WorkSpace" ? 
+-) Difference between "Transit Gateway" and "AWS Resource Access Manager" ?  In "P-4.30" clearly explaind in the explanation.
+-) API-Gateway proxy and non-proxy ?
+-) Control Tower topic
+-) Guardrails, Controls topics
+-) CloudFormation question in Professional exam "CreateStack with CAPABILITY_NAMED_IAM"
+-) Difference between "service-control-policy"  and "user-based-policy" and "identity-based-policy" and "resource-based-policy" 
+-) What is a "service-linked-role" or  "service-linked-role with identity-based policy"
+-) SAML 2.0
+-) OpenID Connect
+-) "IPSec tunnel" and "IPsec connection"
+-) Can we use "IPSec" with "VPN connection"  or "Direct-Connect"
+-)  DynamoDB's Fine Grained Access Control for authentication and authorization
+-) Difference between "s3-server-side-encryption"  and "S3-Managed-Encryption-keys"
+-) Difference between "geoproximity" and "geolocation" routing ?
+-) What is an Alias record in Route-53 ?
 
 
-============================================================================================
-i am on  4.17
+Difficults words:
+-------------------
+fluctuate           <-- traffic is fixed, it does not gowes up or down.
+
+
+
+========================================================================================================
+IAM roles important points:
+---------------------------
+-) Cross-account access is primarily used for scenarios where you need to grant your IAM users permission 
+   to switch to roles within your AWS account or to roles defined in other AWS accounts that you own.
+-----------------------------
+-) Kinesis-Data-Stream: It offers a longer-term, durable storage.
+-) Kinesis-Data-Firehose: It has a feature to buffer data and supports data transformation in near-real-time.
+                          so in this case no need to store the data.
+
+
+=================================================================================================
+Database imp points:
+-------------------
+
+-) Global tables is a feature of Amazon DynamoDB and is not available for Amazon RDS.
+-) Multi-master configurations are only available for Amazon Aurora and only within a Region.
+-) Aurora global database does not allow writes in multiple Regions, only reads.
+---------------------------------------------------
+-) Aurora Global DB: In a Region-Outage or Failover of the primary-DB region, one of the secondary regions 
+   can be promoted to read and write capabilities in less than 1 minute. IT means if primery-region-A is fialed
+   then less then 1 min the secondary-region is ready for getting read/write requests.
+-) Amazon RDS: when we have two instances, One master DB in Region-A and second read in Region-B, if A goes down
+   then first we have to make manually promote the B DB to become master, this process takes many minutes
+   as it need to reboot the DB.
+-) Aurora  automated backups only occur once every day during the defined backup window, we can set a backup for every
+   5-min  or every 1-hour.
+----------------------------------------------------
+-) Read replicas are available in Amazon RDS for MySQL, MariaDB, Oracle, and PostgreSQL as well as Amazon Aurora.
+-) Amazon DynamoDB table in which each entry is limited to 400 KB only.
+-------------------------------------------------------------
+-) Amazon RDS for MySQL or all "Amazon RDS": assume we have one "Standby" instance and one "Read-Replica", In this case
+  if "Standby" has a failover then it take up to 60s to revocer. If the "Read-Replica" has a failover then it can take 
+  upto 35s to recover.
+---------------------------------------------------------------
+-) When you provision a Multi-AZ DB Instance, Amazon RDS automatically creates a primary DB Instance and synchronously 
+   replicates the data to a standby instance in a different Availability Zone (AZ). Each AZ runs on its own physically distinct, 
+   independent infrastructure and is engineered to be highly reliable.
+---------------------------------------------------------------
+-) Assume we have "Multi-AZ-RDS-MySQL-DB", so it means it is deployed in three Avalibility-zones, we can add also "Read-Replica"
+   in RDS for each Availability-Zone, with this all the "Read-query" pressuer will be come directly to "Read-Replica" and the 
+   primary DB has less pressuer and make a good performance for "Update-query" 
+
+
+
+
+
+-----------------------------------------------------
+-) Amazon EFS uses the NFS protocol which is primarily used by Linux AMIs. This filesystem does not support Windows ACLs.
+-) "Amazon-FSx-for-Lustre" filesystem is used for Linux based instances.
+-) For "Windows-Ec2" use "Amazon-FSx-for-Windows-File-Server" file system. 
+--------------------------------------------------------
+-)  Multi-Attach EBS volumes can only be attached on instances within the same Availability Zone. means if we want to
+   attach mutli-EBS volumes to a single instance then this instance can not span though other "Availability-zones"
+--------------------------------------------------------------
+-) 
+
+
+
+RTO:
+---- 
+It defines how quickly a service must be restored and a recovery point objective.
+RTO of 30 minutes means the service must be running again within half an hour.
+
+RPO:
+----
+It defines how much data it is acceptable to lose.
+RPO of 5 minutes means no more than 5 minutes’ worth of data can be lost.
+
+
+==================================================================================
+i am on  4.35
 
 HPC:           High Performance Computing
 NAS:           Network Attached Storage
@@ -520,13 +760,22 @@ RBP:           Resource-based-policy
 DX:            Aws Direct Connect
 DX Gateway:    Direct Connect gateway
 VIFs:          Public or private Virtural Interface
+
 VGW:           Virtual Private Gateway
+CGW            Customer Gateway
+
 
 OLAP:          Online analytical processing
 OLTP:          Online Transaction Processing 
 S3-WORM        S3 - write-once-read-many
 
 ERM             Amazon Elastic MapReduce
+
+PII           Personally Identifiable Information 
+OLTP          Online Transaction processing
+OLAP          Online Analytics processing
+
+
 
 Protocols:
 ----------
@@ -575,7 +824,12 @@ used by large distributed and replicated workloads, such as Hadoop, Cassandra, a
 
 Spread Placement Group:
 ----------------------
-A spread placement group is used to spread instances across underlying hardware. 
+A spread placement group is a group of instances that are each placed on distinct racks, with each rack 
+having its own network and power source. Spread placement groups are recommended for applications that have 
+a small number of critical instances that should be kept separate from each other. Launching instances in 
+a spread placement group reduces the risk of simultaneous failures that might occur when instances share 
+the same racks. Spread placement groups provide access to distinct racks, and are therefore suitable for 
+mixing instance types or launching instances over time.
 It is not the best option for performance.
 
 It strictly places a small group of instances across distinct underlying hardware to reduce correlated failures.
@@ -599,32 +853,105 @@ networking Instances           |                                    |  large wor
 Cons:                          |                                    | 
 Finite capacity recommend      | Maximum of 7 instances running     | Partition placement groups are not supported for
 launching all you might need   | per group, per AZ                  | Dedicated Hosts
-up front                       | 
+up front        
 
 #######################################################################################################################
-Database imp points:
--------------------
+Elastic Fabric Adapter (EFA):
+----------------------------
+Elastic Fabric Adapter (EFA) is a network interface for Amazon EC2 instances that enables customers to run applications requiring 
+high levels of inter-node communications at scale on AWS. Its custom-built operating system (OS) bypass hardware interface
+enhances the performance of inter-instance communications, which is critical to scaling these applications.
 
--) Global tables is a feature of Amazon DynamoDB and is not available for Amazon RDS.
--) Multi-master configurations are only available for Amazon Aurora and only within a Region.
--) Aurora global database does not allow writes in multiple Regions, only reads.
 
 
-RTO:
----- 
-It defines how quickly a service must be restored and a recovery point objective.
-RTO of 30 minutes means the service must be running again within half an hour.
+#################################################################################################################
+Direct-Connect connection DX 
+----------------------------
+-) a network device that supports Border Gateway Protocol (BGP) and BGP MD5 authentication is needed to establish a
+   Direct Connect link from your data center to your VPC.
 
-RPO:
-----
-It defines how much data it is acceptable to lose.
-RPO of 5 minutes means no more than 5 minutes’ worth of data can be lost.
+
+
+
+
+VPN  Connection:
+----------------
+-)  VPN connection based on a customer gateway and a virtual private gateway (VPG) in AWS.
+
+
+
+
+
+
+
+
+
+###########################################################################################################################
+Elastic Beanstalk:
+-----------------
+
+To maintain full capacity during deployments, you can configure your environment to launch a new batch of instances 
+before taking any instances out of service. This option is known as a rolling deployment with an additional batch. 
+When the deployment completes, Elastic Beanstalk terminates the additional batch of instances.''
+
+Immutable deployments perform an immutable update to launch a full set of new instances running the new version of 
+the application in a separate Auto Scaling group alongside the instances running the old version. Immutable 
+deployments can prevent issues caused by partially completed rolling deployments. If the new instances don't pass
+health checks, Elastic Beanstalk terminates them, leaving the original instances untouched.
+
+
+All at once – 
+-----------
+The quickest deployment method. Suitable if you can accept a short loss of service and if quick deployments are important 
+to you. With this method, Elastic Beanstalk deploys the new application version to each instance.
+
+Rolling – 
+--------
+Avoids downtime and minimizes reduced availability at a cost of a longer deployment time. Suitable if you can't accept 
+any period of completely lost service. With this method, your application is deployed to your environment one batch of instances at a time.
+
+Rolling with additional batch – 
+-----------------------------
+Avoids any reduced availability at a cost of an even longer deployment time compared to the Rolling method. Suitable 
+if you must maintain the same bandwidth throughout the deployment. With this method, Elastic Beanstalk launches an 
+extra batch of instances, then performs a rolling deployment.
+
+Immutable – 
+----------
+A slower deployment method that ensures your new application version is always deployed to new instances instead 
+of updating existing instances. It also has the additional advantage of a quick and safe rollback in case the deployment fails.
+
+Traffic splitting – 
+-----------------
+A canary testing deployment method. Suitable if you want to test the health of your new application version using a 
+portion of incoming traffic while keeping the rest of the traffic served by the old application version.
+
+For deployments that depend on resource configuration changes or a new version that can't run alongside the old version, 
+you can launch a new environment with the new version and perform a CNAME swap for a blue/green deployment.
+
+Because AWS Elastic Beanstalk performs an in-place update when you update your application versions, your 
+application can become unavailable to users for a short period of time. You can avoid this downtime by 
+performing a blue/green deployment, where you deploy the new version to a separate environment and then swap CNAMEs 
+of the two environments to redirect traffic to the new version instantly. With this method, you can have two 
+independent environments and you can quickly switch between the version by swapping the URLs.
+
+
+
+#######################################################################################################################
+
 
 #####################################################################################################################
 AWS Global Accelerator :
 -------------------------
 AWS Global Accelerator provides improved performance and high availability when you have copies of your application 
 running in multiple AWS Regions
+
+##########################################################################################################################
+AWS App Runner:
+--------------
+AWS App Runner can be used to quickly deploy containerized web applications and APIs, at scale and with no prior 
+infrastructure experience required.
+
 
 ##################################################################################################################################
 IAM:
@@ -746,12 +1073,117 @@ It means we create "tags" on each resourse
    }
 }
 
-############################################################################################################################
+
+---------------------------------------------------------------------------------------------
+Service role: 
+-------------
+A service role is an AWS Identity and Access Management (IAM) that grants permissions to an AWS service so that the 
+service can access AWS resources. Only a few Systems Manager scenarios require a service role. When you create a 
+service role for Systems Manager, you choose the permissions to grant in order for it to access or interact with 
+other AWS resources.
+
+Service-linked role: 
+-------------------
+A service-linked role is predefined by Systems Manager and includes all the permissions that the service requires 
+to call other AWS services on your behalf.
+
+If you plan to use Systems Manager to manage on-premises servers and virtual machines (VMs) in what is called 
+a hybrid environment, you must create an IAM role for those resources to communicate with the Systems Manager service.
+
+
+
+##############################################################################################################################
+AWS Transit gateway Vs AWS Resource Access Manager(RAM)
+-------------------------------------------------------
+Transit gateway by default only allows VPCs from the same AWS account to be attached. For our cross-account scenario, 
+we’ll have to use another AWS service called the "AWS Resource Access Manager" (RAM).
+
+
+
+###########################################################################################################
+Cloudwatch Dashboard     vs  CloudWatch Logs insights:
+
+
+Cloudwatch Dashboard:
+-------------------
+Amazon CloudWatch dashboard is primarily used for scenarios where you have to monitor your resources in a single view, 
+even those resources that are spread across different AWS Regions.
+
+CloudWatch Logs Insights:
+-------------------------
+CloudWatch Logs Insights instead since it enables you to interactively search and analyze your log data
+
+###############################################################################################################################
+AWS EMR Cluster:
+---------------
+EMR is a hosted Hadoop framework for running analytics on big data
+
+
+0044 7799401577
+###############################################################################################################################
 AWS AppSync:
 ------------
 
 AWS AppSync can be used to provide a GraphQL API that can be used to query multiple databases, microservices,
 and APIs (allow the retrieval of data from multiple data sources).
+
+
+#########################################################################################################
+AWS Code Commit:
+---------------
+when we commit a code with code-commit, we can build upto 10 trigger, these trigger will be executed every
+time when we commit code to that repository.
+
+
+###################################################################################################
+AWS Migration Hub:
+-------------------
+AWS Migration Hub simply provides a single location to track the progress of application migrations across multiple 
+AWS and partner solutions. Using Migration Hub just allows you to choose the AWS and partner migration tools 
+that best fits your needs while providing visibility into the status of migrations across your portfolio of applications.
+
+
+###################################################################################################################
+Other Services or Importan services:
+===================================
+
+AWS Ground Station:
+------------------
+AWS Ground Station is a fully managed service that lets you control satellite communications, process data, and scale 
+your operations without having to worry about building or managing your own ground station infrastructure
+
+
+
+AWS Elemental MediaConnect:
+---------------------------
+AWS Elemental MediaConnect is just a high-quality transport service for live video.
+
+
+
+Amazon Polly:
+-------------
+Amazon Polly is a machine learning service, it is quite limited as it just turns text into lifelike speech that 
+allows you to create applications that talk and build entirely new categories of speech-enabled products.
+
+
+
+Amazon Comprehend:
+----------------
+Amazon Comprehend is used to derive and understand valuable insights from text within documents
+
+AWS Device Farm:
+----------------
+AWS Device Farm to send out the offers to the mobile app
+
+Amazon Pinpoint:
+----------------
+Amazon Pinpoint to send push notifications,
+
+
+AppFlow:
+--------
+AppFlow is used to securely transfer data between Software-as-a-Service (SaaS) applications like 
+Salesforce, SAP, Zendesk, Slack, and ServiceNow, and AWS services
 
 ############################################################################################################################
 Virtual Interfaces:    Best link:  https://docs.aws.amazon.com/whitepapers/latest/aws-direct-connect-for-amazon-connect/virtual-interfaces-vif.html
@@ -812,7 +1244,7 @@ We can not integrate API Gateway directly to  DynamoDB when using an HTTP API.
 SQS:
 ----
 SQS has a maximum message size of 256 KB
-
+SQS FIFO queue can only handle 3000 messages per second.
 
 ====================================================================================================
 AWS Config:
@@ -841,7 +1273,23 @@ the request parameters, and the response elements returned by the service.
 =================================================================================================
 AWS Server Migration Service (AWS- SMS)
 --------------------------------------
-The SMS service is used for migrating virtual machines, not data.
+The SMS service is used for migrating virtual machines such as VMware vSphere and Windows Hyper-V.  not data.
+
+
+AWS Application Migration Service (MGN) 
+----------------------------------------
+AWS MGN supports syncing of attached volumes as well, so you don't have to migrate the data volumes manually.
+AWS Application Migration Service (MGN) is primarily used to migrate virtual machines only, which can be 
+from VMware vSphere and Windows Hyper-V to your AWS cloud
+
+
+
+AWS Data Pipeline:
+------------------
+AWS Data Pipeline is primarily used to quickly and easily provision pipelines that remove the development and 
+maintenance effort required to manage your daily data operations which lets you focus on generating insights 
+from that data. Although you can use this to connect your data on your on-premises data center,
+
 
 ==================================================================================================
 Amazon Keyspaces:
@@ -1007,18 +1455,13 @@ AWS Systems Manager
 
 Note: AWS Systems Manager Maintenance Windows is designed to select a defined window of time in which you EC2 instances will be patched.
 
+-) Systems Manager Automation is designed to configure and manage instances with custom runbooks or pre-defined runbooks maintained 
+by AWS, not for building and deploying serverless applications on AWS Lambda.
 
 
 AWS Systems Manager Patch Manager:
 ---------------------------------
 Use AWS Systems Manager Patch Manager to install the tool on all of the EC2 instances within a single patch
-
-
-
-
-
-
-
 
 
 
@@ -1033,8 +1476,17 @@ so this Lambda can run on these 13 region Edges     |  So it takes less latency,
                                                     |       are situated near to the end-users
 
 
-
 https://www.google.com/search?client=firefox-b-d&sxsrf=AB5stBiTgy-tCG-SY5FNzExyGp0Yl2kADg:1688643753840&q=cloudfront+functions+vs+lambda%40edge&uds=G04A-MXytn38IJj124QiRKGo-tv_FNgwfUo041QkmThBmsWFXb0YMptKNu3mw5W9HmSiEzM-&tbm=isch&sa=X&ved=2ahUKEwjt3OWYgPr_AhXQ66QKHeI_BjwQ0pQJegQICxAB&biw=2061&bih=841&dpr=1.76#imgrc=OCY79Uzhgo7MvM
+
+
+
+CloudFront  or   ALB
+SNI - Server Name Identification
+--------------------------------
+In the Application-Load-Balancer normally we have only one certificate that has one "root" domaine and sub-domain from this root domain, but now A
+new function come name "SNI" , it helps us to provide two completely seperate "root" domains, this means now we can add two certificates 
+with Application-load-balancer. 
+
 
 =====================================================================================================
 AWS Firewall Manager:
@@ -1045,10 +1497,55 @@ Resolver DNS Firewall. With Firewall Manager, you set up your protections just o
 them across your accounts and resources, even as you add new accounts and resources.
 
 =================================================================================================
-AWS WAF    vs   AWS Schield:
+AWS WAF    vs   AWS Shield:
 --------------------------
 The primary difference between AWS Shield and WAF is that while AWS WAF can mitigate DDoS attacks at layer 7 of the OSI reference model, 
 AWS Shield protects web services from DDoS attacks at layer 3 and 4 of the OSI reference model.
+
+===============================================================================================================
+Route 53
+========
+
+Note:
+-) To route domain traffic to an ELB load balancer, use Amazon Route 53 to create an alias record that points to your load balancer. 
+
+An alias record is a Route 53 extension to DNS. It's similar to a CNAME record, but you can create an alias record both for the 
+root domain, such as example.com, and for subdomains, such as www.example.com. (You can create CNAME records only for subdomains). 
+-) For EC2 instances, always use a Type A Record without an Alias. 
+-) For ELB, Cloudfront, and S3, always use a Type A Record with an Alias, 
+-) For RDS, always use the CNAME Record with no Alias.
+
+
+
+Simple routing policy – 
+---------------------
+Use for a single resource that performs a given function for your domain, for example, a web server that serves 
+content for the example.com website.
+
+Failover routing policy
+-----------------------
+Use when you want to configure active-passive failover.
+
+Geolocation routing policy
+--------------------------
+Use when you want to route traffic based on the location of your users.
+
+Geoproximity routing policy – 
+--------------------------
+Use when you want to route traffic based on the location of your resources and, optionally, shift traffic from 
+resources in one location to resources in another.
+
+Latency routing policy – 
+----------------------
+Use when you have resources in multiple AWS Regions and you want to route traffic to the region that provides the best latency.
+
+Multivalue answer routing policy – 
+----------------------------------
+Use when you want Route 53 to respond to DNS queries with up to eight healthy records selected at random.
+
+Weighted routing policy – 
+------------------------
+Use to route traffic to multiple resources in proportions that you specify.
 
 
 =====================================================================================================================
@@ -1068,9 +1565,11 @@ Linear:
 Traffic is shifted in equal increments with an equal number of minutes between each increment. You can choose from 
 predefined linear options that specify the percentage of traffic shifted in each increment and the number of minutes between each increment.
 
-All-at-once: 
+All-at-once: or  "in-place"
 ------------
 All traffic is shifted from the original Lambda function to the updated Lambda function all at once.
+
+Note: AWS Lambda and Amazon ECS deployments cannot use an in-place deployment type.
 
 Blue/green: 
 -----------
@@ -1099,6 +1598,8 @@ You can run Amazon EC2 compute instances on a Snowball Edge device using the Ama
 which supports a subset of the Amazon EC2 API operations. Data can subsequently be transferred to Amazon S3 
 for storage and additional processing.
 
+Note:
+-) An AWS Snowball Edge device can hold up to 100 TB of data
 
 =================================================================================================
 AWS Batch:
@@ -1299,6 +1800,8 @@ AWS Outposts:
 AWS Outposts is a family of fully managed solutions delivering AWS infrastructure and services to virtually 
 any on-premises or edge location for a truly consistent hybrid experience
 
+AWS Outposts support running some AWS services such as ECS, IoT Greengrass, and SageMaker Edge, 
+it does not support running Amazon Rekognition locally.
 
 =================================================================================================
 Security Group
@@ -1326,6 +1829,14 @@ Retail, and many more industries
 ==============================================================================================
 S3
 ==
+
+
+Note: 
+there is a delay of up to 15 minutes in Cross-Region Replication. In the event of a failover, some data 
+might not have been replicated yet on the secondary region.
+
+
+
 
 S3-Standard
    S3-Stamdard-IA
@@ -1419,6 +1930,18 @@ RestrictPublicBuckets -
 ----------------------
 This will prevent non AWS services or authorized users (such as an IAM user or role) from being able to publicly access objects in the bucket.
 
+
+
+S3 Encryption:
+-------------
+-) SSE-S3 requires that Amazon S3 manage the data and the encryption keys.
+
+-) SSE-C requires that you manage the encryption key.
+
+-) SSE-KMS requires that AWS manage the data key but you manage the customer master key (CMK) in AWS KMS.
+
+
+
 ##############################################################################################################
 RedShift and RedShift spectrum:
 ------------------------------
@@ -1474,7 +1997,10 @@ Using an Interface endpoint to grant access to your S3 bucket from your EC2 inst
 traversing the AWS Global Backbone, instead of moving data over the public internet. Adding a resource policy to only 
 allow the EC2 instance IAM role will lockdown the access to this EC2 instance only.
 
+Interface Endpoint:
+https://www.youtube.com/watch?v=0bHXWIM4_0o
 
+https://www.youtube.com/watch?v=CcenGigygs0
 
 
 
@@ -1556,15 +2082,18 @@ AWS Management Console:
 
 
 =============================================================================================
+
 Amazon Inspector:
 -----------------
 Inspector is for identifying vulnerabilities and evaluating against security best practices.
+AWS Inspector is simply a security assessments service that only helps you in checking for 
+unintended network accessibility of your EC2 instances and for vulnerabilities on those EC2 instances.
 
 =============================================================================================
 Amazon Macie:
 -------------
 Macie is used for detecting and protecting sensitive PII data that is in Amazon S3.
-
+AWS Macie primarily scans Amazon S3 buckets for data security and data privacy.
 
 ===================================================================================================
 Amazon Macie:
@@ -1574,15 +2103,27 @@ Amazon Macie cannot be used with RDS.
 
 
 ===========================================================================================
+Virtual-Private-Gateway (VGW):  DJ-3.7
+-----------------------
+A virtual private gateway (VGW) is used with a VPN connection
+
+Imp:
+Only one VGW can attact to a VPC
+
+A Site-to-Site VPN connection offers two VPN tunnels between a virtual private gateway or a transit 
+gateway on the AWS side, and a customer gateway (which represents a VPN device) on the remote (on-premises) side. 
+A virtual private gateway is the VPN concentrator on the Amazon side of the Site-to-Site VPN connection. 
+You create a virtual private gateway and attach it to the VPC from which you want to create the Site-to-Site VPN connection.
+
+
+
+
 VPN:
 ----
 A virtual private gateway (VGW) is used with a VPN connection
 
 
 
-Virtual-Private-Gateway:
------------------------
-A virtual private gateway (VGW) is used with a VPN connection
 
 
 ##########################################################################################################
@@ -1605,7 +2146,7 @@ Amazon RDS MySQL DB instance:
 ----------------------------
 You cannot create a cross-region Multi-AZ deployment with RDS.
 You cannot read from the standby in an Amazon RDS database cluster (you can with Aurora though).
-
+Amazon RDS MySQL RDS instances can support storage autoscaling for up to 64TiB.
 
 
 RDS Disaster Recovery:
