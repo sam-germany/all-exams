@@ -1,8 +1,21 @@
+Imp Points:
+---------------------------------------------------------------
+-)  Secrets are only "encoded" they are not "encrypted"
+    Encoded:        <-- it means base64 encod-decode 
+    Encrypted:      <-- it means we need public key to encrypt and private key to decrypt
+    
+--------------------------
+
+
+
 i am on video: 169
 
 Lectures need to see again
 Node Selectors 62
 Node Affinity  63
+
+.-------------------------
+80- Configuring scheduler profiles.
 
 
 ----------------------------------------------------
@@ -70,9 +83,9 @@ Imperative commands  <-- wehn we try to create a resource directly through comma
 
 Difference between "kubectl apply" and "kubectl create" and "kubectl replace"
 ----------------------------------------------------------------------------
-> "Kubectl apply" creates kubernetes objects through "Declarative commands"
-> "kubectl create" creates kubernetes objects through "Imperative commands"
-> "kubectl replace" creates kubernetes objects through "Imperative commands"
+> "Kubectl apply" creates kubernetes objects through "Declarative commands"  <- with this the last .yaml file will be stored under "metadata.annotations"
+> "kubectl create" creates kubernetes objects through "Imperative commands"  <- with this the last .yaml file will not be stored under "metadata.annotations"
+> "kubectl replace" creates kubernetes objects through "Imperative commands"  <- with this the last .yaml file will not be stored under "metadata.annotations"
 
 
 Difference between  "kubectl replace" and "kubectl replace --force"  and "kubectl edit" commands
@@ -121,6 +134,7 @@ Basic commands:
 > kubectl create secret generic --help
 > kubectl explain secret 
 > kubectl run --help
+> k taint --help 
 
 > kubectl replace --force -f abc.pod          <-- like this it will forcefully delete and recreate the pod
 
@@ -131,10 +145,15 @@ Pods :
 ------
 > kubectl  run  mypod --image nginx -n my-namespace         <-- it will directly create a pod in "my-namespace"
 > kubectl run mypod --image redis:alpine --labels="tier=db"
+> kubectl run mypod --image redis:alpine --labels env=dec,ab=bc
 > kubectl run my-pod --image nginx --port=8080
 > kubectl run my-pod --image httpd:alpine --port 80 --expose true    <-- it create a "pod" and also a "Service" same time
+> kubectl run my-pod --image busy-box --command sleep 3200 --dry-run=client -oyaml      
+> k run mypod --image=ubuntu:18.4 --command -- sleep 1000            
+> k run mypod --image=ubuntu:18.4 --dry-run=client --command -- sleep 1000              
 > kubectl get pods 
 > kubectl get pods -owide              <-- it also shows that on which node this pod is placed
+> kubectl get pod -n my-ns --show-labels         <-- it will show the pods with their labels also
 > kubectl describe pods 
 > kubectl get pods --all-namespaces
 > kubectl get pods -A
@@ -150,25 +169,29 @@ Pods :
 
 > kubectl get pods --watch
 
+> kubect set image   my-deployment my-container=nginx:1.9.1     <--like this we can set a new "image" in the Deployment 
 
 
-ReplicaSet:
+######################################################################################################################################
+Command from practise course:
+----------------------------
+> kubectl get pod -A --sort-by=.metadata.creationTimestamp           <-- sort all the pods as per Descending order as per creation-time
+                                                                        by-default it output in Descending order
+
+> kubectl get pod -A --sort-by=.metadata.creationTimestamp | tac      <-- with "tac" it will reverse the flow and make it to Ascending order
+
+
+#####################################################################################################################################
+ReplicaSet: 
 -------------
 > kubectl explain replicaset
 > kubectl edit rs my-set
 > kubectl scale rs my-set --replicase=5  
 
-> kubectl get all                        <-- it will print all the created objects Pods, ReplicaSet, Deplyoments ...
-
-> kubectl run nginx --image nginx         <-- directly create a pod 
-
-> kubectl run nginx --image nginx  -oyaml    <-- it generate a Pod and a .yaml file also
-
-> kubectl run nginx --image nginx --dry-run=client -o yaml          <-- generate a .yaml file  only
+Deployment: 
+-----------
 
 > kubectl create deployment my-dep --image nginx --replicas=3
-
-> kubectl run nginx --image nginx --dry-run=client -o yaml
 
 > kubectl create deployment --image nginx nginx --dry-run=client -o yaml > nginx-deployment.yaml 
 
@@ -180,11 +203,10 @@ ReplicaSet:
 
 > kubectl set image deployment my-deploy nginx=nginx:1.18
 
-
-
 > kubectl get service 
 > kubectl get svc
 > kubectl describe svc my-service
+
 
 Create a new Service
 -------------------
@@ -225,6 +247,18 @@ svc                <-- It is a subdomain added in DNS, as we are calling a Servi
 cluster.local      <-- It is a subdomain for the cluster,As both of the Namespaces are in same cluster
 --------------------------------------------------------------------------------
 
+Labels and Selectors:
+---------------------
+> k get pods --selector app=App1
+
+> k get pods --selector env=App | wc -l 
+> k get pods --selector env=App --no-headers | wc -l 
+
+> k label pod mypod env=dev,app=dev
+> k label node node01 env=dev
+
+
+
 > kubectl config set-context $(kubectl config current-context) --namespace=dev          <-- like this we can set the config to "dev" namesapce
                                                                                       it means when we do "k get pods" it will fetch pods details from "dev" namespace
 
@@ -249,9 +283,9 @@ Taints:
 -------
 > kubectl describe node kubemaster | grep Taint         <-- this will show us the which "Taint" is applied on the Master-node
 
-> kubectl taint node <any-node-name> key:value:Taint-Type
+> kubectl taint node <any-node-name> key=value:Taint-Type
 
-> kubectl taint node mynode  mykey22:myValue22:NoSchedule
+> kubectl taint node mynode  mykey22=myValue22:NoSchedule
 
 
 To remove the Taint from a node
@@ -318,6 +352,85 @@ spec:
   nodeSelector:
     my-lable: my-value  
 
+#######################################################################################################################
+-----------------------------------------------------------------------------------------------------------
+Node Affinity  
+------------
+
+q) Assume we have two Nodes, one with larger capacity means 5-cpu and 20GB ram and one Node has 2-cpu and 10-gb ram,
+   how we can lable these Nodes and how we can Tell a Pod to go to a Larger Node
+
+> kubectl label nodes node-1 size22=Large22                    <-- we can  put a Lable for the Node  "size=Large"  and if we put same lable in the 
+                                                             Pod defination .yaml file, it means we are saying that that Pod should go to this
+                                                             Node only   
+
+options
+1) requiredDuringSchedulingIgnoredDuringExecution      ( Must take this )
+2) preferredDuringSchedulingIgnoredDuringExecution     ( it is just a advice )
+
+
+Note: 
+1) "requiredDuringSchedulingIgnoredDuringExecution" in this case  as per the condition if no "node" is found with matched label defined
+   in the pod.yaml file then kubernetes will not create any pod and it will go in "Pending" stage, this "Pending" status shows us when we 
+   do "kubectl get pods"
+2) "preferredDuringSchedulingIgnoredDuringExecution" in this case as per the condition if no "node" is found with the matched label
+   kubernetes will not stop the pod , it will just go to another node and create the pod 
+
+
+
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: myapp-pod
+spec: 
+  containers: 
+  - name: nginx-container
+    image: nginx
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size22
+            operator: In                        <-- using  "In"  operator
+            values:
+            - Large22                            <-- like this way we can define that this Pod can be placed on a Node which has a Lable
+            - Medium22                               of   "size22=Large22"   or "size22=Medium22" 
+
+
+
+
+"NotIn" example
+---------------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: myapp-pod
+spec: 
+  containers: 
+  - name: nginx-container
+    image: nginx
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size22
+            operator: NotIn                          <-- using "NotIn"   <-- it means this Pod can go to any Node which do not have a Lable "size22=Small22"            
+            values:
+            - Small22
+
+OR 
+---
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size22
+            operator: Exists      <-- it checks only if the "key" with the name "size22" exists in the Node, then it directly place the pod in that Node
+
+
 ---------------------------------------------------------------
 apiVersion: v1        
 kind: Pod             
@@ -379,6 +492,7 @@ spec:
 
 Note: we can set "ResourceQuota" at Namespace-level, every Namespace can have its own "Resource-Quota"
 
+########################################################################################################################
 -------------------------------------------------------------------------------
 DaemonSet
 --------
@@ -424,6 +538,21 @@ ExecStart=/usr/local/bin/kubelet  \\
 
 Note: in the "kubeconfig.yaml" file we can find this path "staticPodPath: /etc/kubernetes/manifests"
 
+######################################################################################################################
+Static Pod
+-------------
+> cat var/lib/kubelet/                  <-- All 4 files i can find under it.
+
+> cat var/lib/kubelet/config.yaml             <-- in this file "staticPodPath:  ...."  <-- see this key hier the path is defined
+                                                  It is the kubelet on the Node who is creating the pod 
+> cat var/lib/kubelet/kube-apiserver.yaml                                                  
+
+> cat var/lib/kubelet/kube-controller-manager.yaml
+
+> cat var/lib/kubelet/kube-scheduler.yaml 
+
+> cat /etc/kubernetes/manifests/           <-- under this folder we can place all the "Static-pod"  yaml files.
+
 
 
 #########################################################################################################################
@@ -434,7 +563,10 @@ Multi Scheduler:
 
 > kubectl logs my-scheduler -n kube-system         <-- we can view logs of out scheduler
 
+> k get events -o wide                    <-- like this we can see all the events, e.g  when a pod is created then 
+                                          which "scheduler" has placed this pod in the node, we can se scheduler name in event
 
+> k logs my-scheduler -n kube-system            <-- like this we can also see the logs of the "Scheduler" 
 
 
 kube-scheduler.service    (Default Scheduler)
@@ -552,7 +684,8 @@ Monitoring
 Rollout:
 -------
 
-Note: Rolling-update is the default deployment strategy.
+Note: Rolling-update is the default deployment strategy. if we do not define any strategy, then it select by-default "Rolling-update" 
+      as a strategy.
 
 Rolling-update Strategy:
 ---------------
@@ -574,6 +707,11 @@ because at the time of first delete all the pods are deleted.
 > kubect set image   my-deployment my-container=nginx:1.9.1    <-- like this we can change the image of current running deployment   
                                                                  my-deploment is the name of the Deployment
                                                                  my-container is the name of the Container                                      
+
+
+> k rollout status deployment/my-deploy      <-- it will log the status of the deployment
+
+> k rollout history deployment/my-deploy     <-- it will print the history of the deployemnt
 
 > kubectl rollout status my-deployment      <-- with this we will get the status of the deplyoment
 
@@ -743,15 +881,20 @@ spec:
   containers:
     - name: my-ubuntu-sleeper
       image: ubuntu-sleep
-      command: ["sleep"]
+      command: ["sleep"]                    <-- command is same as "Entrypoint"
       args: ["10"]
 
 
-> kubectl run my-pod --image-nginx --command -- sleepA     <-- like this we can override the "command: ["sleepA"]" argument 
+> kubectl run my-pod --image-nginx --command -- sleepA     <-- like this we can override the "command: ["sleepA"]" argumen, 
+                                                              as we do not define anything else so it take "10" from "args"
+
+> kubectl run my-pod --image-nginx --command -- sleepA  2000   <-- like this we can override the "command: ["sleepA","2000]"  
+
 > kubectl run my-pod --image=nginx -- 15                   <-- like this we can override the "args: ["15"]" argument
 or
-> kubectl apply -f pod.yaml -- 15             <-- this is just my try example, but not sure if it works
+> kubectl apply -f pod.yaml -- 15                       <-- this is just my try example, but not sure if it works
 
+> kubectl run my-pod --image=nginx -- sleep 15         <-- like this we can override the "args: ["sleep","15"]" argument
 
 
 ###################################################################################################################
@@ -843,8 +986,8 @@ spec:
         - configMapRef:
             name: my-configmap-A                   <-- here we are putting the above define configmap
       envFrom:
-        - secretRef:
-            name: my-secret 
+        - secretRef:                               <--here we are refering the whole Secret to the pod 
+            name: my-secret                           it means all the key-value will be inserted in as evn-variable
 
 --------------------------------------------------------------------------
 Case-3) 
@@ -893,7 +1036,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: my-secret
-              key: my-username
+              key: MY_USERNAME                  <-- here we are inserting only this key from the secret, as env variable 
         - name: MY_DB_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -906,7 +1049,7 @@ spec:
               key: db-host
 
 ---------------------------------------------------------------------------------------------------
-ConfigMap and Secret as a file
+ConfigMap and Secret as a Volume
 -----------------------------
 
 Step-1) 
@@ -1031,6 +1174,8 @@ spec:
       image: busybox
     - name: second-init-container
       image: nginx  
+
+> k logs <pod-name> -c <init-contaier-name>               <-- like this we can see the logs coming from "InitContainer"      
 
 
 ######################################################################################################
@@ -1315,7 +1460,7 @@ spec:
   capacity:
     storage: 1Gi
   persistentVolumeReclaimPolicy: Retain  
-  hotstPath:
+  hostPath:
     path: /data     
     type: Directory                    <-- "type: Directory" it is optional, if we use "hostPath" then it is automatically taken
 
@@ -1567,3 +1712,5 @@ CoreDNS
    is made with the Name of the service map to ip of the service, so when any pod send a request to the Name of the service then
    the request is forwarded to the ip of the service.
    
+
+##############################################################################################################
