@@ -25,17 +25,19 @@ Kube-api-server            6443   Port
 coredns
 etcd                       2379   Ports 
 kube-proxy
-kube-scheduler             10251  Port 
-Kube-Controller-Manager    10252  Port 
+kube-scheduler             10259  Port 
+Kube-Controller-Manager    10257  Port 
 kube-flannel-ds
 Kubelet                    10250  Port          ( Kubelet can also be deployed on Master-node)
 
 In-Nodes
 -------
-kube-proxy
 Kubelet                    10250  Port 
 Kube-proxy                                      (watch in lecture 223  "Service Networking")
-Services                   30000 till 32767 Ports
+Services                   30000 till 32767 Ports  ( "> ps aux | grep kube-api-server" in this process or directly in the "kube-api-server.yaml  file we can see 
+                                                                                       a attribute "--service-cluster-ip-range=x.x.x.x/x" from here we can find that 
+                                                                                       under which range our cluster is alloweed to provide automatically a ip address 
+                                                                                       to the "Service" when it is created 
 ----------------------------------------------------------
 
 
@@ -53,6 +55,8 @@ CSI:       <-- "Container-Storage-Interface"   e.g AWS-EBS, AWS-EFS, Azure-Disks
 
 Commands:
 ---------
+> k config use-context "user.name"            <-- like this we can change the config, "user.name" come form the  
+                                                "kubectl config view"  -> config.yaml -> users: -> name 
 
 > alias k=kubectl                 <-- it will set k as alias for "Kubectl" command
 
@@ -171,6 +175,12 @@ Pods :
 
 > kubect set image   my-deployment my-container=nginx:1.9.1     <--like this we can set a new "image" in the Deployment 
 
+> k api-resources                           <-- get all the resources 
+
+> k api-resources --namespaced=true         <-- it will return a list of all the resources that we can create inside a "Namespace"
+
+> k api-resources --namespaced=false        <-- it will return a list of all the resources that we can not create inside a "Namespace"
+                                              those must be cluster scope 
 
 ######################################################################################################################################
 Command from practise course:
@@ -1182,10 +1192,24 @@ spec:
 Node:
 ----
 
+-> ssh <node-name>    <-- like this we can switch to or we can say go inside the "node" that the name is defined 
+-> exit               <-- to come out from the node back. 
+
+Note: 
+-) when a node goes offline the master-node wait for 5min before considering it dead. it is defined in the
+   "kube-controller-manager"  --pod-eviction-timeout=5m0s", After this when a new Node come in place of old one 
+  then it comes blank with no pods scheduled on it. 
+
+
+
 
 > kubectl drain my-node-1          <-- if we want to delete all the pods on the node, after this command no pod will be available on the node
                                        and the "kube-scheduler" will not place new node on this node, Internally it do "kubectl cordon" that 
                                        so that no new node will be placed on the Node
+
+> kubectl drain my-node-1 --ignore-daemonsets
+
+> kubectl drain my-node-01 --force                                        
 
 > kubectl uncordon my-node-1      <-- Only after doing "uncordon" the Node come online again and the "kube-scheduler" will start placing 
                                       Pods on this Node again.
@@ -1194,12 +1218,55 @@ Node:
                                       But the old Pods will still remain running on this Node, Only after "kubectl uncordon" the 
                                       Kube-scheduler is alloweed to place the pods again on this Node.
 
-> kubectl drain node --ignore-daemonsets
-> kubectl drain node --force 
+
 
 #############################################################################################################
 Cluster Upgrade
 ----------------
+if i am haveing kubernetes version v1.13.4
+
+kube-apiserver      v1.13.4
+Controller-manager  v1.13.4
+Kube-scheduler      v1.13.4
+Kubelet             v1.13.4
+kube-proxy          v1.13.4 
+kubectl             v1.13.4
+
+ETCD Cluster        v3.2.18 
+CoreDNS             v1.1.3         <-- these both of them have their own release versions, they are not same as kubernetes-version
+
+
+Imp-points:
+----------
+-) As "Kube-apiserver" is the main component and all the other components are taking through "kube-apiserver" so in this case 
+  all other component must be lower or equal to the version of "kube-apiserver".
+
+-) If "kube-apiserver" has "v1.13.4" then  "Controller-manager" and "kube-scheduler" can be either has same version or can be one version lower then "kube-apiserver" version
+   It means they can be on "v1.12"  version but not below the -1 version 
+
+-) If "kube-apiserver" has "v1.13.4" then "kubelet" and "kube-proxy" can be either has same version or can be two version lower then "kube-apiserver" version   
+   It means then can be on "v1.12" or "v1.11"
+
+-) If "kube-apiserver" has "v1.13.4" then "kubectl" (Kubectl that we have installed on our computers), "Kubectl" can be one version higher or one version lower then
+   the "kube-apiserver" version. it means "kubectl" can be "v1.12" or "v1.14"
+
+Note:
+-) Upgrading Cluster is always first we Upgrade "Master-node" after we upgrade "Worker-nodes"
+
+-) If we upgrade the cluster with "kubeadm" tool then we should upgrade "kubelet" manually on every Node extra.
+-) We must upgrade the kubeadm-tool itself before upgrading the cluster
+
+
+
+
+
+
+
+
+
+
+
+
 
 > kubeadm upgrade plan
 
@@ -1223,7 +1290,6 @@ Step-4)
 Upgrade "Kubeadm" and "Kubelet" on Worker Node
 
 > kubectl drain my-node-1
-
 > apt-get upgrade -y kubeadm=1.12.0-00
 > apt-get upgrade -y kubelet=1.12.0-00
 > kubeadm upgrade node config --kubelet-version v1.12.0
@@ -1231,14 +1297,104 @@ Upgrade "Kubeadm" and "Kubelet" on Worker Node
 
 > kubectl uncorden my-node-1
 
+########################################################################################################################################
+ETDC Backup
+-----------
+
+> ps -ef | grep -i etcd   <-- we can also get all the endpoint info from a "process", like this we are getting info from a "etcd" process 
+                                      
+
+> k get pods -n kube-system   
+> k describe pod etcd-controlplane   <- under etcd.Image  <-- here in the image-name we can find the deployed version of "ETCD"
+
+
+
+> export ETCDCTL_API=3    <-- like this we can set the ETCDCTL version to "3", normally we need this "ETCDCTL_API=3 command before 
+                              every "etcdctl" command, so just "export" it then we do not need to put it in front of every command.
+> etcdctl version          
+
+-) ETDC cluster is placed on the master-node
+
+-) "etcd.service"   <-- under this file we can find "--data-dir=/var/lib/etcd" <-- here by-default kubernetes store all the data for "ETCD"
+
+Steps for Backup using snapshot:
+---------------------
+> etcdctl snapshot save snapshot.db 
+> etcdctl snapshot status snapshot.db 
+
+Steps for Restore ETCD db from Backup 
+------------------------------------
+> service kube-apiserver stop                                                     <-- first stop the "kube-apiserver"
+> etcdctl snapshot restore snapshot.db --data-dir /var/lib/etcd-from-backup       <-- here we put the path where the backup is stored
+
+> change the new data directry path in teh "etcd.service" path. directory name specified in the above command "etcd-from-backup"
+
+> systemctl daemon-reload
+> service etcd restart 
+> service kube-apiserver start 
+
+Imp: 
+-) With all the "etcdctl" we shoud add these 4 commands also 
+--endpoints=https://127.0.0.1:2379
+--cacert=/etc/etcd/ca.crt 
+--cert=/etc/etcd/etcd-server-crt 
+--key=/etc/etcd/etcd-server.key 
+
+
+
+
+
+
 
 ##########################################################################################################################################
 Certificates
 -------------
 
+Public key extensions:
+------------------------
+*.pem 
+*.crt             <--  Those end with these are "Public Key" or "Public Certificates"
 
-.pem , .crt             <--  Those end with these are "Public Key" or "Public Certificates"
-.key, "-key"            <-- Those have in the name ".key" or "-key" are "Private Key"
+
+Private key extensions:
+----------------------
+*.key
+*-key.pem            <-- Those have in the name ".key" or "-key" are "Private Key"
+
+
+> cat aaa.csr | base64             <-- it will encode the Certificate but print the certificate in multiple-lines 
+> cat aaa.csr | bswe64 -w 0        <-- it will endcode the certificate and print the certificate as a Single-line
+
+
+
+
+Note: Their are three types of Certificates:
+
+Root certificates:     <-- These are configured on the "CA" (Certificate Authority)
+Server Certificates:   <-- These are configured on the Servers 
+Client Certificates:   <-- These are configured on the Clints  
+
+
+---------------------------------------------------------------------
+"Servers Components" in Kubernetes Cluster
+-------------------------------------------
+These below are three server and should have Server-Certificates
+
+1) Kube-API Server 
+2) ETCD     Server 
+3) Kubelet  Server 
+
+
+"Client Components" in Kubernetes Cluster
+-----------------------------------------
+These below are clients and should have Client-Certificates 
+
+1) Kube-Scheduler           <-- It is a Client for Kube-api server, so we generate a Client-Certificate for it 
+2) Kube-Controller-Manager  <-- It is a Client for "kube-api" server, so we generate a Client-Certificate for it 
+3) kube-proxy               <-- It is a client for "kube-api" server, so we generate a Client-certificate for it. 
+
+
+
 
 
 
@@ -1252,9 +1408,11 @@ CERTIFICATE AUTHORITY ( CA )
 
 ADMIN USER:
 -------------
-> openssl genrsa -out admin.key 2048                                            <-- admin.key  It "Generate-Key"
-> openssl req -new -key admin.key -subj "CN=kube-admin" -out admin.csr          <-- admin.csr  It generate "Certificate-Signing-Request"
-> openssl x509 -req -in admin.csr -CA ca.crt -CAkey  -out ca.key                <-- ca.crt     It generate "Sign-Certificates"
+> openssl genrsa -out admin.key 2048                                                      <-- admin.key  It "Generate-Key"
+> openssl req -new -key admin.key -subj "CN=kube-admin/O=system:masters" -out admin.csr   <-- admin.csr  It generate "Certificate-Signing-Request"
+                                                                                           "O=system:masters"  <-- with this we are saying that this is not 
+                                                                                                                  a normal user, it is a admin-user
+> openssl x509 -req -in admin.csr -CA ca.crt -CAkey  -out ca.key                          <-- ca.crt     It generate "Sign-Certificates"
 
 KUBE SCHEDULER
 -------------
@@ -1277,6 +1435,30 @@ KUBE PROXY
 
 
 ---------------------------------------------------------------------------------------------------------
+> cat  /etc/kubernetes/manifests/kube-apiserver.yaml 
+
+> openssl x509 -in <path to xxx.crt>  -text -noout                        
+> openssl x509 -in /etc/kubernetes/oki/apiserver.crt -text -noout                <-- like this we can get all the info about the cretificate.
+                                                                                   With "-noout" it will not create a new file with the Certificate 
+                                                                                   it will just print the Certificate info on the console  
+  
+> k get csr                                         <--- to see all the "Certificate Signing Requests"
+> k certificate approve <name-of-Certificate>       <-- with this we can approve the Certificate
+> k get csr <name-of-certificate> -oyaml            <-- like this we can see the details inside the certificate 
+
+> k certificate deny <name-of-certificate>          <-- like this we can deny a "Certificate Signing Request" 
+
+> k delete csr <name-of-certificate>                <- in last step first we "deny" the request and after that we delete the CSR request. 
+
+
+
+
+
+
+
+
+
+
 How we can make a REST call to "KUBE-API" server with these admin Certificates and keys ? 
 
 > curl https://kube-apiserver:6443/api/v1/pods --key admin.key --cert admin.crt --cacert ca.crt    <-- This is the example of REST-Api call that we make 
@@ -1286,14 +1468,14 @@ How we can make a REST call to "KUBE-API" server with these admin Certificates a
 
 
 
-> openssl x509 -in /etc/kubernetes/oki/apiserver.crt -text -noout                <-- like this we can get all the info about the cretificate.
-                                                                                   With "-noout" it will not create a new file with the Certificate 
-                                                                                   it will just print the Certificate info on the console  
-  
+
 
 #######################################################################################################
 kubeconfig
 ----------
+
+./kube/config            <-- be default "kubectl" look for the "config-file" under this folder 
+
 
 > kubectl config -h                                   <-- like this we can list all the commands  for "config"
 
@@ -1303,6 +1485,11 @@ kubeconfig
 
 > kubectl config --kubeconfig=my-base-config use-contexts dev-frontend   <-- if we have two "./kube/config" files then we can add 
                                                                             the file name like this "--kubeconfig=my-base-config"
+
+> k config use-context research --kubeconfig <path-to-file>       <-- "--kubeconfig" this attribute is used when we put the .config file 
+                                                                     in anyother location rather then ./kube/config
+
+> mv /root/my-kube-config   /root/.kube/config           <-- like this we can move from other place to default folder  the .config file
 
 Steps to create Context file
 ----------------------------
@@ -1324,6 +1511,58 @@ Step-3) Setting Context
 RBAC    Role, Rolebinding, ClusterRole, ClusterRolebinding
 ----
 
+Core API Group:  
+---------------
+Pods, Nodes, Namespaces, Services, Configmaps, Secrets, Events, Endpoints, PV, PVC 
+
+Named API Groups:
+-----------------
+apps:           Deployments, ReplicaSets, StatefulSets, DaemonSets, DeploymentsRollback
+extensions:     Ingress, NetworkPolicies, PodSecurityPolicies
+batch:          Jobs, CronJobs
+storage.k8s.io: StorageClass, VolumeAttachment
+policy:         PodDisruptionBudgets
+
+
+
+Role:
+-----
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""]                       <--"" indicates the core API group, Not the "Named Api Group" (imp)
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+
+
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: User
+  name: jane                                  <-- "name" is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role                                    <-- this must be Role or ClusterRole
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+
+> cat /etc/kubernetes/manifests/kube-apiserver.yaml       <-- to view "api-server" options where cluster is created with "kubeadm" tool     
+> ps -aux | grep authorization 
+
+
+
+
+
+
+
 > kubectl auth can-i  create deployments             <-- like this we can check if the current user is alloweed to "Create Deployments"
 
 > kubectl auth can-i create pods                     <-- like this we can check if the current user is alloweed to "Create Pod"       
@@ -1333,9 +1572,12 @@ RBAC    Role, Rolebinding, ClusterRole, ClusterRolebinding
 > kubectl auth can-i create pods --as dev-user --namespace  my-ns-a  <-- like this we can check it "dev-user" has permission to create pod in the
                                                                              "my-ns-a" Namespace
 
-> kubectl create role my-role --verb=list,create,delete --resources=pods --resourceNames=pod-a,pod-b   <-- this role is applied only for "pod-a" and "pod-b"
+> kubectl create role my-role --verb=list,create,delete --resource=pods 
+
+> kubectl create role my-role --verb=list,create,delete --resource=pods --resourceNames=pod-a,pod-b   <-- this role is applied only for "pod-a" and "pod-b"
 
 > kubectl create rolebinding my-rolebinding --role=my-role --user=dev-user
+
 
 
 
@@ -1343,18 +1585,104 @@ RBAC    Role, Rolebinding, ClusterRole, ClusterRolebinding
 ServiceAccount 
 --------------
 
+serviceAccountName:      <-- this is the name of attribute that we should put under Deplyoment -> template -> spec -> serviceAccountName: xxx
+
+imagePullSecrets:       <-- this we have to put under Deployment -> template -> spec -> imagePullSecrets: -> -name: xxxx    
+
+Note: 
+-) if we create new attribute in a Deployment for serviceAccount then it automatically recreate the pods with new SA 
+-) But if we directly change the SA inside a pod then, we have to recreate the pod, then only it effects, so better to put 
+inside the pod.yaml file 
+
 
 > kubectl create serviceaccount my-sashboard-sa
 
-> kubectl get sa
+> kubectl create token <service-account-name>            <-- like this we can create a Token for a existing "service-account"
+
+> k create secret docker-registry -help        <-- "docker-registry" is  a type of special secret that we should create to pull images from DockerHub  
+                                                  like this we can get help for creating a secret for pulling Image from DockerHub
 
 
 
+------------------------------------------------------------------------------------------
+Security contexts:
+------------------
+
+Pod level Security context
+---------------------------
+Pod -> spec -> securityContext -> runAsUser: 1010     <-- Pod level "securityContext"
+                                                         like this we can forcefully say the pod to run all the process not as root-user 
+                                                        it will run all the process as normal "user" with Id "1010"
 
 
+Container level Security context
+--------------------------------
+Pod  -> spec -> containers -> securityContext -> runAsUser: 1010     <-- As we are defining the attribute "securityContext" under "containers"
+                                                                        it is then a "container level" security context
 
+SYS_TIME capability:
+-------------------
+pod -> spec -> containers -> securityContext -> capabilities -> add -> ["SYS_TIME"]        <-- note that the pod must run as "root user" then only it works
+ 
 
+NET_ADMIN capability:
+-------------------
+pod -> spec -> containers -> securityContext -> capabilities -> add -> ["NET_ADMIN"]        <-- note that the pod must run as "root user" then only it works
 
+-------------------------------------------------------------------------------------
+Network Policies:
+----------------
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      role: db                                     <-- this is the pod to which the other Pods trying to access, 
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - ipBlock: 
+            cidr: 172.17.0.0/16                    <-- IP of the pod that from which we trying to access the main-pod 
+            except:
+              - 172.17.1.0/24
+        - namespaceSelector:                      <-- Namespace in which all the pods that can access the main-pod
+            matchLabels:
+              project: myproject
+        - podSelector:                             <-- the pod form which we want to  access the main-pod. This Pod should be in the same namespace that 
+            matchLabels:                               the main-pod is having
+              role: frontend
+      ports:
+        - protocol: TCP
+          port: 6379
+  egress:
+    - to:
+        - ipBlock:                           <-- this is the IP that the main-pod can send request to 
+            cidr: 10.0.0.0/24
+      ports:
+        - protocol: TCP
+          port: 5978
+    - to:          
+        - namespaceSelector:                      <-- Namespace to which the main-pod can send request to 
+            matchLabels:
+              project: myproject
+      ports:
+        - protocol: TCP
+          port: 5978              
+    - to:                        
+        - podSelector:                             <-- Pod that the main-pod can send the request
+            matchLabels:                          
+              role: fronten
+      ports:
+        - protocol: TCP
+          port: 5978
+
+> k get networkpolicies 
+> k get netpol my-network-policy 
 
 
 ######################################################################################################################
@@ -1424,15 +1752,15 @@ Commands:
 
 > kubectl get pv
 > kubectl get pvc
-> kubectl delete pcc my-claim-name
+> kubectl delete pvc my-claim-name
 > 
 
 
 -) Their are three types of "PersistentVolume" modes
-   - RWO--ReadWriteOnce        <-- the volume can be mounted as read-write by a single node. ReadWriteOnce access mode still can    
+   - RWO--ReadWriteOnce        <-- the volume can be mounted as read-write from pods placed in a single node. ReadWriteOnce access mode still can    
                                     allow multiple pods to access the volume when the pods are running on the same node.
-   - ROX--ReadOnlyMany         <-- the volume can be mounted as read-only by many nodes.
-   - RWX--ReadWriteMany        <-- the volume can be mounted as read-write by many nodes.
+   - ROX--ReadOnlyMany         <-- the volume can be mounted as read-only from pods placed in many nodes.
+   - RWX--ReadWriteMany        <-- the volume can be mounted as read-write from pods placed in many nodes.
      RWOP--ReadWriteOncePod    <-- 
 
 -) The "accessModes" of both PV and PVC should be match, then only PVC can claim a PV 
@@ -1441,8 +1769,9 @@ Commands:
                                                It can not be re-used by any other Claims.
 >) persistentVolumeReclaimPolicy: Delete   <-- when we delete the PVC the attached PV will also be delete at the same time
 
->) persistentVolumeReclaimPolicy: Recycle   <-- when we delete the PVC the data in the attached PVC will be deleted, After that 
-                                               with no-data available this PV can be claimed by any other PVC
+>) persistentVolumeReclaimPolicy: Recycle   <-- In this case when a PVC is deleted, the data stored in the PV will also be deleted,
+                                              But the PV remain their, and after this recycle process the PV can be claimed by any other PVC 
+                                               
 
 Step-1) Create "Persistent Volume"
 
@@ -1529,6 +1858,10 @@ spec:
 StorageClass:
 ------------
 
+> k get storageclass 
+> k get sc 
+
+
 StorageClass can use three type of Disks that we define under "Parameters"
 
 Silver StorageClass:               Gold StorageClass:          Platinum StorageClass:
@@ -1596,14 +1929,16 @@ spec:
 Networking:
 ----------
 
-
+----------------------------------
 > route  
+> ip route           <-- both of these command we use to see the "routing-table" entries 
+-----------------------------------
 
 > ip link    <-- to list and modify interface on the host.
 
 > ip addr    <-- to see the ip-addresses link to above interfaces.
 
-> ip addr add 192.168.1.10/24 dev eth0         <-- like this we can set ip-address on a Interface.
+> ip addr add 192.168.1.10/24 dev eth0         <-- like this we can set ip-address on a Interface. This command we have to execute on linux machine 
                                                   Note: all the changes made above are valid only till a new re-start. All will be deleted.
                                                   If we want to presist the changes, then we have to put then in the Network-interface file.
 
@@ -1624,19 +1959,20 @@ Network-A  -->   Network-B  -->   Network-C          <-- these are the networks 
 
 
 
-> cat >> /etc/hosts    <-- in this file add   ->   192.168.1.11  db      <-- this is file is placed on every linux machine.
-
-
 -------------------------------------------------------------------------------------
 DNS Server:
 ----------
+
+> cat >> /etc/hosts    <-- in this file add   ->   192.168.1.11  db      <-- this is file is placed on every linux machine.
+
 
 Assume we have a DNS service with ip - 192.168.1.100
 
 > /etc/resolv.conf     <-- on every Linux machine have a file "resolv.conf" in it just add the "DNS" server ip, then when we do a ping then 
                            it just check the ip in DNS server and return the result.
 
-
+> cat /etc/nsswitch.conf             <-- here we can define, which DNS server, the host first look, it should search in local-file with DNS entry 
+                                       or the call first go to any extern DNS server 
 --------------------------------------------------------------------------------------------
 Domain Names 
 -------------
@@ -1660,22 +1996,38 @@ CNAME               <-- mapping  food.web  to  my-web.com, It is name-to-name ma
 
 
 --------------------------------------------------------------------------------
+> nslookup                        <-- if we put a entry in local "/etc/resolv.conf" file, "nslookup" does not check this file
+                                     It directly check and send request to DNS server 
+
+> dig                            <-- if we put a entry in local "/etc/resolv.conf" file, "nslookup" does not check this file
+                                     It directly check and send request to DNS server 
+
 > ps aux                                        <-- when we we run this command on the pod, then it will show the process running on the pod
 > ps aus                                        <-- when we run this command on the node, then it show all the process running on the whole node.
 
 
-> ip netns add my-interface-a                   <-- like this we can add a new Network-namespace on the pod container
-> ip netns                                      <-- like this we can list all the Network-namespace available on the pod
+> ip netns add my-interface-a                   <-- with this we can create a new "Network-Namespace" on a Linux-host or we can say linux-machine 
+> ip netns                                      <-- like this we can list all the Network-namespace available on the linux-host 
 
-> ip link                                                <-- to like all the interfaces on the Node.
+> ip link                                       <-- to like all the interfaces on the linux-host.
+
+> ip netns exec <network-namespace-name> ip link         <-- like this we can see which Network interface that is defined inside the "Network-namespace"
+OR
+> ip -n <namesapce-name> link                        <--both of these commands are same 
+
+> arp                                           <-- we can see entried in the linux-host, this show the list of other hosts that we have made connection 
+
+> ip netns exec <namespace-name> arp             <-- this command runs now inside the given "namespace-name"
+
+> route                                        <-- like this we can get the entries from the routing-table on the linux-host 
+
+> ip netns exec <namespace-name> route          <-- like this we will get the routing-table entrie from the given namespace 
 
 > ip address                                     <-- we can get the "Network-interface" and "MAC-address" that is attached to pod or Node
 
 > ip address show <interface-name>             <-- e.g  eth0  <-- it can be a interface name, then it will give us the info about it.
 
 > ip address show type bridge                  <-- it can show us all the "Bridge-network-interface" on the Machine, Node or Pod.
-
-> ip netns exec <network-namespace-name> ip link         <-- like this we can see which Network interface^
 
 > ip route                                      <-- it will give info about all the routes that are defined.
 
@@ -1686,6 +2038,67 @@ CNAME               <-- mapping  food.web  to  my-web.com, It is name-to-name ma
 > route 
 
 > netstat  --help 
+
+> ip link add <any-cable-endpoint-name> type veth peer name <any-cable-endpoint-name>        <-- like this we create two endpoints with a attachment 
+
+> ip link add <cable-endpoint-name> netns <namespace-name>                       <-- like this we can attach one side of the cable-endpoint to the namespace 
+
+> ip link add <cable-endpoint-name> netns <namespace-name>                       <-- like this we can attach other side of the cable-endpoint to the other namespace 
+
+> ip -n <namespace-name> addr add 192.168.15.1 dev <cable-endpoint-name>         <-- like this we can define a ip-address to a namespace 
+
+> ip -n <namespace-name> link set <cable-endpoint-name> up                       <-- like this we are activating the links connection 
+
+> ip link add <any-bridge-name> type bridge                                      <-- like this we can create a network-bridge on a linux-machine 
+
+> ip netns                                                                   <-- to get all the namesapces from a "Docker-host"
+
+ 
+> ip address show type bridge                                <-- it will show all the "bridge" interface on the machine 
+
+
+
+#####################################################################################################################
+CNI    (Container network interface)
+----
+-) The main purpose of the CNI is when a new "Pod" is created then it should assign a "IP" address and also create connections to "Network-bridge"
+   that a pod can call any other po or service.
+
+-) kubelet.service          <-- in this file we can see the 
+                                "--network-plugin=cni"            <-- which type of newtork-plugin we have defined 
+                                "--cni-bin-dir=/opt/cni/bin"      <-- in this directory we see all the supported cni-plugins as executable files e.g  "bridge" "dhcp" "flannel"
+                                "--cni-conf-dir=/etc/cni/net.d"   <-- in this location we can find a "configuration" file, this files is used by "kubelet" to know which plugin to be used. 
+
+> ps -aux | grep kubelet       <-- like this we can also see all the configuration about the "CNI" defined in the "kubelet"
+
+
+> cd /etc/cni/net.d/<name-of-file>               <-- here is the file that is executed by the CNI every time when a new container is created. 
+
+
+> kubectl logs <wave-net-ere> -n kube-system       <-- As in this example we have "wave" as CNI installed, in the logs we can see 
+                                                      a attribute "ipalloc-range:10.x.x.x/x"  <-- from here we can findout the defined 
+                                                      range for the  ipü-address that will be allocated to every pod. 
+
+
+--------------------------------------------------------------------------------------------------------------------
+Kube-proxy: 
+-----------
+-) When we create a new "Service" then automatically "kube-proxy" will be executed and it prove a ip address to the newely created "Service" 
+
+> ps aux | grep kube-api-server       <--    in this process or directly in the "kube-apiserver.yaml  file we can see 
+                                             a attribute "--service-cluster-ip-range=x.x.x.x/x" from here we can find that 
+                                             under which range our cluster is alloweed to provide automatically a ip address 
+                                             to the "Service" when it is created 
+
+> iptables -L -t nat | grep <service-name>        <-- like this we can find the "Ip address" that is assigned to the service 
+
+Logs:
+----
+> /var/log/kube-proxy.log                    <-- from here we can see all the logs that are produced by the "kube-proxy" 
+
+
+
+
 
 ##########################################################################################################
 Services & kube-api-server & Kube-proxy   (Vid  223: Service-Networking)
@@ -1709,8 +2122,1492 @@ CoreDNS
 -------
 
 -) When a Service is created, then a ip-address is assigned to it, After Service is created then a entry in the CoreDNS table
-   is made with the Name of the service map to ip of the service, so when any pod send a request to the Name of the service then
+   is made with the Name of the "service-map" to ip of the service, so when any pod send a request to the Name of the service then
    the request is forwarded to the ip of the service.
    
 
 ##############################################################################################################
+Ingress:
+---------
+> k create ingress --help
+
+###########################################################################################################
+100 Questions
+
+
+Q-1) Update the image of the deployment  ?
+
+1)
+> k get deploy -owide                                 <-- like this we will see all the deployment with the image-name defined on them 
+
+2)
+> k set image deployment <deploy-name> <image-name>   <-- like this we can update the image 
+
+----------------------------------------------------------------------------------------
+Q-2) Change the static pod path ?
+
+1) 
+> ps -aus | grep kubelet 
+
+2)
+--config=/var/lib/kubelet/config.yaml            <-- then find this path 
+
+3)
+vi /var/lib/kubelet/config.yaml                 <-- open this file and see the option "staticPodPath: ......" and update the path 
+                                                    after that just save the file and no need to do anything else 
+
+----------------------------------------------------------------------------------------
+Q-3)  Upgrade the cluster ?
+                    -kubeadm: 1.19.0
+                    -kubelet: 1.19.0
+                    -kubectl: 1.19.0
+
+1) k drain <node-name>
+2) k cordon <node-name>
+3) apt update 
+4) apt install kubeadm=1.19.0-00
+5) kubeadm upgrade apply v1.19.0
+6) apt install kubelet=1.19.0-00
+7) apt install kubectl=1.19.0-00
+8) systemctl restart kubelet 
+9) kubectl uncordon <node-name> 
+
+
+------------------------------------------------------------------------------------------
+Q-4) Create a new deployment and scale with 2 replicas 
+            - name: httpd-deploy 
+            - image: http:alpine 
+
+1) k create deployment <deploy-name> --image=http:alpine 
+
+2) k scale deployment <deploy-name> --replicas=2
+
+------------------------------------------------------------------------------------------
+Q-5) Create a pod with labels 
+     -name: mypod
+     -image: redis:alpine
+     -labels: tier=redis 
+
+1) k run my-pod --image=redis:alpine -l tier=redis 
+
+-------------------------------------------------------------------------------------
+Q-6) Creat a pod in a namespace 
+     -namespace: tech
+     -pod name: my-pod
+     -image: redis:alpin
+
+1) k create  namespace tech 
+2) k run my-pod --image=redis:alpine -n tech 
+
+----------------------------------------------------------------------------------------
+Q-7) Create a pod and expose it
+      -name: mypod
+      -image: redis:alphine
+      -service name: my-service
+      -port: 8080
+      -targe-port: 8080
+
+1) k run mypod --image=redis:alpine 
+2) k expose pod mypod --name=my-service --port=8080 --target-port:8080
+
+-----------------------------------------------------------------------------------------
+Q-8)  create a deployment with 3 replca and upgrade by using "rolling-update"
+      -name: my-deploy 
+      -image: nginx:1.16
+      -upgrage: nginx:1.17
+
+Note: As we need to show the rollingupdate so we will create a .yaml file first then create it 
+
+
+1) k create deploy my-deploy --image=nginx:1.16 --replicas=3 --dry-run=client -oyaml > deploy.yaml 
+
+2) k set image deployment/my-deploy nginx=nginx:1.17 --record        <-- the main point it we need to use the 
+                                                                      name of the "image"  "nginx=nginx:1.17"
+                                                                      and also "--record" that we can rollback 
+                                             Note: try how to rollback to old version and again this version 
+
+3) k rollout history deployment my-deploy 
+
+
+-------------------------------------------------------------------------------------------
+Q-9) create a static pod with a command  "sleep 1000"
+       -name: my-pod 
+       -image: redis:alpine 
+
+1) 
+> ps -aus | grep kubelet 
+
+2)
+--config=/var/lib/kubelet/config.yaml            <-- then find this path 
+
+
+3) k get nodes                            
+
+4) my-node  ssh                           <-- we have to first go inside the node 
+
+5) sudo -i                               <-- we have to change to the "root" user 
+
+6) vi /var/lib/kubelet/config.yaml                 <-- open this file and see the option "staticPodPath: ......"
+                                                      in this attribute the path is defined, Just copy that path 
+
+7) logout                                <-- just logout from the node 
+
+8) k run my-pod --image=busybox --command sleep 1000 --dry-run=client -oyaml > pod.yaml 
+
+9) k get nodes -o wide                  <-- here we are taking the ip of the node 
+
+10) sudo scp pod.yaml <node-ip>:/root/        <-- here we are copying the file from worker-node to controleplane node 
+
+11) minikube ssh                              <-- we ssh to main node again 
+
+12) sudo -i                                    <-- get permissions as "root" user 
+
+13) cp /root/pod.yaml    /etc/kubernetes/manifests/       <-- "/etc/kubernetes/manifests/"   <-- this is the static pod path on controleplane node 
+
+14) logout                        <-- as "kubelet" is not installed on "master" node so we have to logout every time out from master-node 
+
+
+--------------------------------------------------------------------------------------------------
+Q-10)  Tain a node to be unschedulabel and test it by creating a pod on it ?
+        -node-name: test-node 
+        -Taint  
+         -key:env_type
+         -value: production
+         operator: NoSchedule 
+
+  Note: just for testing i will create two pods, one with same labels and one with no labels that it can not be placed on the node 
+
+1) k taint node <node-name> env_type=production:NoSchedule  
+
+2) k describe node <node-name> | grep -l taint               <-- like this we can check that the above "taint" command works or not 
+
+3) k run test-pod-a --image=redis:alpine                    <-- after creating check if this pod is running on the tainted node or not 
+
+4) k run test-pod-b --image=redis:alpine --dry-run=client -oyaml > pod.yaml 
+
+5) 
+spec:                                               <-- like this in  pod defination file, under "spec" we can create a tolerations
+  tolerations:
+  - key: env_type 
+    effect: NoSchedule 
+    operator: Equal 
+    value: porduction  
+
+6) k apply -f pod.yaml 
+
+
+----------------------------------------------------------------------------------------------------
+Q-11) Create a new Service-account, Cluster-role, Cluster-rolebinding ? 
+      and make it possible to list the persistent volumes, And create a pod with the service-account 
+      -service account name: my-sc-account 
+      -clusterrole name: pv-role
+      -clusterrolebinding: pv-binding 
+      -pod name: pv-pod 
+      -image: redis 
+
+
+1) k create serviceaccount my-sc-account 
+
+2) k create clusterrole pv-role --resource=persistentvolumes --verb=list 
+
+3) k create clusterrolebinding pv-binding --clusterrole=pv-role --serviceaccount=default:my-sc-account        <-- "default" we need to put this name 
+                                                                                                              as we want to make it as default 
+
+4) k run pv-pod --image=redis --dry-run=client -oyaml > pod.yaml 
+
+5) 
+spec:
+  serviceAccountName: my-sc-account                    <-- like this we can add the "ServiceAccount" to the pod 
+
+6) k create -f pod.yaml 
+
+----------------------------------------------------------------------------------------------------
+Q-12) Create a NetworkPolicy that allows  all pods in the "tech-deploy" namespace to have communication only on a single port 
+      -NetworkPolicy name: tech-policy 
+      -Port: 80/TCP 
+
+1) k label namespace tech-deploy app=tech-deploy            <-- first we add a "label" to the namespace 
+
+
+2) vi network.yaml 
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              app: tech-deploy 
+      ports:
+        - protocol: TCP
+          port: 80
+
+> k apply -f network.yaml 
+
+-------------------------------------------------------------------------------------------------------
+Q-13) List all the internla IPs of all the nodes in the cluster and save it to file /doc/ip_nodes.txt 
+
+
+> search in kubernetes documentation for "kubernetes cheat sheet"
+
+> kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'   <-- this is the command we get from the  
+                                                                                                    "kubernetes cheat sheet" page 
+
+> kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}' > /doc/ip_nodes.txt     <-- here i have changed 
+                                                                                                                          "ExternalIP"  to "InternalIP"
+
+Note: just for double check, check the internal ip of the node and then check what is written on the file .
+
+
+----------------------------------------------------------------------------------------------------------
+Q-14) Create a multipod with two containers. And add the command "sleep 3600" to container 2
+      -name container 1: micro 
+      -image: nginx 
+
+      -name container 2: mega 
+      -image: busybox 
+
+
+1) k run multi-pod --image=busybox --command sleep 3600 --dry-run=client -oyaml > multi.yaml 
+
+2) 
+spec:
+  containers:
+  - command:
+    - sleep 
+    - "3600"
+    image: buxybox
+    name: mega
+  - name: micro
+    image: nginx   
+
+3) k apply -f multi.yaml 
+
+--------------------------------------------------------------------------------------------------
+Q-15) A new colleague "Jan" has joined your team. Create a new user and grant him access to the cluster.
+      He should have the permission to create, list, get, update and delete pods in the "tech" namespace. 
+
+
+1) Search in kubernetes-documentation "Certificate signing request" 
+
+2) openssl genrsa -out jan.key 2048
+
+3) openssl req -new -key jan.key -out jan.csr -subj "/CN=jan"        <-- after executing this command it ask many yes-no   just press enter 
+
+4) vi certificatesigningrequest.yaml 
+
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: jan 
+spec:
+  request: xxxxxxxxxxx paste the certificate here xxxxxxxxxxxx
+  signerName: kubernetes.io/kube-apiserver-client
+  expirationSeconds: 86400  # one day
+  usages:
+  - client auth
+
+5) cat jan.csr | base64 | tr -d "\n"           <-- it will return a "Certificate", just copy that certificate and past in the above certificatesigningrequest.yaml  file 
+ 
+
+6) k apply -f certificatesigningrequest.yaml   
+
+7) k get csr                                   <-- the certificate-signing-request  should be in a pending start, we should approve it 
+
+8) k certificate approve jan                   <-- like this we can approve the Certificate-signing-request 
+
+9) vi role.yaml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: tech                                     <-- as it is a "role" not a cluster-role and above defined permissions for "tech" namespace 
+  name: pod-reader
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "create", "list", "update"]
+
+10) vi rolebinding.yaml 
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: tech
+subjects:
+- kind: User
+  name: jan                               # "name" is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role                 #this must be Role or ClusterRole
+  name: pod-reader                # this must match the name of the Role or ClusterRole you wish to bind to
+  apiGroup: rbac.authorization.k8s.io
+
+11) k apply -f role.yaml
+12) k apply -f rolebinding.yaml 
+
+13) k auth can-i delete pods -n tech --as jan             <-- here i am checking if "jan" user is alloweed to delete a pod in the "tech" namespace 
+
+
+-----------------------------------------------------------------------------------------------------------
+Q-16) Create a service from the "green" pod and run a DNS lookup to check the service and write to file /doc/lookup.txt 
+      -service name: green-service
+      -port: 80
+
+Note: As per given, "green" pod is their, i have to create a new Service for it and after that i create a new pod and run inside this new 
+       pod "nslookup <service-name>"
+
+1) k expose pod green --name=green-service --port=80
+
+2) k run my-pod --image=busybox:1.28 --command sleep 3600         <--here we are creating a new pod, just for running "nslookup" command as pre given in the question 
+
+3) k exec -it my-pod -- nslookup green-service               <-- first check if the output is correct 
+
+4) k exec -it my-pod -- nslookup green-service > /doc/lookup.txt         <-- now put the output in a .txt file  
+
+5) cat /doc/lookup.txt                             <-- at the end always check the content of the file if everything is ok 
+
+
+----------------------------------------------------------------------------------------------------------
+Q-17) Create a secret and mount it to the pod "yellow"
+      -secret name: yellow-secret 
+      -secret content: password=kube1234
+
+
+1) k create secret generic yellow-secret --from-literal=password=kube1234
+
+2) k get pod yellow -oyaml > yellow.yaml 
+
+3) 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: yellow
+spec:
+  containers:
+    - name: dotfile-test-container
+      image: registry.k8s.io/busybox
+      volumeMounts:
+        - mountPath: "/secret"      
+          name: yellow-secret-a 
+  volumes:
+    - name: yellow-secret-a 
+      secret:
+        secretName: yellow-secret
+
+4) k delete pod yello                     <-- as we want to create a new pod with the .yaml file, so we first delete the old pod. 
+
+5) k apply -f yellow.yaml 
+
+6) k describe pod yellow                  <-- check it the secret is attached to the pod 
+
+Note: just check in the real how the secret is mounted, it has created a folder for volume or how it has done 
+
+---------------------------------------------------------------------------------------------------------------
+Q-18) List all the persistent volumes sorted by capacity and write to file /doc/pervol.txt ?
+
+Note: just for testing create 3 different pv with different capacity 
+
+Note: first go to kubernetes documentation "cheat sheet" and search for  "sorted by"
+
+1) k get pv --sort-by=.spec.capacity.storage            <-- check if the order is sorted or not 
+
+2) k get pv --sort-by=.spec.capacity.storage > /doc/pervol.txt          
+
+3) cat /doc/pervol.txt                                      <-- always check the output 
+
+------------------------------------------------------------------------------------------------------------------
+Q-19) Find the pod label  environment=process, find all the pods running high CPU workloads and write the name of which is 
+      consuming the most CPU to the file /doc/cpu.txt 
+
+
+1) k get pods -l environment=process           <-- first check how many pods are having a lable "environment=process" 
+
+2) k top pod --sort-by cpu -l environment=process       <-- it return the pod 
+
+3) k top pod --sort-by cpu -l environment=process | head -2        <-- check in the process what is the effect of  "head -2"
+
+4) k top pod --sort-by cpu -l environment=process | head -2 > /doc/cpu.txt    
+
+------------------------------------------------------------------------------------------------------------------
+Q-20) Use JSON path to get all the node names and store them in the file /doc/nameofnodes.txt 
+
+Note: go to kubernetes documentation "cheat sheet" search for "get nodes"
+
+1) kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="ExternalIP")].address}'         <-- copy this from the documentation page 
+
+2) kubectl get nodes -o jsonpath='{.items[*].metadata.name}'      <-- modify the command and check the output 
+
+3) kubectl get nodes -o jsonpath='{.items[*].metadata.name}' > /doc/nameofnodes.txt        
+
+
+--------------------------------------------------------------------------------------------------------------------
+Q-21) Show the logs from the container and save it to /doc/nginx.log 
+       -pod name: direct-pod 
+       -Container: nginx 
+       -Namespace: dev-net 
+
+1) k get pod direct-pod -n dev-net                   <-- first check the pod is running 
+
+2) k logs direct-pod -c nginx -n dev-net              <-- check if the logs can be displayed 
+
+3) k logs direct-pod -c nginx -n dev-net  /doc/nginx.log 
+
+--------------------------------------------------------------------------------------------------------------------
+Q-22) Create a new ingress resource and exposes service "hello" on path /hello by using service port 5678
+       -name: ingress-connect 
+       -namespace: host-dev 
+
+1)  vi ingress.yaml                         <-- just copy from the documentation the example ingress, this is easy to solve this question 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-connect 
+  namespace: host-dev
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /hello 
+        pathType: Prefix
+        backend:
+          service:
+            name: hello 
+            port:
+              number: 5678
+
+2) k apply -f ingress.yaml 
+
+------------------------------------------------------------------------------------------------------------------------
+Q-23) Overwrite the label of the dev-nginx pod with the value "env=true"
+
+Note: their is already a label "env=green" defined on the pod, we have to overwrite this label 
+
+
+1)  k label pod/dev-nginx env=true --overwrite 
+
+
+----------------------------------------------------------------------------------------------------------------------
+Q-24) Upgrade the image in the deployment "green" to buxybox:1.28, check the history and roll back 
+
+1) k set image deployment green busybox=busybox:1.28 --record
+
+2) k get deployment green                                       <-- check the image version is updated or not 
+
+3) k rollout undo deployment green                              <-- rollback the updation 
+
+4) k get deployment green                                       <-- check if the old version is again their or not .
+
+
+--------------------------------------------------------------------------------------------------------------------------
+Q-25) Find out how many pods are available with the label env=green in the cluster and write them to the file /doc/podsavailable.txt 
+
+1) k get pods -l env=green > /doc/podsavailable.txt 
+
+
+
+----------------------------------------------------------------------------------------------------------------------------
+Q-26) The pod "red" is failing, Find out why and fix the issue ?
+
+1) k describe pod red                 <-- here we see "sleeeep" command is written wrong through the error logs"
+
+2) k get pod red -oyaml  > red.yaml    <-- in the red.yaml file just update the "sleep" 
+
+3) k apply -f red.yaml                
+
+---------------------------------------------------------------------------------------------------------------------------
+Q-27) Create a pod that will only be scheduled on a node with a specific label 
+      -pod name: blue
+      -image: nginx 
+
+1) k label nodes <node-name> disk=green                               <-- to label the pod, first we have to label the node 
+
+2) k describe nodes <node-name>                                       <-- check if the label is created 
+
+3) k run blue --image=nginx --dry-run=client -oyaml > blue.yaml  
+
+4) vi pod.yaml 
+
+spec:
+  nodeSelector:
+    disk: green 
+
+5) k apply/create -f pod.yaml                      
+
+
+------------------------------------------------------------------------------------------------------------------------
+Q-28) Create a pod which uses a persistent volume for storage
+      -pod name: yellow
+      -image:    busybox 
+      -persistent volume name:       yellow-pv-volume 
+      -persistent volume claim:      pvc-yellow 
+      -persistent volume claim size: 100mi
+
+Note their is already pv volume "yellow-pv-volume"
+
+
+1) vi persistentvolumeclaim.yaml 
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-yellow 
+spec:
+  accessModes:
+    - ReadWriteOnce 
+  resources:
+    requests:
+      storage: 100mi
+
+2) k apply -f persistentvolumeclaim.yaml 
+
+3) k run yellow --image=busybox --dry-run=client -oyaml > yellow.yaml 
+
+4) vi yellow.yaml 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: yellow 
+spec:
+  containers:
+    - name: busybox
+      image: busybox 
+      volumeMounts:
+      - mountPath: "/data"
+        name: pv-storage 
+  volumes:
+    - name: pv-storage
+      persistentVolumeClaim:
+        claimName: pvc-yellow
+
+5) k apply -f yellow.yaml 
+
+--------------------------------------------------------------------------------------------------------------
+Q-29) Remove the taint added to the node "my-node-a",
+      Taint: key=red:NoSchedule 
+
+> k describe node my-node-a | grep Taint                   <-- it will show the taint value 
+
+> k taint nodes my-node-a key=red:NoSchedule-                <-- just put "-" at the end of the Taint then it will be removed
+
+> k describe node my-node-a | grep Taint                 <-- now after removing it has no value. 
+
+--------------------------------------------------------------------------------------------------------------
+Q-30) Take a backup and restore ETCD ?
+
+
+-------------------------------------------------------------------------------------------------------------
+Q-31) Schedule a pod on the node "my-node-a" by using tolerations 
+      -pod name: blue-pod 
+      -image: nginx 
+
+Note: Node has already a Taint   Taint: app=frontend:NoSchedule 
+
+1) k run blue-pod --image=nginx --dry-run=client -oyaml > blue-pod.yaml 
+
+2) vi blue-pod.yaml 
+
+spec:
+  tolerations:
+  - effect: NoSchedule 
+    key: app 
+    operator: Equal 
+    value: frontend 
+
+
+3) k apply -f blue-pod.yaml 
+
+4) k get pod blue-pod -owide            <-- with this we can see on which node this pod is running on 
+
+
+----------------------------------------------------------------------------------------------------------------
+Q-32) Apply autoscaling to the "green-deployment" with a minimum of 5 and maximum of 10 replicas and a target CPU of 75%
+
+Note: their is a deployment name "green-deployment"
+
+1) k autoscale deployment green-deployment --min=5 --max=10 --cpu-percent=75  
+
+2) k get hpa      <-- with this we can see the values of "green-deployment"
+
+3) k get pods                   <-- check if we are having 5 replicas of the pods 
+
+
+-------------------------------------------------------------------------------------------------------------------
+Q-33) Check how many nodes are in ready state and write it to the file /doc/readynodes.txt 
+
+> k describe nodes | grep ready | wc -l             <-- it returns the number count of ready nodes 
+                                                    Note: just check if this command also counts header also 
+
+
+> k describe nodes | grep ready | wc -l   > /doc/readynodes.txt 
+
+--------------------------------------------------------------------------------------------------------------------
+Q-34) Create a pod and set the environment variable "dev=dev10"
+       -pod name: grey 
+       -image: nginx 
+
+1) k run grey --image=nginx --restart=Never --env=dev=dev10
+
+2) k exec -it grex -- sh -c 'echo $dev'                               <-- like this we can check that env variable is set or not in the pod 
+                                                                        it should return us the value 
+
+3) k describe pod grey              <-- like this we can also see the configured env variable 
+
+
+-------------------------------------------------------------------------------------------------------------------
+Q-35) Create a configmap and add it to the pod 
+        -pod name: blue
+        -configmap name: my-config 
+        -Data: user=root,password=pass1234
+
+
+1) k create configmap my-config --from-literal=user=root --from-literal=password=pass1234  
+
+2) k describe configmap my-config                        <-- like this we can re-check the created configmap 
+
+3) k get pod blue -oyaml > blue-pod.yaml 
+
+4) vi blue-pod.yaml 
+
+spec:
+  containers:
+  - envFrom:
+    - configMapRef:
+        name: my-config 
+
+5) k delete pod blue                     <-- first delete the old pod 
+
+6) k apply -f blue-pod.yaml               
+
+7) k exec -it blue -- env                   <-- like this we can directly on the pod if the env variable is set or not 
+
+-----------------------------------------------------------------------------------------------------------------
+Q-36) List all the events sorted by the timestamp and write the result to file /doc/events.log 
+
+Note: search in kubernetes-documentation "cheat sheet" after that in page search "get events"
+
+1)  kubectl get events --sort-by=.metadata.creationTimestamp         <-- check the output 
+
+2)  kubectl get events --sort-by=.metadata.creationTimestamp   /doc/events.log 
+
+
+
+----------------------------------------------------------------------------------------------------------------
+Q-37) Create a pod with a non-persistent volume 
+      -pod name: non-per-pod 
+      -image: redis 
+      -mount path: /data/per-redis 
+
+
+Note: As it ask for "non-persistent" so first we search in the kubernetes-documentation "emptyDir: {}" 
+
+1) vi non-persistent-pod.yaml 
+
+apiVersion: v1           
+kind: Pod
+metadata:
+  name: non-pre-pod 
+spec:
+  containers:
+  - image: redis 
+    name: test-container
+    volumeMounts:
+    - mountPath: /data/per-redis 
+      name: cache-volume
+  volumes:
+  - name: cache-volume
+    emptyDir:                          <-- this example is from documentation but in video he shows  "emptyDir: {}"
+      sizeLimit: 500Mi
+
+
+------
+
+apiVersion: v1           
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: registry.k8s.io/test-webserver
+    name: test-container
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+
+2) k apply -f non-persistent-pod.yaml 
+
+----------------------------------------------------------------------------------------------
+Q-38) The node "minikube" is in "NotReady" state, Investigate and bring the node back to ready state.
+
+
+1) k get nodes                                 <-- first check the "STATUS" of the node .
+
+2) k describe node minikube                    <-- in the "Events" below it shows also same "NodeNotReady"
+
+3) <name-of-node> ssh                          <-- first go inside the node .
+
+4) sudo -i                                     <-- like this we will get "root" priveleges 
+
+5) systemctl status kubelet                    <-- check the status of the "kubelet"
+                                                  If in the third or fourth line "Acticve: inactive (dead)"
+                                                  like this we found thats mean the problem is with "kubelet"
+
+6) systemctl start kubelet 
+
+7) systemctl enable kubelet 
+
+8) systemctl status kubelet                       <-- here it should show the "active (running)
+
+9) logout 
+
+10) k get nodes                                <-- now it should show the status "READY" 
+
+-------------------------------------------------------------------------------------------------
+Q-39) Make the node "my-node" unavailable and reschedule all the pods on it.
+
+
+1) k get pods -owide                                    <-- check how many pods are their and on which node they are running 
+
+2) k get nodes                                          <-- it should show two or more nodes, so that we can "cordon" one node 
+
+3) k cordon <my-node>                                   <-- now we have make it unschduable 
+
+4) k drain <my-node>  --ignore-daemonsets --force       <-- now we are releasing the pods from this node.
+
+5) k get pods -owide                                    <- now we can see the pods are running on another node .
+
+6) k get nodes                                           <-- on the node "STATUS = Ready,SchedulingDisabled" 
+                                                            it means we can not schedule any pod on it 
+
+
+-----------------------------------------------------------------------------------------------------
+Q-40) Create a pod that echo's "goggggg" and then exists, The pod should be deleted automatically when it is completed 
+     -pod name: tech-pod 
+     -image: busybox
+
+1) k run tech-pod --image=busybox -it --rm --restart=Never -- /bin/sh -c 'echo goggggg'   <-- After executing this command in the output it should 
+                                                                                            print the message and also a seperate message, 
+                                                                                            that pod is deleted            
+                                                                                       
+
+-----------------------------------------------------------------------------------------------------
+Q-41) Annotate the existing pod "yellow" and use the value "name=yellow-pod" 
+
+Note: we use "Annotations" when we do want the metadata to be identified, like with labels we can identify the pods 
+      and rearrange it with a category.
+
+
+1) k annotate pod yellow name=yellow-pod                        <-- just check in the .yaml formate if it is "Annotated" or not 
+
+
+-----------------------------------------------------------------------------------------------------
+Q-42) Get list of all pods in all namespaces and write it to the file /doc/podsnamespaces.txt 
+
+1) k get pods --all-namespaces                <-- first check the output 
+
+2) k get pods --all-namespaces   > /doc/podsnamespaces.txt            <-- after that check the file also .
+
+
+
+----------------------------------------------------------------------------------------------------
+Q-43) Update the password in the existing configmap "config-green" to "NewPass1234" 
+
+1) k describe configmap config-green            <-- first check which password is currenty written in the configmap 
+
+2) k get configmap config-green -oyaml > config-green.yaml    <-- here update the password in the .yaml file 
+
+3) k replace --force -f config-green.yaml 
+
+4) k get pods                                  <-- at the end we must check, if the pods is still running or not,
+                                               if the configmap is not their then pod stops running 
+
+5) k describe pod green                       <-- check under "Environment" that config-map is defined or not.
+
+6) k exec -it green -- env                   <-- it should also print "password=NewPass1234"
+
+
+
+----------------------------------------------------------------------------------------------------------
+Q-44) You just created the pod "blue", but it is not scheduling on the node. Troubleshoot and fix the issue 
+
+1) k describe pod blue               <-- check the "Events" thier it shows some issue with "nodeselector" 
+
+2) k describe node minikube         <-- check the label defined on it  "app=blue"
+
+3) k get pod blue -oyaml > blue-pod.yaml    
+
+spec: 
+  nodeSelector:
+    app: blue                          <-- make the correction in the name 
+
+4) k replace --force -f blue-pod.yaml 
+
+5) k get pods                                    <-- at the end check if the pod "blue" is running 
+
+6) k describe pod blue                            <-- also check in the ein, if nodeselector is correctly updated 
+
+---------------------------------------------------------------------------------------------------------
+Q-45) Create a network policy and allow traffic from the "green" pod to the "finance-service" and the "data-service"
+      -policy name:  internal-policy 
+      -policy type:  egress 
+      -label pod:    role=post 
+      -egress allow: finance 
+      -finance port: 8080
+      -egress allow: data 
+      -data port:    5432
+
+
+
+1) network-policy.yaml
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-policy 
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      role: post
+  policyTypes:
+    - Egress
+  egress:
+    - to:  
+        - podSelector:
+            matchLabels:
+              name: frnance
+    - to:  
+        - podSelector:
+            matchLabels:
+              name: data 
+
+------------------------------------------------------------------------------------------------------------
+Q-46) Create a pod and set "SYS_TIME" + sleep 3600 seconds 
+       -pod name: grey 
+       -image: busybox 
+
+1) k run grey --image=busybox --command sleep 3600 --dry-run=client -oyaml > sys-time-pod.yaml 
+
+2) go to kuberentes documentation search for "sys_time"
+
+3) vi sys-time-pod.yaml 
+
+spec:
+  containers:
+  - name: grey 
+    image: busybox 
+    securityContext:
+      capabilities:
+        add: ["SYS_TIME"]
+
+4) k apply -f sys-time-pod.yaml 
+
+5) k describe pod grey                        <-- just check if commands and SYS_TIME is correctly configured or not 
+
+
+------------------------------------------------------------------------------------------------------------
+Q-47) Create a clusterrole and a clusterrolebinding which provides get,watch,list access to the pods 
+       
+       -clusterrole name:       cluster-administrator 
+       -cluserrolebinding name: clusterbinding-administrator 
+       -serviceaccount:         admin-sa 
+
+1) k create clusterrole cluster-administrator --verb=get,watch,list --resource=pods 
+
+2) k create clusterrolebinding clusterbinding-administrator --clusterrole=cluster-administrator --serviceaccount=admin-sa 
+
+3) k auth can-i list pods --as system:serviceaccount:default:admin-sa         <-- like this we can recheck if it works 
+
+
+-----------------------------------------------------------------------------------------------------------
+Q-48) Get the IP address of the "blue" pod and write it to the file /doc/ip.txt 
+
+1) k get pods -l run=blue -A -o jsonpath='{range.items[*]}{@.status.podIP}{""}{"\n"}{end}'
+
+Note: check how he has done and how we get the output of a pod as a json 
+
+or alternatively, just copy the ip address of the blue pod replicas and paste them to the .txt file 
+
+
+---------------------------------------------------------------------------------------------------------
+Q-49) Find out the version of the cluster and write it to the file  /doc/versioncluster.txt 
+
+
+Note: he did not show the answer, but told that use the same above command to print the answer on the .txt file 
+
+1) k get nodes  -l run=blue -A -o jsonpath='{range.items[*]}{@.status.podIP}{""}{"\n"}{end}'     <-- just check if this command works 
+
+
+
+----------------------------------------------------------------------------------------------------------
+Q-50) Change the mountpath of the nginx container in the "online" statefulset to  /usr/share/nginx/updated-html"
+
+
+1) k get statefulset online                  <-- first check the state for the statefulset if it is in "READY" state 
+
+2) k get statefulset online -oyaml > online-statefulset.yaml 
+
+3) vi online-statefulset.yaml       
+
+spec:
+  containers:
+  - name: nginx 
+    volumeMounts:
+      mountPath: /usr/share/nginx/updated-html        <-- change the "mountPath" value under "nginx" container 
+
+
+4) k replace -force -f online-statefulset.yaml       
+
+5) k get statefulset online            <-- check if it is in ready state
+
+6) k describe statefulset online           <-- check if the mount path is updated 
+
+
+-----------------------------------------------------------------------------------------------------------
+Q-51)  Create a cronjob which prnts the date and "Running" every minute
+       -pod name: show-date-job 
+       -image:    busybox 
+
+1) vi cronjob.yaml 
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: busybox:1.28
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - date; echo Running               <-- "- date;"   it is a DATE command in linux and it print 
+          restartPolicy: OnFailure                 "echo Running"  it prints "Running" every min 
+
+
+2) k apply -f cronjob.yaml 
+
+
+--------------------------------------------------------------------------------------------------------------
+Q-52) User JSONPATH and get a list of all the pods with name and namespaces, and write to the file /doc/name-namespace.txt 
+
+1) kubectl get pods -A -o jsonpath='{range.items[*]}{.metadata.name}{"\t"}{.metadata.namespace}{"\n"}{end}'    <-- this command he made by himself 
+
+2) kubectl get pods -A -o jsonpath='{range.items[*]}{.metadata.name}{"\t"}{.metadata.namespace}{"\n"}{end}' > /doc/name-namespace.txt 
+
+
+
+---------------------------------------------------------------------------------------------------------------
+Q-53) Create a networkpolicy and allow traffic from all the pods in the "dev-tech" namespace  and from pods with 
+      the label "type=review" to the pods matching the label "app=postgres" 
+
+Note: to understand the question, In the question he define "allow traffic from" it means we have to put this policy on the 
+      target port so every thing that comes to target port shoul be filtered.
+
+1) k label namespace/dev-tech app=dev-tech              <-- first label the namespace 
+
+       
+1) vi network-policy.yaml 
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres 
+  policyTypes:
+    - Ingress 
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              app: dev-tech 
+        - podSelector:
+            matchLabels:
+              type: review
+
+Note: if in the question they do not define any port, then we have also not to define a port in the networkpolicy 
+
+
+---------------------------------------------------------------------------------------------------------------
+Q-54) Create a pod with container port  80. It should check the pod running at endpoint /healthz on port 80 + verify + delete the pod 
+      -pod name: health-pod 
+      -Image: nginx 
+
+> k run health-pod --image=nginx --port=80 --restart=Always --dry-run=client -oyaml > liveness-pod.yaml 
+
+1) vi liveness-pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: health-pod 
+spec:
+  containers:
+  - name: nginx 
+    image: nginx
+    livenessProbe:                           <-- From the kubernetes-documentation page i have taken this "livenessProbe" option 
+      httpGet:
+        path: /healthz
+        port: 80
+      initialDelaySeconds: 300              
+  restartPolicy: Always        
+
+3) k apply -f liveness-pod.yaml 
+
+4) k descirbe pod health-pod               <-- check if the pod works fine 
+
+5) k delete pod health-pod                  <-- As asked in the question at the end delete the pod .
+
+
+-------------------------------------------------------------------------------------------------------------
+Q-55) Monoitor the logs of the pod "yellow", extract all the log lines matching with "not found" and write to the 
+      file /doc/failed.log 
+
+1) k get logs yellow | grep "not found" 
+
+2) k get logs yellow | grep "not found" > /doc/failed.log   
+
+
+
+--------------------------------------------------------------------------------------------------------------7
+Q-56) Rollback the deployment "blue-deplyoment" to revision 1 
+
+1) k rollout history deployment blue-deploy                      <-- here it will show some revision 1,2 or maybe 3 
+
+2) k rollout history deployment blue-deploy --revision=1         <-- it will rollback to the "revision 1"
+
+
+------------------------------------------------------------------------------------------------------------------
+Q-57)  List the orange pod with the custom columns POD_STATIS and POD_NAME and write to the file  /doc/status.txt 
+
+1) k get pod orange -o=custom-columns="POD_NAME:.metadata.name,POD_STATUS:.status.containerStatuses[].state"      <-- this command is made by him  
+
+
+--------------------------------------------------------------------------------------------------------------
+Q-58) For the orange pod , set the CPU memory requests and limits 
+      Reqiests: CPU=20m, memory=40Mi
+      Limits: CPU=160m, memory=200Mi
+
+Note: first check it may be a case that the requests and limits are already their and we need just to update them,
+        In this case we assume that these are their 
+
+1) k get pod  orange -oyaml > orange-pod.yaml 
+
+2) vi orange-pod.yaml                             <-- just change the resources as given in the question 
+
+3) k replace --force -f orange-pod.yaml 
+
+
+------------------------------------------------------------------------------------------------------------
+Q-59) Create a pod with a non-persistent storage 
+      -pod name: redis-pod 
+      -Image: redis
+
+Note: i have created this pod from kubernetes document search "emptyDir"
+
+apiVersion: v1           
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: registry.k8s.io/test-webserver
+    name: test-container
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+
+
+------------------------------------------------------------------------------------------------------------
+Q-60) Troubleshoot the failed pod "dev-blue" and make it running again 
+
+
+Note: In this case the image name was wrong, So first he creates a .yaml file from pod then use "k replace -f " to create new 
+
+
+
+--------------------------------------------------------------------------------------------------------------
+Q-61) Expose the yellow-tech pod internally and create a test-pod for look-up 
+      -port: 80
+      -service name: yellow-tech-service 
+      -test pod name: test-yellow-tech 
+      -Type: ClusterIP 
+
+
+1) k expose pod yellow-tech-service --name=yellow-tech-service --port=80 --target-port=80 --type=ClusterIP 
+
+2) k run test-yellow-tech --image=busybox:1.28  --it --restart=Never -- nslookup yellow-tech-service
+
+
+----------------------------------------------------------------------------------------------------------
+Q-62) Create a DaemonSet 
+       -name:  blue-daemon 
+       -image: httpd:alpine  
+
+> k get nodes                <-- check how many different nodes are running, at the end on ever Node one "DaemonSet" should run 
+
+1) k create deployment blue-daemon --image=httpd:alpine --dry-run=client -oyaml > blue-daemon.yaml 
+
+2) vi blue-daemon.yaml 
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: blue-daemon 
+  labels:
+    app: blue-daemon 
+spec:
+  selector:
+    matchLabels:
+      app: blue-daemon 
+  template:
+    metadata:
+      labels:
+        app: blue-daemon 
+    spec:
+      containers:
+      - name: blue-daemon 
+        image: httpd:alpine 
+
+4) k apply -f blue-daemon.yaml 
+
+5) k get pods  -A             <-- it will return all the DaemonSets, check if all the DaemonSets are running on different Nodes 
+
+
+-------------------------------------------------------------------------------------------------------------
+Q-63) There'S an issue with the node "my-node". The admin is not able to schedule any pods on the node.
+      Fix the issue and deploy pod-1.yaml on the node. 
+
+
+1) k get node my-node -owide             <-- As per in this question the STATUS= Ready,SchedulingDisabled
+                                            As it is "SchedulingDisabled" it means we can not Schedule any pod on it 
+
+
+2) k describe node my-node              <-- In the Events we can check, their should also be the same message showing 
+
+3) k uncordone my-node                  
+
+4) k get node my-node -owide             <-- now STATUS=Ready state 
+
+5) k apply -f pod-1.yaml             <-- First chceck the pod-1.yaml file if the "nodeName" is correct, after that execute the "apply" command 
+
+
+
+---------------------------------------------------------------------------------------------------------------
+Q-64) Get all the objects in all the namespaces and write to file /doc/all.txt 
+
+1) k get all --all-namespaces > /doc/all.txt 
+
+
+
+
+--------------------------------------------------------------------------------------------------------------
+Q-65) Create a pod and assign it to the node my-node 
+      -pod name: dev-grey
+      -image:    nginx 
+
+1) first check if the node with name "my-node" exists 
+
+2) k run dev-grey --image=nginx --dry-run=client -oyaml > dev-grey.yaml 
+
+3) vi dev-grey.yaml 
+
+spec:
+  nodeName: my-node 
+
+4) k replace --force -f dev-grey.yaml 
+
+
+-------------------------------------------------------------------------------------------------------------
+Q-66) Create all the pods with the label "env=tech-dev" and write to the file  /doc/label.txt 
+
+1) k get pods -l env=tech-dev                           <-- first check the output of this command 
+
+2) k get pods -l env=tech-dev  > /doc/label.txt            
+
+
+
+
+-------------------------------------------------------------------------------------------------------------
+Q-67) Create a taint on the node "my-node" with the key "spray" value of "red" and effect of "NoSchedule" 
+
+Note: first check if the node "my-node" is in READY state and also their is no "SchedulingDisabled" option is written in STATUS 
+
+1) k taint node my-node spray=red:NoSchedule 
+
+2) k describe node my-node | grep Taints          <-- like this we can see if Taint was successfull or not 
+
+
+----------------------------------------------------------------------------------------------------------
+Q-68) Create a pod and set tolerations 
+      -pod name: dev-green 
+      -Image: nginx 
+      -Tolerations: spray=red:NoSchedule 
+
+1) k describe node  my-node | grep Taints            <-- like this we can check if the Taints on the Node matches the given Tolerations 
+
+2) k run dev-green --image=nginx --dry-run=client -oyaml > dev-green.yaml 
+
+3) vi dev-green.yaml 
+
+spec:
+  tolerations:
+  - effect: NoSchedule 
+    key: spray 
+    opersator: Equal
+    value: red 
+  
+
+4) k apply -f dev-green.yaml 
+
+5) k describe pod dev-green | grep Node     <-- like this we can check on which node this pod is placed 
+
+
+--------------------------------------------------------------------------------------------------------------
+Q-69) Check the image version of the "grey" pod without using the describe command and write to file /doc/grey-image.txt 
+
+1) k get pod grey -o jsonpath='{.spec.containers[*].image}{"/n"}'          <-- i am not sure ".containers[*]  <-- "*" star should be their or not 
+
+2) k get pod grey -o jsonpath='{.spec.containers[*].image}{"/n"}'  > /doc/grey-image.txt 
+
+
+
+----------------------------------------------------------------------------------------------------------
+Q-70) Create a pod with a sidecar container for logging 
+       -pod name: pod-logging
+       -image: busy-box 
+
+Note: first go to kubernetes-documentation search for  "sidecar logging", then it opens a page under "Logging Architecture"
+      just copy the pod manifest file, and delete the last container from it change the name of the pod 
+
+
+1) vi logging-pod.yaml 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-logging 
+spec:
+  containers:
+  - name: count
+    image: busybox:1.28
+    args:
+    - /bin/sh
+    - -c
+    - >
+      i=0;
+      while true;
+      do
+        echo "$i: $(date)" >> /var/log/1.log;
+        echo "$(date) INFO $i" >> /var/log/2.log;
+        i=$((i+1));
+        sleep 1;
+      done      
+    volumeMounts:
+    - name: varlog
+      mountPath: /var/log
+  - name: count-log-1
+    image: busybox:1.28
+    args: [/bin/sh, -c, 'tail -n+1 -F /var/log/1.log']
+    volumeMounts:
+    - name: varlog
+      mountPath: /var/log
+  volumes:
+  - name: varlog
+    emptyDir: {}
+
+2) k apply -f logging-pod.yaml 
+
+
+
+--------------------------------------------------------------------------------------------------------
+Q-71) Find out where the kubernetes master and KubeDNS are running at and write to file  /doc/info.txt 
+      
+Note: "Kubernetes master" means  master node 
+      "KubeDNS"  or they can also say "CoreDNS" 
+
+1) k cluster-info                       <-- see the output of this commands 
+
+2) k cluster-info > /doc/info.txt 
+
+
+
+------------------------------------------------------------------------------------------------------
+Q-72) Print the pod names and start times to the file /doc/start.txt 
+
+1) k get pods -o jsonpath='{range.items[*]}{.metadata.name}{"\t"}{.status.startTime}{"\n"}{end}'  
+
+
+
+
+
+----------------------------------------------------------------------------------------------------
+Q-73) Create a pod and run the command which shows "Welcome from tech" and sleep for 100 seconds 
+      -pod name: tech-blue
+      -image: busybox 
+
+
+1) k run tech-blue --image=busybox  > tech-blue-pod.yaml 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo Welcome from tech-educator; sleep 100; done"]
+    image: busybox 
+
+
+--------------------------------------------------------------------------------------------------
+Q-74) Create the pod "green" and specify a CPU request of "1" and CPU limit of "2"
+      -image: nginx 
+
+
+Note: First i go to kubernetes-documentation and search for  "pod cpu"
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: green 
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      limits:
+        cpu: "2"
+      requests:
+        cpu: "1"
+
+
+-----------------------------------------------------------------------------------------------
+Q-75) Scale the "blue" deployment to 5 replicas 
+
+1) k scale deployment blue --replicas=5 
+
+
+
+--------------------------------------------------------------------------------------------
+Q-76) List al the secrets and configmaps in the cluster in all namespaces and write to file /doc/config-secret.txt 
+
+
+1) k get configmaps,secrets --all-namespaces       <-- check th eoutput 
+
+2) k get configmaps,secrets /doc/config-secret.txt 
+
+
+
+--------------------------------------------------------------------------------------------
+Q-77) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
