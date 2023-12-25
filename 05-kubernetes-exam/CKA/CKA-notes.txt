@@ -21,7 +21,7 @@ Node Affinity  63
 ----------------------------------------------------
 In Master-Node
 ---------------
-Kube-api-server            6443   Port
+Kube-api-server            6443   Port    (But somewhere i saw 8443 also)
 coredns
 etcd                       2379   Ports 
 kube-proxy
@@ -3525,7 +3525,443 @@ Q-76) List al the secrets and configmaps in the cluster in all namespaces and wr
 
 
 --------------------------------------------------------------------------------------------
-Q-77) 
+Q-77) Create a NetworkPolicy which denies all the ingress traffic 
+
+
+Note: In the kubernetes documentation i searched for "default deny ingress" then in page i search for "default deny ingress"
+      their we can also check "default allow all ingress", and both the same rules for "Egress" traffic 
+
+
+1) vi network-policy.yaml 
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+
+
+-----------------------------------------------------------------------------------------------
+Q-78) Create an init-container in a pod which creates the file "check.txt" in the "tech-dir" directory.
+      Use the main container to check if the "check.txt" file exists and execute the "sleep 300" command when it exists 
+      -pod name: blue-check 
+      -image initcontainer: busybox:1.28 
+      -image container: alpine 
+
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: green 
+spec:
+  volumes:
+  - name: blue-volume
+    emptyDir: {}
+  initContainers:
+  - name: init-busybox 
+    image: busybox:1.28
+    command: ['sh', '-c', 'mkdir /tech-dir; echo > /tech-dir/check.txt']
+    volumeMounts:
+    - name: blue-vol 
+      mountPath: /tech-dir 
+  containers:
+  - name: alpine 
+    image: alpine 
+    command: ['sh','-c','if [ -f /tech-dir/check.txt ]; then sleep 300; fi']
+
+
+------------------------------------------------------------------------------------------------------
+Q-79) List the logs of the pod names "dev-green" and search for the pattern "start" and write it to the 
+     file /doc/start.txt 
+
+
+
+1) k get pods     <-- check the name of the pod, it may be it not directly "dev-green" it can be a part of deployment 
+
+2) k logs dev-green-erere-eeer | grep start            <-- check if logs are showing 
+
+3) k logs dev-green-erere-eeer | grep start > /doc/start.txt 
+
+
+
+-------------------------------------------------------------------------------------------------------
+Q-80) Expose the deployment  "blue-deploy" 
+       -name service: blue-service 
+       -port: 6379 
+       -type: NodePort 
+
+1) k get deployment blue-deploy       <-- first check if deployment is running 
+
+2) k expose deployment blue-deploy --name blue-service --type=NodePort --port=6379 --target-port=6379
+
+3) k describe service blue-service 
+
+
+-----------------------------------------------------------------------------------------------------
+Q-81) Create two pods with different labels 
+      -pod 1 name: pod-1
+      -image: nginx
+      -label: env=green 
+
+      -pod 2 name: pod-2
+      -image: nginx
+      -label: env=red 
+
+1) k run pod-1 --image=nginx -l env=green 
+
+2) k run pod-2 --image=nginx -l env=red 
+
+3) k get pod -l env=green 
+
+3) k get pod -l env=red 
+
+
+-------------------------------------------------------------------------------------------------
+Q-82) Create a new clusterrole named "green-clusterrole" which allows you to create deployments 
+      After create a new servivceaccount named "green-sa" in the "tech" namespace.
+      And finally, bind the clusterrole to the serviceaccount by creating a rolebinding named "green-rb"
+
+
+1) k create clusterrole green-clusterrole --verb=create --resource=deployment 
+
+2) k create serviceaccount green-sa --namespace=tech 
+
+3) k create rolebinding green-rb --clusterrole=green-clusterrole --serviceaccount=default:green-sa --namesapce=tech 
+
+
+-------------------------------------------------------------------------------------------------
+Q-83) Find the static pod path and copy the location to /doc/staticpath.txt 
+
+1) k get nodes                  <-- first check all the node 
+
+2) minikube ssh                 <-- as "minikube" is node their so we need to first "ssh" in it 
+
+3) sudo -i                      <-- change the login as "root"
+
+4) ps -aux | grep kubelet         <-- with this we can find the location of the config file "--config=/var/lib/kubelet/config.yaml" 
+
+5) cat /var/lib/kubelet/config.yaml | grep staticPodPath 
+
+Output:
+staticPodPath: /etc/kubernetes/manifests              <-- we copy this path with mouse right-click 
+
+6) logout                                         <-- we logout from the "minikube" node 
+
+7) echo /etc/kubernetes/manifests > /doc/staticpodpath.txt 
+
+
+
+-------------------------------------------------------------------------------------------------
+Q-84) Delete a pod "white-shark" without any delay 
+
+1) k get pods                 <-- check if "white-shark" pod is running 
+
+2) k delete pod white-shark --grace-period=0 --force 
+
+
+----------------------------------------------------------------------------------------------
+Q-85) Grep the current context and write it to the file /doc/current.txt 
+
+1) k config current-context                    <-- first check the current context 
+
+2) cat ~/.kube/config                       <-- it will print the config file 
+
+3) cat ~/.kube/config | grep current               <-- check if it prints the current context same as the output in command 1
+
+4) 3) cat ~/.kube/config | grep current > /doc/current.txt 
+
+
+
+---------------------------------------------------------------------------------------------
+Q-86) Get a list of all the pods which were recently deleted 
+      Write the list to the file /doc/recentdelete.txt 
+
+
+
+
+
+--------------------------------------------------------------------------------------------
+Q-87) There is something wrong with the "dark-blue" pod. Troubleshoot and fix the issue 
+
+1) k describe pod dark-blue 
+
+-) in this question their is a type in the "Args"     "d0ne"  it should be "done"
+
+
+--------------------------------------------------------------------------------------------
+Q-88) Create a pod "yellow" with the image "redis:alpine" and a storage which lasts as long as the lifetime of the pod 
+      
+Note: in the indirect way they are asking to create a "non-persistent" storage with "emptyDir"      
+
+
+1) vi non-persist.yaml
+ 
+apiVersion: v1           
+kind: Pod
+metadata:
+  name: yellow
+spec:
+  containers:
+  - image: redis:alpine 
+    name: redis 
+    volumeMounts:
+    - mountPath: /data/redis                           <-- normally we can use any path, but "/data/redis/" is used by him in video 
+      name: cache-volume
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+
+
+-----------------------------------------------------------------------------------------
+Q-89) Create a pod and add "runAsUser:2000" and "fsGroup:5000"
+       -Pod name: sec-pod 
+       -image:    nginx 
+
+
+1) k run sec-pod --image=nginx --dry-run=client -oyaml > sec-pod.yaml 
+
+2) vi sec-pod.yaml 
+
+
+apiVersion: v1           
+kind: Pod
+metadata:
+  name: sec-pod 
+spec:
+  securityContext:
+    runAsUser: 2000
+    fsGroup: 5000
+  containers:
+  - image: nginx 
+    name: nginx 
+
+
+--------------------------------------------------------------------------------------------
+Q-90) There's an issue with the kubeconfig file located in the folder ~/.kube/config 
+      Troubleshoot and fix the issue 
+
+clusters:
+  - cluster:
+      server: https://192.168.49.2:8443                  <-- in the video here was "9000" written, change it to 8443
+                                                       Note: in some case we use 6443 and in some 8443 so just check with both,      
+
+
+---------------------------------------------------------------------------------------------
+Q-91) Create a pod named "sec-blue" with the image "nginx" and set "NET_ADMIN"
+
+Note: i just go to kubernetes documentation and search for  "net_admin"
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sec-blue 
+spec:
+  containers:
+  - name: nginx
+    image: nginx 
+    securityContext:
+      capabilities:
+        add: ["NET_ADMIN", "SYS_TIME"]
+
+
+
+-------------------------------------------------------------------------------------------
+Q-92) Delete all the pods with the label "environment: orange" 
+
+1) k get pod -l environment=orange 
+
+2) k delete pod -l environment=orange 
+
+2) k get pod -l environment=orange                     <-- check if the pods are still their 
+
+
+
+---------------------------------------------------------------------------------------------
+Q-93) Create a multipod with three containers:
+      -Name container 1: container-1
+      -image:            nginx 
+
+      -Name container 2: container-2
+      -image:            redis 
+
+      -Name container 3: container-3
+      -image:            alpine 
+
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-pod 
+spec:
+  containers:
+  - name: container-1
+    image: nginx
+  - name: container-2
+    image: redis 
+  - name: container-3
+    image: alpine 
+
+----------------------------------------------------------------------------------------------
+Q-94) Replace the "grey" pod with the existing yaml file "pod-replace.yaml" and verify after 
+
+Note: Their is a existing pod name "grey", and their is pod-replace.yaml  file and it has also a pod with same name "grey"
+
+1) k get pod grey -oyaml                      <-- in this case existing pod has a image: nginx:1.17
+
+1) k replace --force -f pod-replace.yaml 
+
+2) k get pod grey -oyaml                      <-- after replacing it has a new image: nginx:1.18
+
+
+
+---------------------------------------------------------------------------------------------
+Q-95) Change the requested storage size of the PersistentVolumeClaim "storage-pvc" to 800Mi
+
+1) k get pvc storage-pvc            <-- their is already a pvc with the current size of "2Gi"
+
+2) k get pvc storage-pvc > pvc.yaml 
+
+3) vi pvc.yaml     
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 800Mi                   <-- Here change the storage from "2Gi" to "800Mi"
+
+
+4) k replace --force -f pvc.yaml           <-- like this we can replace the older with the current.
+
+---------------------------------------------------------------------------------------------
+Q-96) Edit and existing pod "green-nginx" and add the command "sleep 3600"
+
+1) k get pod green-nginx 
+
+2) k get pod green-nginx > green-nginx.yaml 
+
+3) vi green-nginx.yaml 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sec-blue 
+spec:
+  containers:
+  - name: nginx
+    image: nginx 
+    command:
+    - "sleep"
+    - "3600" 
+
+4) k replace --force -f green-nginx.yaml 
+
+
+----------------------------------------------------------------------------------------------
+Q-97) Add a readiness probe to the existing deployment "ready-deployment"
+       -path: /ready
+       -port: 80
+
+Note: Readiness probe checks that, the this pod is ready to recieve traffic.
+
+1) k get deploy ready-deployment -oyaml > ready-deployment.yaml 
+
+2) vi ready-deployment.yaml 
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:                <-- "httpGet" <-- this example i did not saw in the kubernetes-documentation so i have to remember it 
+            path: /ready
+            port: 80
+          successThreshold: 3  
+
+3) k replace --force -f ready-deployment.yaml          <-- try and check this if it works 
+
+--------------------------------------------------------------------------------------------
+Q-98) Get all contexts and write it to the file /doc/contexts.txt 
+
+Note: With "contexts" he means "contexts" in the  "~/.kube/config" file 
+
+1) k config get-contexts           <-- see the output 
+
+2) k config get-contexts > /doc/contexts.txt 
+
+
+-----------------------------------------------------------------------------------------
+Q-99) Create a replicaset "front-replicaset" with the image "nginx" which has 3 replicas 
+
+Note: As with imperative commands we can not create directly replicaset, so in this case 
+      First we will create a Deployment, After that we need to change the "kind"
+
+1) k create deployment front-replicaset --image=nginx --dry-run=client -oyaml > replicaset.yaml 
+
+2) vi replicaset.yaml 
+
+apiVersion: apps/v1
+kind: ReplicaSet                       <-- change "Deployment" to "ReplicaSet"
+metadata:
+  name: front-replicaset 
+  labels:
+    app: front-replicaset 
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: front-replicaset
+  strategy: {}                              <-- we have to remove this field "strategy"     
+  template:
+    metadata:
+      labels:
+        app: front-replicaset 
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+
+3) k apply -f replicaset.yaml 
+
+4) k delete pod <take-name-of-pod>           <-- just delete one pod and it should create new pod again as part of ReplicaSet 
+
+--------------------------------------------------------------------------------------------
+Q-100) List all the control plane components and write to the file /doc/controlcomp.txt 
+
+1) k get pods -n kube-system                      <-- see the output 
+
+2) k get pods -n kube-system > /doc/controlcomp.txt 
+
+
 
 
 

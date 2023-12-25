@@ -1,0 +1,119 @@
+
+
+
+Q-1) There are various pods running in all the namespace of cluster.
+   List all the pods sorted by their AGE in Ascending order and save to /opt/pods_asc.sh 
+
+1) k get pod -A --sort-by=.metadata.creationTimestamp                <-- it will print the output by default in "Desecending order"
+
+2)  k get pod -A --sort-by=.metadata.creationTimestamp | tac         <-- "tac" command will reverse the order of the output 
+
+3)  echo "k get pod -A --sort-by=.metadata.creationTimestamp | tac" > /opt/pods_asc.sh    <-- we have to write this command in this target fiel 
+
+4) cat /opt/pods_asc.sh 
+
+5) chmod +x /opt/pods_asc.sh 
+
+6) ./opt/pods_asc.sh                                  <-- like this we can execute this file, and see the result  
+
+----------------------------------------------------------------------------------------------------
+Q-2) Create a static pod on node01 "static-nginx"  image "nginx" and you have to recreated/restarted automatically
+     in case of any failure happens  
+
+1) k get nodes                       <-- it shows we have two nodes 
+
+2) ssh node01                        <-- we go inside the node01 
+
+3) ps aux | grep kubelet                <-- here we search for "--config=/var/lib/kubelet/config.yaml"
+
+4) cat /var/lib/kubelet/config.yaml             <-- in the end their is key "staticPodPath" copy the path value from this attribute 
+                                                 
+5) cd /etc/kubernetes/manifests               
+
+6) vi pod.yaml 
+
+
+-------------------------------------------------------------------------------------------------------
+Q-3) Create a pod called pod-multi with two containers,
+     name: container1
+     image: nginx 
+
+     name: container2
+     image: busybox 
+     command: sleep 4800 
+
+
+
+------------------------------------------------------------------------------------------------------
+Q-4) Create a pod called delta-pod in defense namespace belonging to the development environment env=dev, tier=front
+        image=nginx 
+
+Note: main point to understand is that "development environment" means labels, that we have to set labels here 
+
+
+
+-----------------------------------------------------------------------------------------------------
+Q-5) Create a pod called admin-pod, image=busybox, Allow the pod to be able to set system_time 
+    command sleep 3200
+
+Note: system_time       means  "SYS_TIME"      <--this i must remember 
+
+
+----------------------------------------------------------------------------------------------------
+Q-6) A kubeconfig file called test.kubeconfig has been created in /root/TEST, Their is something wrong with the configuration 
+
+> kubectl config view                    <-- with this we can view the current config 
+                                            After comparing with the "/root/TEST/config" file the server:https://controlplane:8000
+                                            But normally the port is  6443   "server:https://controlplane:6443"
+
+
+
+------------------------------------------------------------------------------------------------------
+Q-7) Create a new deloyment "web-proj-268" image "nginx:1.16  replica 1
+     Next upgrade the deployment to version 1.17 using rolling update 
+     Make sure that the version upgrade is recorded in the resources  annotation 
+
+
+
+-----------------------------------------------------------------------------------------------------
+Q-8) Create a pod called web-pod using image nginx, expose it internally with service called web-pod-svc.
+     Check that you are able to look up the service and pod from within the cluster. 
+
+     Use the image: busybox:1.28 for dns lookup,
+     Record resoults in /root/web-svc.svc and /root/web-pod.pod 
+
+Note: As when we are trying to make a "nslookup" in this case with the "80" port "Service" can be reached.
+
+
+1) k run web-pod --image=nginx 
+
+2) k expose pod web-pod --name=web-pod-svc --port=80 
+
+3) k run nslookup-pod --image=busybox:1.28 --command sleep 4800
+
+4) k exec -it nslookup -- nslookup web-pod-svc                     <-- check if the output is correct 
+
+5) k exec -it nslookup -- nslookup web-pod-svc > /root/web-svc.svc                
+
+6) cat /root/web-svc.svc                                            <-- like this we can print the output 
+
+Note: to save the "nslookup" result in a .pod file we need the first the ip address of the  "nsloopup-pod"
+
+7) k get pods                                <-- Assume in output we get the ip address of the pod is  IP=10.50.192.2
+
+8) k exec -it nslookup -- nslookup 10-50-192-2.default.pod                   <-- like this we will get the ping result 
+
+9) k exec -it nslookup -- nslookup 10-50-192-2.default.pod > /root/web-pod.pod 
+
+-----------------------------------------------------------------------------------------------------
+Q-9) Use JSON PATH query to retrieve the osimages of all the nodes and store it in a file  "abc.txt"  at root location.
+
+Note: The osimages are under the nodeInfo section under status of each node. 
+
+1) k get nodes -o jsonpath='{.items[*].status.nodeInfo.osImages}' > abc.txt 
+
+
+
+
+
+
