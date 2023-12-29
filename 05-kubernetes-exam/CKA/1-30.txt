@@ -113,6 +113,459 @@ Note: The osimages are under the nodeInfo section under status of each node.
 1) k get nodes -o jsonpath='{.items[*].status.nodeInfo.osImages}' > abc.txt 
 
 
+-----------------------------------------------------------------------------------------------------
+Q-10) Create a Persistent Volume with the given specification.
+
+Volume Name: pv-rnd 
+Storage: 100Mi
+Access modes; ReadWriteMany
+Host Path: /pv/host_data-rnd
+
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv0003
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /pv/host_data-rnd   
+
+---------------------------------------------------------------------------------------------    
+Q-11) kubernetes worker node node01 is not respoinding, have a look and fix the issue 
+
+
+-------------------------------------------------------------------------------------------
+Q-12) List the internal IP of all nodes of the cluster, Save the result to a file /root/internal_ip_list 
+      Answer should be in the format: InternalIP of First Node <space> InternalIP of the second Node (in a single line )
+
+
+      
+------------------------------------------------------------------------------------------
+Q-13)(Check)  One static pod "web-static", image "busybox" is currently running on controlplane node, 
+      move that static pod to run on node01, donot need to do any other changes.
+
+Note: Static pod name should be changed from web-static-controlplan to web-static-node01 
+
+
+---------------------------------------------------------------------------------------
+Q-14)(Check)  Create a new deployment called web-003. Scale the deployment to 3 replicas 
+      Make sure desired number of pods always running. 
+
+1) k create deployment web-03 --image=nginx --replicas=3 
+
+2) k get pods -n kube-system     <--check the video how he has fixed the issue 
+
+
+-------------------------------------------------------------------------------------
+Q-15)(check) Upgrade the cluster (Master and worker Node) from  1.18.0   to   1.19.0 
+
+1) k get nodes              <-- we have "controlplane" (master)  and node01 (worker) nodes 
+
+2) k drain controlplane --ignore-daemonsets          <-- Drain the master node first, it will also "cordon" the node 
+3) ssh controlplane
+4) apt update 
+5) apt install kubeadm=1.19.0-00
+6) kubeadm upgrade apply v1.19.0 
+7) apt install kubelet=19.19.0-00
+8) systemctl restart kubelet 
+9) k uncordon controlplane 
+10) k get nodes                               <-- at this point we can see the "master" node upgrade is finished 
+                                              In the output recheck the verion for master node 
+
+Note: we run same commands for "worker node" again 
+
+1) k drain node01 --ignore-daemonsets          <-- Drain the worker node now , it will also "cordon" the node 
+
+2) ssh node01
+3) apt update 
+4) apt install kubeadm=1.19.0-00
+5) kubeadm upgrade node 
+6) apt install kubelet=19.19.0-00
+7) systemctl restart kubelet 
+8) k uncordon node01
+9) k get nodes                               <-- at this point we can see the "worker" node upgrade is finished 
+                                              In the output recheck the verion for worker  node 
+
+----------------------------------------------------------------------------------------
+Q-16)(check)  There are 2 worker node associate with kubernetes cluster, use JSONPATH query to 
+      retrieve nodes osimage name and store it in file  "~/abc.txt"
+
+
+1) k get node -o jsonpath='{.items[*].status.nodeInfo.osImage}'  > abc.txt 
+
+
+--------------------------------------------------------------------------------------
+Q-17) Deploy a web-load-5461 pod using the nginx:1.17 image with the labels set the tier=web
+
+
+----------------------------------------------------------------------------------------
+Q-18)(check) Create a pod "front-pod" that write "binaries downloaded successfully" into file 
+      "front-pod.txt" and then exit 
+
+      Check, Pod "front-pod" should be deleted automatically when it is completed.
+
+1) k run front-pod --image=busybox --it --rm --restart=Never -- /bin/sh -c 'echo binaries downloaded successfully' > front-pod.txt 
+
+
+------------------------------------------------------------------------------------
+Q-19)(check) Check how many nodes are in ready stat and write the information about nodes tainted with "NoSchedule" into file abc.txt 
+
+      At least one node's taint information should be logged in a file with below format 
+
+      {"name":"<<Node_Value>>",
+       "taints":<<value>>}
+      {"name":"<<Node_Value>>",
+       "taints":<<value>>}
+
+1) k get nodes -o json | jq ".items[]|{name:.metadata.name, taints:.spec.taints}" > abc.txt 
+
+
+-------------------------------------------------------------------------------------
+Q-20)(Check)  Create new namespace "airfusion"
+              Create a new network policy named my-net-pol in the airfusion namespace 
+
+      Requirements:
+      -------------
+      Network policy should allow PODs within the airfusion to connect to each other only on Port 80.
+      No other ports should be alloweed.
+      No PODs from outside of the airfusion should be able to connect to any pods inside the airfusion.
+
+1) k create ns airfusion 
+
+2) k run nginx --image=nginx --namespace airfusion
+
+2) vi network-policy.yaml 
+
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: my-net-pol
+  namespace: airfusion               
+spec:
+  podSelector: {}          <-- This policy is applied to all the Pods in the namespace where this policy is created
+  policyTypes:                 As this policy is created in the "airfusion" namespace, so it is applied on all the pods of this namesapce 
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}          <-- It allows the Ingress traffic from all the pods from the namesapce where the networkpolicy is created 
+      ports:                           It means that all the pods from "airfusion" can connect to this pod on port 80
+        - protocol: TCP
+          port: 80
+
+
+---------------------------------------------------------------------------------------
+Q-21) Expose the "audit-web-app" web pod as service "audit-web-app-service" application on port 30002
+      on the nodes on the cluster. 
+
+Note: The web application listens on port 8080 
+
+1) k expose pod audit-web-app --name audit-web-app-service --type=NodePort --dry-run=client -oyaml > audit-service.yaml 
+
+2) vi audit-service.yaml 
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: audit-web-app-service
+  labels:
+    run: audit-web-app
+spec:
+  type: NodePort
+  selector:
+    run: audit-web-app 
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30002
+
+---------------------------------------------------------------------------------
+Q-22) Taint the worker node node01 with details provide below. Create a pod called dev-pod-nginx using image=nginx,
+      make sure that workloads are not scheduled to this worker node 
+
+     Create a another pod called prod-pod-nginx using image=nginx with toleration to be scheduled on node01
+Details:
+      key: env_type, value:production, operatio:Equal and effect:NoSchedule 
+
+-------------------------------------------------------------------------------------
+Q-23) Create a pod called pod-jxc56fv, using details mentioned below 
+
+     securityContext 
+        funAsUser: 1000
+        fsGroup: 2000
+     
+     -image: redis:alpine 
+
+
+-----------------------------------------------------------------------------------
+Q-24) (check)  Get the node node01 information in JSON format and store it in a file at:
+              /opt/outputs/nodes-fz456723je.json 
+
+
+1) k get node node01 -o json > /opt/outputs/node-fz456723je.json 
+
+
+
+-------------------------------------------------------------------------------------
+Q-25)(check) Take a backup of ETCD db and sacce it to root directory with name: "etcd-backup.db"
+
+Note: search in the kubernetes-documentation  "etcd snapshot" then we can copy the below command 
+
+ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 \
+  --cacert=<trusted-ca-file> --cert=<cert-file> --key=<key-file> \
+  snapshot save <backup-file-location>
+
+1) k get pods -n kube-system                           <-- copy the name of the "etcd" pod 
+
+2) k describe pod etcd-controlplane -n kube-system           <--copy the details needed for the below command from this pod 
+
+
+ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379 \
+  --cacert=<trusted-ca-file>  \                                   <-- as written in the <> copy from above  "--trusted-ca-file"
+  --cert=<cert-file> \                                            <-- as written in the <> copy from above  "--cert-file"
+  --key=<key-file> \                                              <-- as written in the <> copy from above  "--key-file"
+  snapshot save <backup-file-location>                            <-- backup location is defined in the question 
+
+
+-------------------------------------------------------------------------------------------------
+Q-26) A new application finance-audit-pod is deployed in finance namespace. There is something wrong with it 
+      There is something wrong with it, Identify and fix the issue 
+
+      Note: No configuration changed allwoeed, you can only delete and recreate the pod (if required )
+ 
+1) Here was only worng name written "sheep"
+
+
+--------------------------------------------------------------------------------------------------
+Q-27) A new user named "alok" need to be created. Grant him access to the cluster. user "alok" should have 
+      permission to create, list, get, update and delete pods in the space namespace.
+
+      The private key exists at location: /root/alok.key 
+                  csr exists at location: /root/alok.csr 
+
+Same question example given in other questions 
+
+------------------------------------------------------------------------------------------------
+Q-28)(check)  Create a PersistentVolume, PersistentVolumeClaim and Pod with below specifications 
+
+pv:
+---
+volume name:    mypvlog
+storage:        100Mi
+Access Mode:    ReadWriteMany 
+Host Path:      /pv/log 
+Reclaim Policy: Retain 
+
+PVC:
+---
+Volume Name:  pv-claim-log 
+Storage:      50Mi 
+Access Modes: ReadWriteMany 
+
+Pod:
+---
+Name:          my-nginx-pod 
+Image:         nginx 
+Volume:        PersistenVolumeClaim: pv-claim-log 
+Volume mount:  /log
+
+
+
+1) vi pv.yaml 
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mypvlog
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain    
+  hostPath: 
+    path: /pv/log   
+
+2) pvc.yaml 
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-claim-log 
+spec:
+  accessModes:
+    - ReadWriteMany 
+  resources:
+    requests:
+      storage: 50Mi 
+
+3) pod.yaml 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-nginx-pod
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      volumeMounts:
+      - mountPath: "/log"
+        name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: pv-claim-log 
+
+
+----------------------------------------------------------------------------------------------
+Q-29) Worker node node01 not responding, have look and fix the issue 
+
+
+1) k get nodes 
+
+2) k descirbe node node01 
+
+3) systemctl status kubelet.service
+
+4) systemctl restart kubelet 
+
+5) systemctl status kubelet.service
+
+6) journalctl -u kubelet 
+
+7) systemctl daemon-reload 
+
+8) systemctl restart kubelet 
+
+9) systemctl status kubelet.service
+
+
+----------------------------------------------------------------------------------------------
+Q-30)(check) A pod "my-nginx-pod" image nginx in custom namespace is not running, Find the problem and fix it
+      and make it running 
+
+Note: All the supported definition files has been placed at root. 
+
+Good example. it hast some issues with PVC created in a different namespace rather then "custom" namespace 
+
+
+-----------------------------------------------------------------------------------------------
+Q-31) Create a multi-container pod "multi-pod" in development namespace using images: nginx and redis 
+
+
+
+-----------------------------------------------------------------------------
+Q-32)(check) A pod "nginx-pod" (image=nginx) in default namespace is not running.  
+      Find the problem and fix it and make it running. 
+
+Here was some issue with the taint on node, but their is not toleration on pod 
+
+
+-------------------------------------------------------------------------------
+Q-33) Create a new deployment called nginx-deploy, with image nginx:1.16 and 8 replica.
+      There are 5 worker node in cluster 
+
+      Please make sure no pod will get deployed on 2 worker node, 
+      -worker-node-1
+      -worker-node-2
+
+      At end Revert any changed that you did in cluster 
+
+1) k cordon worker-node-1 
+2) k cordon worker-node-2
+
+3) k create deployment nginx-deploy --image=nginx:1.16 --replicas=8
+
+-----------------------------------------------------------------------------------
+Q-34)(check)  Create a ReplicaSet "web-pod" image nginx:1.16 replica 3 
+              There already a pod running in cluster 
+              Make sure that total count of pod running into a cluster is not more then 3 
+
+
+
+-------------------------------------------------------------------------------------
+Q-35)(check)  There are 3 node in the cluster, create DaemonSet "my-pod" image nginx 
+              on each node except one node "worker-node-3"
+
+ 
+----------------------------------------------------------------------------------
+Q-36)(Check) Generate a file abc.txt with details about the available size of all the node in a kubernetes 
+             cluster using a custom column, format as mentioned below:
+
+
+1) k get node -o custom-columns=NAME:.metadata.name, AVAILABLE_MEMORY:.status.allocatable.memory,AVAILABLE_CPU:.status.allocatable.cpu 
+
+
+
+
+----------------------------------------------------------------------------------
+Q-37)(Check) Create a pod "nginx-k8s" using image nginx and initcontainer "git-k8s" with image alpine/git.
+      Volume mount path of the main container "/usr/share/nginx/html"
+
+      Nginx index.html need to be override with shared volume.
+      Index.html file cloned from path "https://github.com/jhawithu/k8s-nginx.git"
+
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: nginx-k8s 
+      image: nginx
+      ports:
+      - containerPort: 80
+      volumeMounts:
+      - mountPath: "/usr/share/nginx/html"
+        name: mydata
+  initContainers:
+  - name: git-k8s
+    image: alpine/git 
+    args:
+    - clone
+    - --single-branch 
+    - -- 
+    - https://github.com/jhawithu/k8s-nginx.git
+    - /data 
+    volumeMounts:
+    - mountPath: /data
+      name: mydata
+  volumes:
+  - name: mydata 
+    emptyDir: {}       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

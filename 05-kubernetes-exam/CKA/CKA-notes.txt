@@ -1,3 +1,17 @@
+
+
+Questions
+-----------------
+-) How to use Notepad
+-) Can we open two termainals in real exam ?
+-) How to mark a question as done or completed, check if i skip a question then how i can come back 
+-) cd ~        <-- with this command can i go back the starting command prompt after goind to "cd /etc/kubernetes/manifests"
+-) Check how the ETCD backup command will react in the real environment
+-) check i have to everytime "ssh <node-n<me>" and then need "suod -i" for the ETCD backup and for static-pod creation
+-) "ps -aux | grep kukbelet"  <-- if i want to find the static-pod-path then i have to do "ssh controlplane" node or how i will do it 
+
+
+
 Imp Points:
 ---------------------------------------------------------------
 -)  Secrets are only "encoded" they are not "encrypted"
@@ -5,23 +19,57 @@ Imp Points:
     Encrypted:      <-- it means we need public key to encrypt and private key to decrypt
     
 --------------------------
+Imp Points:
+
+-) Kube-scheduler is responsible for scheduling the pod, it means it will decide on which Node the pod 
+should be placed, if a "Pod" is in a pending state, then first check "kube-scheduler" pod is running or not in "kube-system" namespace 
+
+-) Kube-Controller-Manager  is responsible for deployment, like how many replicaSet should be their, if after increasing the replica
+  of a "Deployment" no new replica is created, then first check the "kube-controller-manager" pod in the "kube-system" namespace 
+
+-) service kubelete start 
+-) journalctl -u kubelet 
+
+-) "kubectl api-resources"         <-- with this command we can get the calue name for  "--resource="  that we have to put in "Role" or "ClusterRole"
+
+-) k get pods --kubeconfig /root/CKS/super.kubeconfig               <-- Normally by default kubernetes by default look for config file under  ".kube/config" file 
+                                                                      but with the "--kubeconfig <file-path>" we can use a seperate configuration file also for testing.
+
+-) "k run beta --image=busybox --command sleep 4800 --env=name=beta"        <-- how to create "environment" variables.
+
+-) ps -aux | grep kubelet 
+
+-) k label pod my-pod env=prod --overwrite     <-- before their was a label "env=dev" and we want to change to "env=prod" then just use this "--overwrite" command
+
+-) k run test-pod alpine/curl --rm -it  -- sh                 <-- like this we can create a test pod fastly just for executing curl commands, "-rm" it will remove the pod 
+                                                                  after executin this command, or after exit.
+
+-) k run pod --image=busybox -it --rm --restart=Never -- sh -c 'echo aaaaaa vvvv'              <-- Main point is when using "busybox" then must use "sh -c" or "/bin/sh -c"
+                                                                                                "--restart-Never" we must use this command otherwise it will not work, and 
+                                                                                                it struct in some never ending loop 
+
+-) > k get events -o jsonpath='{range.items[?(@.reason=="Killing")]}{.involvedObject.name}{"\n"}{end}'         <-- get the last deleted objects
+
+-----------------------------------------------------
+Important-Question 1-100
+
+Search: 13,33,36,48,49,52,55,57,69,71,72,73,76,79,83,85,86,98,99,100
 
 
+pod-commands: 34,40,78
 
-i am on video: 169
+Error: 38,63
+Network-policy: 12,45,77
 
-Lectures need to see again
-Node Selectors 62
-Node Affinity  63
+liveness-probe: 54
+Readiness-probe: 97
 
-.-------------------------
-80- Configuring scheduler profiles.
-
+3,9(see-copy-method)
 
 ----------------------------------------------------
 In Master-Node
 ---------------
-Kube-api-server            6443   Port    (But somewhere i saw 8443 also)
+Kube-api-server            6443   Port    (But somewhere i saw 8443 also)   "https://controlplane:6443/......
 coredns
 etcd                       2379   Ports 
 kube-proxy
@@ -41,6 +89,9 @@ Services                   30000 till 32767 Ports  ( "> ps aux | grep kube-api-s
 ----------------------------------------------------------
 
 
+> /etc/kubernetes/manifests/             <-- on the "controlplane" or "master" node we can get all the controlplane resources .yaml files 
+
+
 
 ETCD
 =====
@@ -57,6 +108,8 @@ Commands:
 ---------
 > k config use-context "user.name"            <-- like this we can change the config, "user.name" come form the  
                                                 "kubectl config view"  -> config.yaml -> users: -> name 
+
+> k config set-context --current --namespace=<namespace-name>   <-- like this we can set a default namesapce and every query goes to that namesapce.
 
 > alias k=kubectl                 <-- it will set k as alias for "Kubectl" command
 
@@ -216,7 +269,46 @@ Deployment:
 > kubectl get service 
 > kubectl get svc
 > kubectl describe svc my-service
+######################################################################################################################
+Rollout:
+-------
 
+Note: Rolling-update is the default deployment strategy. if we do not define any strategy, then it select by-default "Rolling-update" 
+      as a strategy.
+
+Rolling-update Strategy:
+---------------
+In Rolling-update if we have 5 pods are already their, and we want to update them with new version, then while doing
+deployment, it delete one pod and bring one new, in this way it goes.
+
+Recreate Strategy:
+In this case it first delete all the pods and after that it create all new pods at once, this strategy can have downtime 
+because at the time of first delete all the pods are deleted.
+
+
+> kubectl get deployments 
+
+> kubectl create -f abc.yaml          <-- with this command we can create a deployment first time
+
+> kubectl apply -f abc.yaml           <-- As a deployment is already create, with this command it will update the Deployment
+                                         If their is no deployment then with this command we can also deploy it first time
+
+> kubect set image   my-deployment my-container=nginx:1.9.1    <-- like this we can change the image of current running deployment   
+                                                                 my-deploment is the name of the Deployment
+                                                                 my-container is the name of the Container                                      
+
+
+> k rollout status deployment/my-deploy      <-- it will log the status of the deployment
+
+> k rollout history deployment/my-deploy     <-- it will print the history of the deployemnt
+
+> kubectl rollout status my-deployment      <-- with this we will get the status of the deplyoment
+
+> kubectl rollout history my-deployment   
+
+> kubectl rollout undo my-deployment          <-- with this we can rollback the changes to last deployed deployment.
+ 
+> k rollout undo deployment my-deployment --to-revision=3           <-- like this we can rollback to any version    
 
 Create a new Service
 -------------------
@@ -690,45 +782,7 @@ Monitoring
 
 
 
-######################################################################################################################
-Rollout:
--------
 
-Note: Rolling-update is the default deployment strategy. if we do not define any strategy, then it select by-default "Rolling-update" 
-      as a strategy.
-
-Rolling-update Strategy:
----------------
-In Rolling-update if we have 5 pods are already their, and we want to update them with new version, then while doing
-deployment, it delete one pod and bring one new, in this way it goes.
-
-Recreate Strategy:
-In this case it first delete all the pods and after that it create all new pods at once, this strategy can have downtime 
-because at the time of first delete all the pods are deleted.
-
-
-> kubectl get deployments 
-
-> kubectl create -f abc.yaml          <-- with this command we can create a deployment first time
-
-> kubectl apply -f abc.yaml           <-- As a deployment is already create, with this command it will update the Deployment
-                                         If their is no deployment then with this command we can also deploy it first time
-
-> kubect set image   my-deployment my-container=nginx:1.9.1    <-- like this we can change the image of current running deployment   
-                                                                 my-deploment is the name of the Deployment
-                                                                 my-container is the name of the Container                                      
-
-
-> k rollout status deployment/my-deploy      <-- it will log the status of the deployment
-
-> k rollout history deployment/my-deploy     <-- it will print the history of the deployemnt
-
-> kubectl rollout status my-deployment      <-- with this we will get the status of the deplyoment
-
-> kubectl rollout history my-deployment   
-
-> kubectl rollout undo my-deployment          <-- with this we can rollback the changes to last deployed deployment.
- 
 
 ###############################################################################
 Docker Commands:
@@ -3963,24 +4017,54 @@ Q-100) List all the control plane components and write to the file /doc/controlc
 
 
 
+#################################################################################################################
+
+Check on the Master Node:
+------------------------
+> service kube-apiserver status 
+> service kube-controller-manager status
+> service kube-scheduler status 
+
+Logs on Master:
+--------------
+> k logs kube-apiserver-master -n kube-system 
+
+> sudo journalctl -u kube-apiserver 
+
+Check on the Worker Node:
+-----------------------
+> service kubelet status 
+> service kube-proxy status 
 
 
 
 
+#####################################################################################################################
+Json Path queries
+-----------------
+
+> k get nodes -o=jsonpath='{.items[*].metadata.name}'                                         <-- it use "-o=jsonpath="
 
 
+> k get nodes -o=custom-columns=ANY-NAME:.metadata.name                                       <-- like this we can create output with custom "Columna-name" 
 
+> k get nodes -o=custom-columns=ANY-NAME:.metadata.name, ANY-NAME:.status.capacity.cpu 
 
+> k get nodes --sort-by=.metadata.name 
 
+> k get nodes --sort-by=.status.capacity.cpu  
 
+> k get nodes -o=jsonpath='{.items[*].metadata.name}{.items[*].status.capacity.cpu}'   <-- master node 4 4        Assume we have two nodes 
 
+> k get nodes -o=jsonpath='{.items[*].metadata.name}{"\n"}{.items[*].status.capacity.cpu}'       <-- "\n"  for "New-line"
 
+> k get nodes -o=jsonpath='{.items[*].metadata.name}{"\t"}{.items[*].status.capacity.cpu}'       <-- "\t"  for one "tab" space 
 
+> k get nodes -o=jsonpath='{range .items[*]}{.metadata,name}{"\t"}{.status.capacity.cpu}{"\n"}{"end"}'    
 
+> k get nodes -o=custom-columns=NODE-A:.metadata.name
 
-
-
-
+> k get nodes -o=custom-columns=NODE-A:.metadata.name,CPU-A:.status.capacity.cpu 
 
 
 

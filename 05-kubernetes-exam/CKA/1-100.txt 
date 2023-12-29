@@ -8,7 +8,8 @@ Q-1) Update the image of the deployment  ?
 > k get deploy -owide                                 <-- like this we will see all the deployment with the image-name defined on them 
 
 2)
-> k set image deployment <deploy-name> <image-name>   <-- like this we can update the image 
+> k set image deployment <deploy-name> <containerName>=<image-name>   <-- like this we can update the image, main point is we have to give 
+                                                                         "ContainerName" and new image 
 
 ----------------------------------------------------------------------------------------
 Q-2) Change the static pod path ?
@@ -202,8 +203,9 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: test-network-policy
-  namespace: default
+  namespace: tech-deploy
 spec:
+  podSelector: {}
   policyTypes:
     - Ingress
   ingress:
@@ -267,6 +269,9 @@ Q-15) A new colleague "Jan" has joined your team. Create a new user and grant hi
 
 3) openssl req -new -key jan.key -out jan.csr -subj "/CN=jan"        <-- after executing this command it ask many yes-no   just press enter 
 
+
+Note: on the same kubernetes-documentation page search at the end "CertificateSigningRequest" 
+
 4) vi certificatesigningrequest.yaml 
 
 apiVersion: certificates.k8s.io/v1
@@ -281,13 +286,17 @@ spec:
   - client auth
 
 5) cat jan.csr | base64 | tr -d "\n"           <-- it will return a "Certificate", just copy that certificate and past in the above certificatesigningrequest.yaml  file 
- 
+                                                    this command also given on the same page 
 
 6) k apply -f certificatesigningrequest.yaml   
 
 7) k get csr                                   <-- the certificate-signing-request  should be in a pending start, we should approve it 
 
 8) k certificate approve jan                   <-- like this we can approve the Certificate-signing-request 
+
+9) k create role my-role  --verb=get,list,watch,delete --resource=pods  --namespace=my-namespace
+
+OR
 
 9) vi role.yaml
 
@@ -300,6 +309,8 @@ rules:
 - apiGroups: [""] # "" indicates the core API group
   resources: ["pods"]
   verbs: ["get", "create", "list", "update"]
+
+10) k create rolebinding <any-name> --role=pod-reader --user=john --namespace=my-namespace
 
 10) vi rolebinding.yaml 
 
@@ -397,9 +408,9 @@ Q-19) Find the pod label  environment=process, find all the pods running high CP
 
 1) k get pods -l environment=process           <-- first check how many pods are having a lable "environment=process" 
 
-2) k top pod --sort-by cpu -l environment=process       <-- it return the pod 
+2) k top pod --sort-by cpu -l environment=process                 <--  the cpu usages of all the pods 
 
-3) k top pod --sort-by cpu -l environment=process | head -2        <-- check in the process what is the effect of  "head -2"
+3) k top pod --sort-by cpu -l environment=process | head -2        <-- "head -2" means return only first two lines, first line is header, second is with the name of pod with higherst usage 
 
 4) k top pod --sort-by cpu -l environment=process | head -2 > /doc/cpu.txt    
 
@@ -426,6 +437,9 @@ Q-21) Show the logs from the container and save it to /doc/nginx.log
 2) k logs direct-pod -c nginx -n dev-net              <-- check if the logs can be displayed 
 
 3) k logs direct-pod -c nginx -n dev-net  /doc/nginx.log 
+
+OR
+> k logs direct-pod nginx -n dev-net                 <-- with "-c" we can also get the logs
 
 --------------------------------------------------------------------------------------------------------------------
 Q-22) Create a new ingress resource and exposes service "hello" on path /hello by using service port 5678
@@ -570,6 +584,42 @@ Q-29) Remove the taint added to the node "my-node-a",
 --------------------------------------------------------------------------------------------------------------
 Q-30) Take a backup and restore ETCD ?
 
+> cat /etc/kubernetes/manifests/etcd.yaml | grep file               <-- like this we will get all the info that we need for backup
+
+Restoring from a backup simple way:
+--------------------------------
+
+1) ETCDCTL_API=3 etcdctl --data-dir <new-location-which-is-used-by-etcd-db> snapshot restore  <path-of-backup>/snapshot.db
+
+This line is optional  "2) vi etcd.yaml          "--data-dir=<new-location-which-is-used-by-etcd-db>"   <-- update the location in this file" (see 133-last question to understand)
+
+2b) volumes:
+      path: var/lib/etcd            <-- chage this path to the  <new-location-which-is-used-by-etcd-db>
+
+
+3) systemctl restart etcd 
+
+OR
+
+Restoring from a backup:
+----------------------
+1) ls <path-where "snaposhot.db" is stored> 
+
+2) service kube-apiserver stop
+
+3) ETCDCTL_API=3 etcdctl --data-dir <new-location-which-is-used-by-etcd-db> snapshot restore  <path-of-backup>/snapshot.db
+
+This line is optional  "4) vi etcd.yaml          "--data-dir=<new-location-which-is-used-by-etcd-db>"   <-- update the location in this file" (see 133-last question to understand)
+
+4b) volumes:
+      path: var/lib/etcd            <-- chage this path to the  <new-location-which-is-used-by-etcd-db>
+
+
+5) systemctl daemon-reload 
+
+6) service etcd restart 
+
+7) service kube-apiserver start 
 
 -------------------------------------------------------------------------------------------------------------
 Q-31) Schedule a pod on the node "my-node-a" by using tolerations 
@@ -611,8 +661,9 @@ Note: their is a deployment name "green-deployment"
 Q-33) Check how many nodes are in ready state and write it to the file /doc/readynodes.txt 
 
 > k describe nodes | grep ready | wc -l             <-- it returns the number count of ready nodes 
-                                                    Note: just check if this command also counts header also 
-
+                                               Note: just check if this command also counts header also 
+                                                   "wc -l"  <-- it just count how many lines are their, so be carefull
+                                                              as some time it can also cout the header line also, so always recheck
 
 > k describe nodes | grep ready | wc -l   > /doc/readynodes.txt 
 
@@ -621,10 +672,11 @@ Q-34) Create a pod and set the environment variable "dev=dev10"
        -pod name: grey 
        -image: nginx 
 
-1) k run grey --image=nginx --restart=Never --env=dev=dev10
+1) k run grey --image=nginx --restart=Never --env=dev=dev10 --env=qa=bbb
 
-2) k exec -it grex -- sh -c 'echo $dev'                               <-- like this we can check that env variable is set or not in the pod 
-                                                                        it should return us the value 
+2) k exec -it grey -- sh -c 'echo $dev'                               <-- like this we can check that env variable is set or not in the pod 
+OR                                                                        it should return us the value 
+2) k exec grey -- sh -c 'echo $dev'                            <-- this command works without "-it" also 
 
 3) k describe pod grey              <-- like this we can also see the configured env variable 
 
@@ -777,6 +829,7 @@ Note: we use "Annotations" when we do want the metadata to be identified, like w
 
 1) k annotate pod yellow name=yellow-pod                        <-- just check in the .yaml formate if it is "Annotated" or not 
 
+2) k describe yellow | grep -i annotations                      <-- "-i" if we do not use "-i" then we will not get answer.
 
 -----------------------------------------------------------------------------------------------------
 Q-42) Get list of all pods in all namespaces and write it to the file /doc/podsnamespaces.txt 
@@ -921,7 +974,7 @@ Q-49) Find out the version of the cluster and write it to the file  /doc/version
 
 Note: he did not show the answer, but told that use the same above command to print the answer on the .txt file 
 
-1) k get nodes  -l run=blue -A -o jsonpath='{range.items[*]}{@.status.podIP}{""}{"\n"}{end}'     <-- just check if this command works 
+1) k get --raw "/version" | jq -f '.gitVersion'     <-- just check if this command works 
 
 
 
@@ -1076,7 +1129,7 @@ Q-56) Rollback the deployment "blue-deplyoment" to revision 1
 ------------------------------------------------------------------------------------------------------------------
 Q-57)  List the orange pod with the custom columns POD_STATIS and POD_NAME and write to the file  /doc/status.txt 
 
-1) k get pod orange -o=custom-columns="POD_NAME:.metadata.name,POD_STATUS:.status.containerStatuses[].state"      <-- this command is made by him  
+1) k get pod orange -o=custom-columns="POD_NAME:.metadata.name,POD_STATUS:.status.phase"      <-- this command is made by him  
 
 
 --------------------------------------------------------------------------------------------------------------
@@ -1351,12 +1404,14 @@ Q-73) Create a pod and run the command which shows "Welcome from tech" and sleep
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx
+  name: busybox
 spec:
   containers:
-  - name: nginx
-    command: ["/bin/sh"]
-    args: ["-c", "while true; do echo Welcome from tech-educator; sleep 100; done"]
+  - name: busybox
+    command:
+    - "/bin/sh"
+    - "-c"
+    - "echo 'This is my best pod' && sleep 1000"
     image: busybox 
 
 
@@ -1555,6 +1610,8 @@ Q-85) Grep the current context and write it to the file /doc/current.txt
 Q-86) Get a list of all the pods which were recently deleted 
       Write the list to the file /doc/recentdelete.txt 
 
+
+> k get events -o jsonpath='{range.items[?(@.reason=="Killing")]}{.involvedObject.name}{"\n"}{end}'
 
 
 
@@ -1850,6 +1907,7 @@ Q-100) List all the control plane components and write to the file /doc/controlc
 1) k get pods -n kube-system                      <-- see the output 
 
 2) k get pods -n kube-system > /doc/controlcomp.txt 
+
 
 
 
