@@ -802,7 +802,7 @@ Q-39) Make the node "my-node" unavailable and reschedule all the pods on it.
 
 3) k cordon <my-node>                                   <-- now we have make it unschduable 
 
-4) k drain <my-node>  --ignore-daemonsets --force       <-- now we are releasing the pods from this node.
+4) k drain <my-node>  --ignore-daemonsets               <-- now we are releasing the pods from this node.
 
 5) k get pods -owide                                    <- now we can see the pods are running on another node .
 
@@ -907,11 +907,20 @@ spec:
         - podSelector:
             matchLabels:
               name: frnance
+          ports:
+          - protocol: TCP 
+            port: 8080    
     - to:  
         - podSelector:
             matchLabels:
               name: data 
+          ports:
+          - protocol: TCP 
+            port: 8080    
 
+
+
+            
 ------------------------------------------------------------------------------------------------------------
 Q-46) Create a pod and set "SYS_TIME" + sleep 3600 seconds 
        -pod name: grey 
