@@ -1,15 +1,76 @@
--) check eTCD backup and restore for CKA course
--) ingress host path www.any-website.com     in cka course 
-
 Questions
 -----------------
--) How to use Notepad
--) Can we open two termainals in real exam ?
--) How to mark a question as done or completed, check if i skip a question then how i can come back 
--) cd ~        <-- with this command can i go back the starting command prompt after goind to "cd /etc/kubernetes/manifests"
--) Check how the ETCD backup command will react in the real environment
--) check i have to everytime "ssh <node-n<me>" and then need "suod -i" for the ETCD backup and for static-pod creation
--) "ps -aux | grep kukbelet"  <-- if i want to find the static-pod-path then i have to do "ssh controlplane" node or how i will do it 
+pages open first 
+
+Volumes 
+env with secret 
+env with configmap 
+cronjob 
+job 
+ingress 
+------------------------
+Topics: Ingress, config, 
+Labs: 66,70,80,102,114,11, 141  (164 till 170 ) (150- till - 163)
+
+Labs: 141,152 
+
+------------------------------------------------------------------
+How we can enable "alpha" or " beta" versions for any Resources.
+1) 
+-) rabc.authorization.k8s.io    <-- enable "/v1alpha1" version 
+
+> vi /etc/kubernetes/mainifests/kube-apiserver.yaml 
+> under command:   - --runtime-config=rbac.authorization.k8s.io/v1alpha1              <-- like this we can update the config.
+
+
+1-a) Api versions
+
+> kube-apiserver.yaml      ->  command:   --runtime-config=batch/v2alpha1       <-- like this we can enable "batch/v2alpha1" version.
+
+-------------------------------------------------------------
+2) How to get the preferred version of a resource.
+
+> k proxy 8001&        -> curl localhost:8001/apis/authorization.k8s.io       <-- "authoriazation.k8s.io  <-- like this we can find the 
+                                                                                                              "preferredversion"
+
+
+------------------------------
+2) How to create a "tls" Secret 
+
+> k create secret tls --key=<put-the-given-key>  --cret=<put-the-given-cret> -n my-namespace 
+
+-----------------------------------------------------
+In Docker ui - Find the base OS of the image "python:3.4" 
+
+docker run python:3.6 cat /etc/*release*
+
+
+
+--------------------------------------------
+Pod as Root-User:
+
+spec:
+  securityContext:
+    runAsUser: 0 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -43,6 +104,10 @@ should be placed, if a "Pod" is in a pending state, then first check "kube-sched
 
 -) k label pod my-pod env=prod --overwrite     <-- before their was a label "env=dev" and we want to change to "env=prod" then just use this "--overwrite" command
 
+------------------------------------------------------------------------------------------
+Tesing Pod:
+----------
+
 -) k run test-pod alpine/curl --rm -it  -- sh                 <-- like this we can create a test pod fastly just for executing curl commands, "-rm" it will remove the pod 
                                                                   after executin this command, or after exit.
 
@@ -50,13 +115,62 @@ should be placed, if a "Pod" is in a pending state, then first check "kube-sched
                                                                                                 "--restart-Never" we must use this command otherwise it will not work, and 
                                                                                                 it struct in some never ending loop 
 
+-) k run mypod --image=ubuntu:18.4 --command sleep 1000        <-- check the  difference between "--"  using it or not ? 
+
+OR 
+
+-) k run mypod --image=ubuntu:18.4 --command -- sleep 1000            
+
+-) k run mypod --image=ubuntu:18.4 --dry-run=client --command -- sleep 1000 
+
+-) k run tech-pod --image=busybox -it --rm --restart=Never -- /bin/sh -c 'echo goggggg'   <-- After executing this command in the output it should 
+                                                                                            print the message and also a seperate message, 
+                                                                                            that pod is deleted     
+
+-) k run test-yellow-tech --image=busybox:1.28  --it --restart=Never -- nslookup yellow-tech-service
+
+
+-) k create job --image=busybox:1.28 $do > aa.yaml -- sh -c "sleep 2 && echo done"        <-- like this we can create a direct job 
+
+
+
+
+------------------
+1) k run my-pod --image=busybox:1.28 --command sleep 3600         <--here we are creating a new pod, just for running "nslookup" command as pre given in the question 
+
+2) k exec -it my-pod -- nslookup green-service               <-- first check if the output is correct 
+-------------------
+
+-) k run test-yellow-tech --image=busybox:1.28  --it --restart=Never -- nslookup yellow-tech-service
+
+
 -) > k get events -o jsonpath='{range.items[?(@.reason=="Killing")]}{.involvedObject.name}{"\n"}{end}'         <-- get the last deleted objects
 
 -) k get --raw "/version" | jq -f '.gitVersion'     <-- Get the version of the Cluster.
 
 -) k cluster-info              <-- to get where is the "CoreDNS" and "control-plane" running at 
 
--------------------------------------------
+
+How To test a service in another namespace from a pod in another namespace:
+--------------------------------------------------------------------------
+Step-1) 
+> k run test --image=busybox -it -- /bin/sh
+
+Step-2)
+# nc -v -z -w 2 <service-name>   <port-number>    <-- "service-name" means the service to whom we want to connect from this pod, we have to put a space in 
+                                                  between pod and port-number. port-number is the port of the service. it should return 
+                                                  Answer it returns:    <service-name> (ip-address) "open" or "blocked"
+
+OR
+
+Step-2)
+# nslookup <service-name>.<namespace>.svc.cluster.local                
+
+
+
+
+
+######################################################################################################
 -) systemctl status kubelet   
 
 -) systemctl start kubelet 
@@ -78,6 +192,9 @@ or
 --------------------------------------------------------------------
 
 -) systemctl restart etcd 
+
+
+
 
 ---------------------------------------
   containers:
@@ -112,7 +229,26 @@ spec:
       initialDelaySeconds: 300  
 
 
+##################################################################################################
 
+<service-name>                                            <-- like this we can call a service directy within the same namesapce 
+> my-service                                     
+
+<service-name>.<namespace-name>.svc.cluster.local         <-- like this we can call a Service from another namesapce 
+> my-service.tech.svc.cluster.local 
+
+<stateful-pod-name>.<headless-service-name>.<namespace-name>.svc.cluster.local       <-- like this we can call the Headless-pod through headless-service 
+> my-sa-0.myheadless-service.tech.svc.cluster.local 
+
+<pod-internal-ip>.<namespace>.pod 
+10-50-192-2.default.pod                                    <-- like this we can call the pod directly 
+
+<pod-internal-ip>.<namespace>.pod.cluster.local  
+10-50-192-2.default.pod.cluster.local                      <-- in the ip add address use "-" insted of "."
+
+
+
+#####################################################################################################
 
 
 
@@ -407,10 +543,16 @@ Recreate Strategy:
 In this case it first delete all the pods and after that it create all new pods at once, this strategy can have downtime 
 because at the time of first delete all the pods are deleted.
 
+> kubectl create -f abc.yaml  --record          <-- like this we can create a new Deployment and also recording it for the "k rollout" directly from first time.
+                                          Note: As at the creation time we put the flag "--record" now on every update of this deployment it will be automatically 
+                                                saved versions for "k rollout" we do not need everytime to user this "--record" flag on any updation.
+                                          Note: if we do at the time of update a Deployment "--record" , if we do update after this one then we do not 
+                                                need to put this "--record" flag again.     
+
 
 > kubectl get deployments 
 
-> kubectl create -f abc.yaml          <-- with this command we can create a deployment first time
+> kubectl create -f abc.yaml       <-- with this command we can create a deployment first time
 
 > kubectl apply -f abc.yaml           <-- As a deployment is already create, with this command it will update the Deployment
                                          If their is no deployment then with this command we can also deploy it first time
@@ -502,7 +644,215 @@ spec:
     limits.cpu: "10"
     limits.memory: 10Gi  
 
--------------------------------------------------------------------------------------------------------
+
+#####################################################################################################################
+Readiness & Liveness 
+--------------------
+
+
+Readiness-Probe:     
+----------------
+At the time of starting a pod, kubelet check under this "readinessProbe" weather the pod is ready or not.
+Once the pod is ready after that kubelet will not call this endpoint anymore.
+
+Liveness-probe:
+--------------
+
+
+
+
+
+Their are three type of "readinessProbe"
+1) httpGet:
+
+2) tcpoSocket:
+
+3) exec:
+    command                 <-- with this we can define our own command 
+
+
+-) httpget: 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: goproxy
+  labels:
+    app: goproxy
+spec:
+  containers:
+  - name: goproxy
+    image: registry.k8s.io/goproxy:0.1
+    ports:
+    - containerPort: 8080
+    readinessProbe:
+      httpGet:
+        path: /api/any/ready            <--if we have any endpoint in the application, then we can  automatically a request to that endpoint,
+        port: 8080                         that path here and at the time of starting the containter kubelet send it if return 200 then it is ready 
+      initialDelaySeconds: 15           <-- assume i have a JAVA service and it takes 10-15sec to start then we can put that starting time here                                                             
+      periodSeconds: 10                 <-- Default value is 10-sec:  As kubelet make a "readiness" check that this pod is ready or not, here we can define that time 
+                                            after how many seconds kubelet should make a call to check the status of the pod. Deafult value is 10sec 
+      failureThreashold: 4              <-- Default value is 3   if some how after 15 second as above defined the service is not ready then, kubernetes will try 3 
+                                            times to check if the service is ready or not, if after that it is not ready then it will mark pod as faulty. 
+
+
+
+-) tcpSocket:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: goproxy
+  labels:
+    app: goproxy
+spec:
+  containers:
+  - name: goproxy
+    image: registry.k8s.io/goproxy:0.1
+    ports:
+    - containerPort: 8080
+    readinessProbe:
+      tcpSocket:                                           <-- if we have a TCP-Socket connection then use this 
+        port: 8080
+      initialDelaySeconds: 15
+      periodSeconds: 10
+
+
+-) exec: 
+     command: 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: goproxy
+  labels:
+    app: goproxy
+spec:
+  containers:
+  - name: goproxy
+    image: registry.k8s.io/goproxy:0.1
+    ports:
+    - containerPort: 8080
+    readinessProbe:
+      tcpSocket:                                      
+        port: 8080
+      initialDelaySeconds: 15
+      periodSeconds: 10
+
+
+
+
+
+
+
+
+#######################################################################################################################
+Jobs:
+-----
+
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: my-job
+spec:
+  completions: 3                             <-- it will create 3 replicas of this pod    
+  template:
+    spec:
+      containers:
+      - name: my-job
+        image: ubuntu
+        command: ['expr','3','+','2']
+      restartPolicy: Never   
+
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: my-job
+spec:
+  completions: 3            
+  parallelism: 3                       <-- it will create 3 pods that run parallaly, it means one job is done by three pods    
+  template:
+    spec:
+      containers:
+      - name: my-job
+        image: ubuntu
+        command: ['expr','3','+','2']
+      restartPolicy: Never  
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: my-job
+spec:
+  completions: 3                             <-- it will create 3 replicas of this pod    
+  template:
+    spec:
+      containers:
+      - name: my-job
+        image: kodekloud/throw-dice
+      backoffLimit: 25                         <-- it will run 25 times this "Job" as a job starts and if it does not complete then it tries for "25" times
+      completions: 3                          <-- their is some logic written in the image, that the result should be "6" then only the task is completed 
+                                               "completions" means that task should be completed, if the result be 4 or 5 then task is not completed 
+                                                like this we can apply a completions
+
+
+##########################################################################################
+CronJob:
+--------
+
+
+kubectl create cronjob my-cronjob --image=your-image:latest --schedule="*/1 * * * *" --restart=OnFailure --dry-run=client -o yaml > cronjob.yaml
+
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: my-job
+spec:                                   <-- this "spec" section is for "Cronjob" itself 
+  schedule: "* * * * *"
+  successfulJobsHistoryLimit: 2             <-- This field means keep the history of "2" Successful Jobs 
+  failedJobsHistoryLimit: 4                 <-- This field means keep the history of "4" failed jobs.
+  jobTemplate:
+    spec:                               <-- As "CronJob" run "Job" internally, so this "spec" if for "Job"
+      completions: 3            
+      parallelism: 3
+      activeDeadlineSeconds: 10           <--This time is set for the "Job" no matters how many pods are running this job, once it reach "10" sec and 
+      template:                              if the job does not finish then it will terminate all the pods.
+        spec:                            <-- this "spec" section is for "container" itself
+          containers:
+          - name: my-job
+            image: ubuntu
+            command: ['expr','3','+','2']
+          restartPolicy: Never
+          terminationGracePeriodSeconds: 8        <-- it will terminate the pod after "8" seconds
+
+
+###################################################################################################################
+Admission Controllers:
+-----------------------
+
+> kube-apiserver -h | grep  enable-admission-plugins        <-- it will show the list of all the "enabled Admission Controllers"
+
+> kubectl exec kube-apiserver-controlplane -n kube-system -- kube-apiserver -h | grep  enable-admission-plugins       <-- if cluster is deployed with "kubeadm" 
+                                                                                                                      then use this command. 
+
+> ps -ef | grep kube-apiserver | grep admission-plugins          <-- to get the list of all the "enabled" and "disabled"  Admission-controllers 
+
+kube-apiserver.yaml         
+------------------
+spec:
+  containers:
+  - command:
+    - --enable-admission-plugins=<Any-Admission-controller-name>            <-- to enable any new "Admission controller"
+    - ---disable-admission-plugins=<Any-Admission-controller-name>       <-- to disable any existing "Admission controller"
+
+
+    
+
+
+######################################################################################################################
 Taints:
 -------
 > kubectl describe node kubemaster | grep Taint         <-- this will show us the which "Taint" is applied on the Master-node
@@ -1120,12 +1470,12 @@ Environemnt variable adding in pod through configMap
 
 > kubectl create configmap my-configmap --from-literal=my_key_AA=my_value_AA --from-literal=my_key_BB=my_value_BB 
 
-> kubectl create configmap my-configmap --from-file=abc.properties                   <-- write the key-value in a file and put the file name here
+> kubectl create configmap my-configmap --from-env-file=abc.properties                   <-- write the key-value in a file and put the file name here
 
 > kubectl get secret 
 > kubectl create secret my-secret --from-literal=my_key_AA=my_value_AA --from-literal=my_key_BB=my_value_BB 
 
-> kubectl create secret my-secret --from-file=abc.properties                    <-- write the key-value in a file and put the file name here
+> kubectl create secret my-secret --from-env-file=abc.properties                    <-- write the key-value in a file and put the file name here
 
 
 > echo -n "my-pass | base64
@@ -1291,6 +1641,41 @@ spec:
     - name: my-secret-volume-DD
         secret:
           secretName: my-secret-B
+
+
+
+-------------------------------------
+Create a configmap from file:
+-------------------------
+
+abc.txt 
+------
+user=my-user
+pass=1234
+
+
+> k create cm  test-cm --from-env-file=abc.txt          <-- we must use "--from-env-file"
+
+pod.yaml
+--------
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: my-pod
+spec:
+  containers:
+    - name: my-ubuntu
+      image: ubuntu
+      ports:
+        - containerPort: 8080     
+      env:
+        - name: MY_DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: test-cm
+              key: user 
+
+
 
 ##########################################################################################################
 Multicontainer pods,  Sidecar
@@ -1763,6 +2148,14 @@ ServiceAccount
 
 serviceAccountName:      <-- this is the name of attribute that we should put under Deplyoment -> template -> spec -> serviceAccountName: xxx
 
+
+spec:
+  automountServiceAccountToken: false     <-- normally kubernetes automatically add the "default" serviceaccount to the pod, but 
+                                             with this field we can define that the kubernetes should not add any "service-account" 
+                                            token by itself. 
+
+
+
 imagePullSecrets:       <-- this we have to put under Deployment -> template -> spec -> imagePullSecrets: -> -name: xxxx    
 
 Note: 
@@ -1783,6 +2176,12 @@ inside the pod.yaml file
 ------------------------------------------------------------------------------------------
 Security contexts:
 ------------------
+
+> whoami                                 <-- i return that i am a "root" user or any other "user" on ubuntu 
+ 
+> k exec my-pod -- whoami                <-- here we are checking which user permission i have inside the pod "my-pod" 
+
+
 
 Pod level Security context
 ---------------------------
@@ -2356,6 +2755,79 @@ Json Path queries
 
 > k get nodes -o=custom-columns=NODE-A:.metadata.name,CPU-A:.status.capacity.cpu 
 
+
+############################################################################################################
+Helm
+----
+
+> cat /etc/*release*                                            <-- to get the information about the Operating-system installed on the machine e.g "ubuntu" 
+
+> helm --help                                                   <-- it will print all the sub-commands that we can use with "helm"
+
+> helm version 
+
+> helm --debug                                                   <-- to enable "verbose" option 
+
+
+------------------------------------------------------
+> helm install  <my-chart-name> <chart-name-from-provider>       <-- it will pull the "helm-chart" and "install" it also 
+
+
+
+> helm pull --untar <chart-name-from-provider>                    <-- it will only pull the "helm-cart" and store it locally.
+
+> ls <chart-name-from-provider>
+
+> helm install <my-chart-name>  ./path-to-chart                    <-- like this we can install the above "pulled" chart           
+> helm uninstall <my-char-name>                                 <-- to uninstall the package 
+
+OR
+
+> helm repo add <my-name>  <link-for-repo> 
+> helm repo add bitnami  https://charts.bitnami.com/bitnami 
+ 
+
+
+> helm repo list                           <-- like this we can find all the manually "added" repos                                
+---------------------------------------------------------
+
+                "Check the difference between these two commands" 
+
+> helm list                                <-- to list all the available packages. 
+
+
+
+> helm search repo <name> 
+> helm search repo bitnami                   <-- if we have added "repo" manually then like this we can search them. 
+                               App-version   <-- with this "helm search repo" command we can check the "APP VERSION"
+                               CHART VERSION <-- with this "helm search repo" command we can check the chart-version 
+
+
+Search in the Artifact-hub:
+----------------------------
+> helm search hub <chart-name-from-provider>                         <-- to search the chart with provider-name  
+
+> helm search hub <my-chart-name>                                   <-- to search the chart with <my-name> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ###################################################################################################################
 Killler.sh  Questions:
 ------------------------
@@ -2372,10 +2844,9 @@ Killler.sh  Questions:
 
 > kubectl --context=<context-name> <command>     <-- like this we can also run a command by using a special context 
 
+> k config user-context <any-name> --kubeconfig /abc/config                               <-- if the  "config" file is placed at any other location.
+
 -----------------------
-
-
-
 
 
 

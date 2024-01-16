@@ -1,0 +1,91 @@
+
+
+
+Headless-Service with a Pod
+--------------------------
+
+headless-service.yaml 
+----------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-headless-sr
+spec:
+  selector:
+    app: mysql-app
+  ports:
+    - port: 3306
+  clusterIP: None                       <-- when we define this field then it becoes a "Headless" service 
+
+
+
+
+
+vi pod.yaml
+-------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+    subdomain: my-headless-svc                <-- this name must match with the name of the "Headless" state 
+    hostname: my-sql-pod                      <-- my-sql-pod.my-headless-sr.tech.cluster.local 
+                                                
+
+
+
+Headless-Service with a StatefulSet 
+--------------------------
+
+headless-service.yaml 
+----------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-headless-sr
+spec:
+  selector:
+    app: mysql-app
+  ports:
+    - port: 3306
+  clusterIP: None                       <-- when we define this field then it becoes a "Headless" service 
+
+
+vi statefulset.yaml
+-------------------
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: web
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  serviceName: my-headless-sr          <-- in the "StatefulSet" we must define this attribute with the "Headless" Service name 
+  minReadySeconds: 10                     with this "ServiceName" attribute a Deployment automatically create "subdomain" and "hostname" in the pod.
+  replicas: 3
+ 
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: nginx
+        image: nginx 
+
+
+<stateful-pod-name>.<headless-service-name>.<namespace-name>.svc.cluster.local       <-- like this we can call the Headless-pod through headless-service 
+> my-sa-0.myheadless-service.tech.svc.cluster.local 
+
+
+
+
+
+ 
