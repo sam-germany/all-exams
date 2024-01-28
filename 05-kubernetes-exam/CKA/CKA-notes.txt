@@ -2122,6 +2122,9 @@ roleRef:
 
 
 
+> k auth can-i --help          <-- it will give the example of all the command that the user that i logged-in can execute 
+
+> k auth can-i '*' '*'
 
 
 > kubectl auth can-i  create deployments             <-- like this we can check if the current user is alloweed to "Create Deployments"
@@ -2732,8 +2735,9 @@ Check on the Worker Node:
 Json Path queries
 -----------------
 
-> k get nodes -o=jsonpath='{.items[*].metadata.name}'                                         <-- it use "-o=jsonpath="
+> k get pods -o json                                                   <-- to get the json output of the pods.
 
+> k get nodes -o=jsonpath='{.items[*].metadata.name}'                                         <-- it use "-o=jsonpath="
 
 > k get nodes -o=custom-columns=ANY-NAME:.metadata.name                                       <-- like this we can create output with custom "Columna-name" 
 
@@ -2829,10 +2833,13 @@ Search in the Artifact-hub:
 
 
 ###################################################################################################################
-Killler.sh  Questions:
+config    
 ------------------------
 1) Write all the contexts added in you .kube/config file, with "kubectl" command /config.txt 
 
+> k config view                             <-- to view the config that are deifined in the .kube/config file 
+
+> k config view --raw                       <-- sometime if we do not saw any Certificates in the config file then use this "--raw" command to see the content 
 
 > kubectl config get-contexts  > /config.txt       <-- to get all the contexts 
 
@@ -2846,7 +2853,670 @@ Killler.sh  Questions:
 
 > k config user-context <any-name> --kubeconfig /abc/config                               <-- if the  "config" file is placed at any other location.
 
------------------------
+###########################################################################################################################
+CKS Exam:
+---------
+
+
+--------------------------------------------------------------------------------------
+Question-1) 
+
+a) 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-1
+  namespace: default
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress                                     <-- this NP will block all the incoming-outgoing traffic from all the pods in the "default" namespace 
+
+
+
+b) 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-2
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      run: pod-1
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          run: pod-2                          <-- it will allow traffic from "pod-1" to "pod-2"
+
+
+c) 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-3
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      run: pod-2
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          run: pod-1                      <-- it allows "pod-2" to get incoming traffic from "pod-1"
+
+
+d) 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-4
+  namespace: default
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP                     <-- It allows all the pods in default namespae to send traffic to "Port-53" for creating   
+                                           DNS Resolution.
+
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-5
+  namespace: prod
+spec:
+  podSelector:
+    matchLabels:
+      run: pod-3
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: default      <-- As pod-1 is in the "default" namespace so we have to define also the label that is defined in the prod namespace 
+    - podSelector:
+        matchLabels:
+          run: pod-1 
+
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: np-6
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      run: pod-1
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          ns: prod                               <-- As pod-3 is in the "prod" namespace so we have to define also the label that is defined in the prod namespace 
+    - podSelector:
+        matchLabels:
+          run: pod-3          
+
+
+
+> k run pod-1 --image=nginx 
+> k run pod-2 --image=nginx 
+
+> k expose pod-1 --name=svc-pod-1 --port=80           <-- as we are testing with "curl" command so here we must use "--port=80"
+
+> k expose pod-2 --name=svc-pod-2 --port=80
+
+> k exec pod-1 -- curl svc-pod-2                       <-- like this we can test 
+
+> k exec pod-1 -- curl svc-pod-3.prod.svc.cluster.local
+
+-----------------------------------------------------------------------------------------------------------------
+Kubernetes Dashboard:
+---------------------
+
+Question:  Make the kubernetes Dashboard publicily available.
+
+Step-1)
+> k edit deploy kubernetes-dashboard -n kubernetes-dashboard 
+
+spec:
+  containers:
+  - args:
+    - --auto-generate-certificates          <-- remove this argument, Normally it create ssl certificate automaticalls, As we want to make the 
+                                                dashboard unsecure, and available it publicly then we have to remove this.
+    - --insecure-port=9090                  <-- add this argument, it will open the insecure port for the Dashboard.
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 9090  # 8443                 <-- Either we have to remove the "livenessProbe" completely, or we can just change the "port"
+        scheme: HTTP                           with both of these changes it will work.
+
+Step-2) 
+> k edit svc kubernetes-dashboard -n kubernetes-dashboard 
+
+spec:
+  ports:
+  - port: 9090    # 443                    <-- change the "port" from  443  to 9090 
+  - targetPort: 9090  # 8443               <-- change the "targetPort" from 8443  to  9090
+  
+  type: NodePort   # ClusterIp             <-- change the "type" from ClusterIp to "NodePort"
+
+
+Step-3)
+> get clusterrole -A | grep view         <-- their is a predefined clusterrole "view" , This clusterrole allows us to view all the see all the resources in the cluster 
+
+> k create rolebinding my-name --serviceaccount=kubernetes-dashboard:kubernetes-dashboard --clusterrole=view -n kubernetes-dashbaord  <-- it will attach a new crb with the view role
+                                                                                                                                        now we will have access to all the resources in the kubernetes-dashboard namespace 
+
+> k create clusterrolebinding my-name --serviceaccount=kubernetes-dashboard:kubernetes-dashboard --clusterrole=view -n kubernetes-dashbaor  <-- here we are creating a "ClusterRoleBinding" with this it can 
+                                                                                                                                             view all the resources in all the namespaces.   
+
+Note: We can attach a "ClusterRole" with a "RoleBinding" but the "User" or "ServiceAccount" will have only the acces to the resources only that the defined in the Namespace 
+      om which the "RoleBinding" is created 
+      But When we create a "ClusterRole" with the "ClusterRoleBinding" in this case  "User" or "ServiceAccount"  will have access to all the resources in any namespace.
+
+      
+
+###########################################################################################################################      
+Ingress:
+-------
+
+Step-1)
+> https://kubernetes.github.io/ingress-nginx/deploy/          <-- from this website take the below .yaml deployment 
+
+
+> kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
+
+
+Step-2)
+> k edit svc ingress-nginx-controller -n ingress-nginx                <-- chnage the "type: LoadBalancer"  to  "type: NodePort"
+
+> k get nodes -owide            <-- take the INTERNAL-IP  of the "Controlplane" Node 
+
+> k get svc -n ingress-nginx    <-- take the "Port" of "NodePort Service the "ingress-nginx-controller"
+
+> curl Node-IP:NodePort-port    
+> curl 172.30.1.2:32411              <-- this call will return    404         <-- it means connection is created successfully 
+
+> k run pod-1 --image=nginx
+> k run pod-2 --image=httpd
+
+> k expose pod pod-2 --port=80 --name=service1
+> k expose pod pod-2 --port=80 --name=service2
+
+
+
+##################################################################################################################################
+Their is a IP 169.254.169.254  of the Node, and a user can from a pod call this IP address and get the internal info through this IP
+How to block a Pod that it can not make a "curl" command call from the pod.
+
+Step-1)
+> curl http://169.254.169.254/v1/metadata/public-ipv4
+> curl http://169.254.169.254/v1/metadata/hostname                  <-- like this we can make a "curl" command from a pod to get the internal 
+                                                                        info from Hardware or server.
+
+Step-2)
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  podSelector:{}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0                       <-- here we are allowing all the IP, that our pod can call any ip address 
+        except:
+        - 169.254.169.254/32              <-- here we are overwriding the above, that only this ip will be blocked, rest are alloweed.
+
+
+###############################################################################################
+kube-bench:
+----------
+
+How to check the security-loops in the kubernets cluster ?
+
+Step-1)
+> https://github.com/aquasecurity/kube-bench
+> https://github.com/aquasecurity/kube-bench/blob/main/job.yaml        <-- open this file.
+
+
+Step-2)
+> vi job.yaml                  <-- copy paste this in a new .yaml file and create a new pod 
+
+Step-3)
+> k logs <name-of-above-pod>        <-- like this we get the logs of the above create pod, and one-by-one complete all the veneruability findings.
+
+
+###################################################################################################
+Download the newer version of the "kubernetes-binary" and install it 
+
+Step-1)
+> k version              <-- first check which version we are using. and take the binary for the next version 
+
+
+Step-2) 
+> kubernetes docs search for  "kubernetes releases" -> click on left side "Release Notes"  ->  click on "ChangeLog" 
+                                                    -> then go to which version we need and click on "Source Code" or direct on "Server Binaries" or any other
+
+
+Step-3)  Right click on the Binary name link and open in a another tab, after that copy that link from browser 
+> wget https://dl.k8s.io/v1.29.1/kubernetes-server-linux-amd64.tar.gz   <-- download that link with the "wget" command.
+                                                                          it download kubernetes-server-linux-amd64.tar.gz a file like this on node.
+
+Step-4)
+> sha512sum kubernetes-server-linux-amd64.tar.gz
+
+The above command give you output as below 
+b01f8ef7160045363b017e79f1b3c2c5b54a67aa3426c0e5c45562be88bd72a3cb5e72043764684e10e255ecbb19d697765755031aa3c1b49c4e4c12122b3077  kubernetes-server-linux-amd64.tar.gz 
+
+Step-4) 
+In step 3 we have copy the download link, just directly right side of the link their is a binary and it should be same as this above long number 
+just compare them. it must be same. like this we can compare both.
+
+
+Step-5) 
+> docker ps | grep kube-apiserver         <-- it prints many folder name copy the first name e.g  "4696401a780b"
+> docker cp 4696401a780b:/ container      <-- it copy all the files in a folder name "container" we can give any other name also 
+                                              "container" or  "my-container" 
+> cd container                            <-- like this we can check all the contentes in this directory 
+> cd ..
+> find container/ | grep kube-apiserver      <-- "container/usr/local/bin/kube-apiserver"  <-- this is the output and we know the location of it 
+
+> sha512sum container/usr/local/bin/kube-apiserver         <-- like this we will get the "binary address" of the kube-apiserver that is install on the server 
+                                                             After that we can match it with our downloaded binary then we can confirm that exact version is installed or not 
+
+
+#############################################################################################################
+RBAC:
+----
+                                        
+> k api-resource --namespaced=true          <-- it return all the resources that can be created under a "Namespace"
+
+
+> k auth can-i -help                        <-- like this we can get all the command that we can execute with "k auth can-i" 
+
+
+
+
+
+
+
+
+
+############################################################################################################
+ServiceAccount:
+---------------
+
+Step-1)
+> k create sa my-sa 
+
+Step-2)
+> vi pod.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: my-pod
+  name: my-pod
+spec:
+  serviceAccount: my-sa 
+  containers:
+  - image: nginx
+    name: my-pod
+
+Step-3)
+> k exec my-pod -it -- sh 
+# mount | grep secret 
+tmpfs on /run/secrets/kubernetes.io/serviceaccount type tmpfs (ro,relatime,size=1928540k)        <-- this is the output of the above command 
+# cd /run/secrets/kubernetes.io/serviceaccount         <-- under this folder we will see the token that is generated by the "ServiceAccount" 
+# ls 
+ca.crt namespace token                    <-- under this "/run/secrets/kubernetes.io/serviceaccount" we can see these three files 
+
+
+Note: This token we can use when we want to make a call to "Kube-api" server 
+
+
+Q) When we create a "serviceAccount" and attach it to a pod, then it generate automatically a "token" in the pod at "/run/secrets/kubernetes.io/serviceaccount" 
+   With this "token" we can make a call to the "API-Server" and get the secret infos, that we should not have normally, how to disable this "token" 
+
+Their are two ways. 
+
+Way-1) 
+--------
+apiVersion: v1 
+kind: ServiceAccount 
+metadata:
+  name: my-sa 
+automountServiceAccountToken: false            <-- like this "ServiceAccount" will not generate any token, when it attacht to a pod 
+
+
+Way-2)
+apiVersion: v1 
+kind: Pod 
+metadata: 
+  name: my-pod 
+spec: 
+  serviceAccountName: my-sa 
+  automountServiceAccountToken: false           <-- like this "ServiceAccount" will not generate any token, when it attacht to a pod 
+
+Note: With "automountServiceAccountToken: false"   it will not mount the token as a secret to the pod, it will not mount it. so a pod can  
+      not use token to make a call to "API-Server" 
+      
+ 
+-------------------------------------------
+ClusterRole   "edit" 
+------------------
+
+Q) How to limit the permissions of a "ClusterRole"
+
+Step-1) 
+> k create sa my-sa 
+
+Step-1) 
+> k auth can-i delete secret --as system:serviceaccount:prod:my-sa ---namespace=prod    <-- like this we can check if this serviceaccount has permission to delete a secret or not .
+                                                                                           by-default it can not delete any secret.
+Step-2)
+edit         <-- their is a predefine "ClusterRole" that can "edit" every resource in kubernetes 
+
+> k create clusterrolebinding my-crb --clusterrole=edit --serviceaccount=prod:my-sa           <-- i have to define the "namespacename" also 
+
+> k auth can-i delete secret --as system:serviceaccount:prod:my-sa ---namespace=prod         <-- if now we check this after adding "edit" role to serviceaccount, it should have permission to delete 
+
+
+#########################################################################################################
+Cluster Hardening - Restrict API Access
+--------------------------------------
+
+Q) How to disable the "Anonymous-auth" that User can not make a call to "Kubeapi-server" 
+
+
+Step-1)
+> curl https://localhost:6443 -k        <-- normally when we make this "curl" then we are able to make a call to "Apiserver" 
+
+Response:
+--------
+{
+  "kind": "Status"
+  "apiVersion": "vi",
+  "metadata":  {
+
+  }
+  "status": "Failure"                                                         <-- eventhough we are becoming "Failure" but still it means that we are able to make call to "ApiServer" 
+  "message": "forbidden: User \"system:anonymous\" cannot get path \" /\"",       but we are "Forbidden" it means we have to attach Authorization token with the call. 
+  "reason": "Forbidden",
+  "code": 403
+}
+
+
+Step-2) 
+> vi /etc/kubernetes/manifests/kube-apiserver.yaml 
+
+spec:
+  containers:
+  - command:
+    - --anonymous-auth=false                      <--- when we pass this argument then we are not able to make a call 
+
+
+> curl https://localhost:6443 -k            <-- if we call now then it will show that we are not able to make any call 
+
+Response
+---------
+{                
+  "kind": "Status"                                   <-- this is the response come from the above call
+  "apiVersion": "vi",
+  "metadata":  {
+
+  }
+  "status": "Failure"
+  "message": "Unauthorized"
+  "reason": "Unauthorized"
+  "code": 401
+} 
+
+Note: "--anonymous-auth=true"       <-- by-default it is on "true" mode, so we do not need to add as "true" explicitly, 
+                                  But if we make it "--anonymous-auth=false"  then after testing make it true, As ApiServer need for its livenessProbe 
+                                   this "anonymous" acces, so either we remove this annotation as we have put it or make "true"
+
+
+-------------------------------------------------------------------------
+Q) How to make a call to "Api-Server" with "curl" command ?
+
+Step-1)
+> k config view                       <-- like this we can view the config 
+> k config view --raw                 <-- if the certificates are not shown then use this "--raw" command 
+
+Step-2) 
+Now create three files from the .kube/config file from 
+- certificate-authority-data 
+- client-certificate-data 
+-
+
+-> form the output of the above command first copy the "certificate-authority-data" it is base64 encoded so first decode like this all three of them 
+
+> echo <paste-base64- certificate-authority-data> | base64 --decode > ca        <-- we can directly create "ca" file without any extension
+> echo <paste-base64- client-certificate-data> | base64 --decode > crt 
+> echo <paste-base64- client-key-data> | base64 --decode > key 
+
+Note: like this we have create the three files ca,crt,key 
+
+
+Step-3)
+> ip a                           <-- in the result check Nr:2  "eth0" or enp1s0" or any else 
+                                    their is an ip address is written "172.30.1.2" or any other-
+                                    copy that ip address 
+OR 
+In the .kube/config  file also  "server: https://172.30.1.2:6443"   <-- from here we can also take the ip address of "Api-Server" 
+
+
+> curl https://172.30.1.2:6443               <--like this we can make a call to "Api-Server" 
+
+> curl https://172.30.1.2:6443 --cacert ca --cert crt --key key            <-- put all the above created files and execute, we are 
+                                                                            able to connect to "ApiServer" 
+                                                                      Note: we must use "--cacert ca"  this will give error "--cacert=ca"
+
+----------------------------------------------------------------------------
+Q) How to make a "External-access" to the   Kube  "Api-Server" ?
+
+Step-1)
+> k get svc        <-- in the beginning by-default a service is create by kuberntes with the name  "kubernetes" as a "ClusterIP"
+                      To open the Cluster for external calls, just make this service type from "ClusterIP" to "NodePort
+                  Note: copy the port nr of the "NodePort" service 
+
+Step-2)
+- Copy the actual  ".kube/config" file, and past in your local machine. And create file with any-name "my-config"   
+- in the config file their is "server: https://95.216.172.143:6443"   <-- change the port-nr "6443" to the port nr of the nodeport
+  service, it is normally "32278" something like this.
+
+Step-3)
+> k get pods --kubeconfig my-config           <-- as we have copy-paste and create the "my-config" file then use it in this command.
+                                             Note: As above written we must change the port number of the server to NodePort service.       
+
+
+----------------------------------------------------------------------------
+NodeRestriction AdmissionController:
+-----------------------------------
+
+vi etc/kubernetes/manifests/kube-apiserver.yaml 
+
+spec:
+  containers:
+  - command:
+    - --enable-admission-plugins=NodeRestriction    <--normally this plugin is by-default enabled, but if it is not their then put it in the "Api-Server" .yaml file 
+
+Note: 
+
+
+
+#######################################################################################################
+ETCD:
+----
+
+
+Q) How to read a Secret directly from  "ETCD" Server ?
+
+Step-1)
+> k create secret generic my-secret --from-literal=username=sunny 
+> k create secret generic my-secret-2 --from-literal=pass=1234 -n prod           <-- i have created two different secrets 
+
+Step-2) Search for "etcd" values
+> cat /etc/kubernetes/manifests/etcd.yaml | grep etcd
+
+Output:                                                                        <-- something like this comes in output 
+- --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt
+- --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt
+- --etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key
+
+
+
+Step-3) checking if the "etcd" is healthy" optional step 
+> ETCDCTL_API=3 etcdctl endpoint health --cert <put-file-end-with-server.crt>            <-- "endpoint health" with this we are checking the health of ETCD 
+                                      --key <put-file-end-with-server.key> 
+                                      --cacert <put-file-end-with-ca.crt>          <-- put all in one line, just for understanding i do it like this.
+
+Step-4) getting "default namespace  my-secret"
+> ETCDCTL_API=3 etcdctl get /registry/secrets/default/my-secret  --cert <put-file-end-with-server.crt>            <-- "/default/my-secret" with this we are getting the secret from "default" namespace 
+                                                                 --key <put-file-end-with-server.key> 
+                                                                 --cacert <put-file-end-with-ca.crt>
+
+
+Step-5) getting "prod namespace my-secret-2"
+> ETCDCTL_API=3 etcdctl get /registry/secrets/prod/my-secret-2  --cert <put-file-end-with-server.crt>            <-- "/prod/my-secret-2" with this we are getting the secret from "prod" namespace 
+                                                                --key <put-file-end-with-server.key> 
+                                                                --cacert <put-file-end-with-ca.crt>
+
+
+----------------------------------------------------------------------------------------------
+Q) How to encrypt the existing secret using "aescbc" and a password of our choice ?
+
+Step-1) Search in the documentation "encrypt etcd"
+
+Step-2)
+> echo "aaaaaaaaaaaaaaa" | base64           <-- here we are creating a key we are going to encrypt the Secrets in the ETCD 
+                                              Note: this key must be of 16 or 32 characters, otherwise it will not work 
+
+Step-2)
+> cd /etc/kubernetes/etcd-test          <-- normally we can make a folder in any place but it is recommend to crearte here folder 
+                                           we are creating with name "etcd-test 
+
+Step-3)
+vi /etc/kubernetes/etcd-test/my-file.yaml                                 <-- creat this file under the above created dir and put this file under it  
+                                                                       Note: main point is we have to just to put this file here, not need to do "k apply -f "
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+      - configmaps
+      - pandas.awesome.bears.example
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: <BASE 64 ENCODED SECRET>            <--  Put the above encoded key here 
+      - identity: {}
+
+Step-4)
+> vi /etc/kubernetes/manifests/kube-apiserver.yaml  
+
+spec:
+  containers:
+  - command:
+    - kube-apiserver
+    - --encryption-provider-config=/etc/kubernetes/etcd-test/my-file.yaml       <-- put this command at this place, this command is 
+                                                                                 also defined in the documation  
+                                                                                here we have to put the path of the above dir and file           
+    volumeMounts:
+    - mountPath: /etc/kubernetes/etcd-test
+      name: etcd-testing                                                               <-- we have to create a volumeMount 
+      readOnly: true
+  volumes:
+  - hostPath:
+      path: /etc/kubernetes/etcd-test 
+      type: DirectoryOrCreate 
+    name: etcd-testing                                     <-- here we are creating a volume and define the path 
+
+
+
+Note: after making these changes, when ever a new Secret will be created it then that data will not be stored as plain test in the etcd db
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

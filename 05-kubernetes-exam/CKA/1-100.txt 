@@ -281,7 +281,7 @@ metadata:
 spec:
   request: xxxxxxxxxxx paste the certificate here xxxxxxxxxxxx
   signerName: kubernetes.io/kube-apiserver-client
-  expirationSeconds: 86400  # one day
+  expirationSeconds: 86400  # one day                                    <-- if it is asked in question about expiration, then let it here, otherwise delete this line
   usages:
   - client auth
 
@@ -700,6 +700,7 @@ spec:
   containers:
   - envFrom:
     - configMapRef:
+    
         name: my-config 
 
 5) k delete pod blue                     <-- first delete the old pod 
@@ -1018,7 +1019,7 @@ Q-51)  Create a cronjob which prnts the date and "Running" every minute
 
 1) vi cronjob.yaml 
 
-apiVersion: batch/v1
+apiVersion: batch/v1CronJob
 kind: CronJob
 metadata:
   name: hello
