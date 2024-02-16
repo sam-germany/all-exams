@@ -35,10 +35,15 @@ How we can enable "alpha" or " beta" versions for any Resources.
 
 
 ------------------------------
-2) How to create a "tls" Secret 
+2) How to create a "tls" Secret   &  "docker-registry" secret 
 
 > k create secret tls --key=<put-the-given-key>  --cret=<put-the-given-cret> -n my-namespace 
 
+
+> k create secret docker-registry my-sec --docker-username=aa --docker-password=123 
+                                         --docker-server=my-registry.com --docker-email=abc@gmail.com   <-- like this we can create a "Secret" that can be for "imagePullSecret" 
+                                                                                                            in a pod with this we can pull the image 
+                                                                                 
 -----------------------------------------------------
 In Docker ui - Find the base OS of the image "python:3.4" 
 
@@ -52,11 +57,6 @@ Pod as Root-User:
 spec:
   securityContext:
     runAsUser: 0 
-
-
-
-
-
 
 
 
@@ -1675,6 +1675,8 @@ spec:
               name: test-cm
               key: user 
 
+-------------------------------------------------
+
 
 
 ##########################################################################################################
@@ -2440,6 +2442,8 @@ StorageClass:
 > k get sc 
 
 
+
+
 StorageClass can use three type of Disks that we define under "Parameters"
 
 Silver StorageClass:               Gold StorageClass:          Platinum StorageClass:
@@ -2501,6 +2505,268 @@ spec:
     - name: mypd
       persistentVolumeClaim:
         claimName: myclaim-bb
+
+
+---------------------------------------------------------------------------------------
+gp2
+---
+
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp2
+parameters:
+  fsType: ext4
+  type: gp2
+provisioner: kubernetes.io/aws-ebs
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+
+
+
+gp2-pv.yaml
+-----------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    kubernetes.io/createdby: aws-ebs-dynamic-provisioner
+    pv.kubernetes.io/bound-by-controller: "yes"
+    pv.kubernetes.io/migrated-to: ebs.csi.aws.com
+    pv.kubernetes.io/provisioned-by: kubernetes.io/aws-ebs
+  creationTimestamp: "2023-02-02T12:37:29Z"
+  finalizers:
+  - kubernetes.io/pv-protection
+  labels:
+    topology.kubernetes.io/region: eu-west-1
+    topology.kubernetes.io/zone: eu-west-1b
+  name: pvc-7da6e25e-3727-4647-93a3
+spec:
+  accessModes:
+  - ReadWriteOnce
+  awsElasticBlockStore:
+    fsType: ext4
+    volumeID: aws://eu-west-1b/vol-091a7c498
+  capacity:
+    storage: 10Gi
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: kong-data-stolon-stolon-keeper-0
+    namespace: rwip-api-gateway
+    resourceVersion: "1518093054"
+    uid: 7da6e25e-3727-4647-93
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: topology.kubernetes.io/zone
+          operator: In
+          values:
+          - eu-west-1b
+        - key: topology.kubernetes.io/region
+          operator: In
+          values:
+          - eu-west-1
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: gp2
+  volumeMode: Filesystem
+
+
+
+gp2-pvc.yaml
+------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    pv.kubernetes.io/migrated-to: ebs.csi.aws.com
+  finalizers:
+  - kubernetes.io/pvc-protection
+  labels:
+    component: stolon-keeper
+    stolon-cluster: kube-stolon
+  name: kong-data-stolon-stolon-keeper-0
+  namespace: rwip-api-gateway
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: gp2
+  volumeMode: Filesystem
+  volumeName: pvc-7da6e25e-3727-4647-93a3
+
+
+----------------------------------------------------------------------------
+gp3
+---
+
+gp3-strageclass.yaml
+--------------------
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3
+parameters:
+  type: gp3
+provisioner: ebs.csi.aws.com
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+
+
+
+gp3-pv.yaml
+-----------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/provisioned-by: ebs.csi.aws.com
+    volume.kubernetes.io/provisioner-deletion-secret-name: ""
+    volume.kubernetes.io/provisioner-deletion-secret-namespace: ""
+  creationTimestamp: "2023-07-17T11:15:33Z"
+  finalizers:
+  - kubernetes.io/pv-protection
+  - external-attacher/ebs-csi-aws-com
+  name: pvc-12a2cb92-17bd-4b89-8d61-40c385f195f1
+  resourceVersion: "1825656404"
+  uid: a695fe60-d71c-4465-8d4b-050293dde96b
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 32Gi
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: kubecost-cost-analyzer
+    namespace: kubecost
+    resourceVersion: "1825656273"
+    uid: 12a2cb92-17bd-4b89-8d61-40c385f195f1
+  csi:
+    driver: ebs.csi.aws.com
+    fsType: ext4
+    volumeAttributes:
+      storage.kubernetes.io/csiProvisionerIdentity: 1689254055136-8081-ebs.csi.aws.com
+    volumeHandle: vol-0d0ae1e54589b092c
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: topology.ebs.csi.aws.com/zone
+          operator: In
+          values:
+          - eu-west-1a
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: gp3
+  volumeMode: Filesystem
+status:
+  phase: Bound
+
+
+gp3-pvc.yaml
+-----------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    volume.beta.kubernetes.io/storage-provisioner: ebs.csi.aws.com
+    volume.kubernetes.io/selected-node: ip-11-240-144-149.eu-west-1.compute.internal
+    volume.kubernetes.io/storage-provisioner: ebs.csi.aws.com
+  creationTimestamp: "2023-07-17T11:15:29Z"
+  finalizers:
+  - kubernetes.io/pvc-protection
+  labels:
+    app: cost-analyzer
+    app.kubernetes.io/instance: kubecost
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: cost-analyzer
+    helm.sh/chart: cost-analyzer-1.104.1
+  name: kubecost-cost-analyzer
+  namespace: kubecost
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 32Gi
+  storageClassName: gp3
+  volumeMode: Filesystem
+  volumeName: pvc-12a2cb92-17bd-4b89-8d61-40c385f195f1
+
+
+----------------------------------------------------------------------------
+EFS
+---
+
+efs-storageclass.yaml
+---------------------
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: efs-sc
+provisioner: efs.csi.aws.com
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+
+
+efs-pv.yaml
+-----------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    volumeName: efs-grafana
+  name: efs-grafana
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 10Gi
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: kube-prometheus-stack-grafana
+    namespace: monitoring
+    resourceVersion: "2090018606"
+    uid: 2f3fce13-35d0-4b2e-a597-5b9da361ff6d
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: fs-0ef27c45cfe3f5b9e
+  mountOptions:
+  - tls
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: efs-sc
+  volumeMode: Filesystem
+
+
+efs-pvc.yaml 
+------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/instance: kube-prometheus-stack
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 10.0.3
+    helm.sh/chart: grafana-6.50.2
+  name: kube-prometheus-stack-grafana
+  namespace: monitoring
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: efs-sc
+  volumeMode: Filesystem
+  volumeName: efs-grafana
+
+
 
 
 #################################################################################################################################
@@ -3461,6 +3727,660 @@ spec:
 
 Note: after making these changes, when ever a new Secret will be created it then that data will not be stored as plain test in the etcd db
 
+#####################################################################################################
+Runtimeclass:
+-------------
+
+Note: search in the docs "Runtimeclass"
+
+Step-1)
+
+vi rn.yaml 
+---------
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: gvisor                   <-- we can  put any name here 
+handler: runsc 
+
+Step-2)
+vi pod.yaml 
+--------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: test
+  name: test
+spec:
+  runtimeClassName: myclass            <-- like this we can add the above defined "Runtimeclass"
+  containers:
+  - image: nginx
+    name: test
+
+#######################################################################################################
+Q) Run a pod with a "root user"  after that make changes and run it as "non root" user.
+
+
+Step-1) 
+Create a pod and check if it run as "root" user or not 
+
+> k run test-pod --image=nginx -it -- sh 
+# id                                               <-- execute this command  
+uid=0(root) gid=0(root) groups=0(root)             <-- if "uid-0" comes in output it means we are running as "root" user 
+
+Step-2)
+Create a pod as non-root user 
+
+vi pod.yaml 
+-----------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: test
+  name: test
+spec:
+  securityContext:
+    runAsUser: 1000                   <--  here we have defined the user=1000, so it is not a root user, root user is "0"
+    runAsGroup: 2000
+  containers:
+  - command: 
+    - sh 
+    - -c 
+    - sleep 1d                      <-- we must use "sleep 1d" when we use "securityContext" otherwise we will get error 
+    image: nginx
+    name: test
+
+> k exec test -it -- sh       
+# id                                               <-- execute this command  
+uid=1000(root) gid=2000(root) groups=2000(root)    <-- if "uid-2000" comes in output it means we are running as "non-root" user 
+
+
+-------------------------------------------------------------------------------------------
+Q) How to run a "Container" in a pod as a non-root 
+
+vi pod.yaml 
+-----------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: test
+  name: test
+spec:
+  containers:
+  - command: 
+    - sh 
+    - -c 
+    - sleep 1d      
+    image: busybox                <-- in this case we will get a error, As by-default the "busybox-image" run as "root"
+    name: test                            but we defined the container as "non-root" so we get error, in this case we must   
+    securityConext:                       specify that the image should also run as "non-root"
+      runAsNonRoot: true          <-- like this we are forcing pod to run as "non-root" user 
+
+
+-------------------------------------------------------------------------------------------------
+Q) How to run a container as  "Privileged Container"
+
+> k exec -it test-pod -- sh 
+# id 
+uid=0(root) gid=0(root) groups=0(root)         <-- as it shows it run as a "root" user 
+# sysctl kernel.hostname=sunny                 <-- like this we can change the host name of the kernel 
+error                                        <-- but as we do not run it a "Privileged" so it give us error 
+
+
+vi pod.yaml 
+-----------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: test
+  name: test-pod
+spec:
+  containers:
+  - command: 
+    - sh 
+    - -c 
+    - sleep 1d      
+    image: busybox               
+    name: test                         
+    securityConext:                     
+      privileged: true             <-- it will now run as "Privileged" 
+
+
+> k exec -it test-pod -- sh 
+# id 
+uid=0(root) gid=0(root) groups=0(root)         <-- as it shows it run as a "root" user 
+# sysctl kernel.hostname=sunny                 <-- like this we can change the host name of the kernel 
+changed                                        <-- no we can change the privileged.
+
+
+--------------------------------------------------------------------------------------------
+AllowPrivilegeEscalation
+------------------------
+
+
+
+vi pod.yaml 
+-----------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: test
+  name: test-pod
+spec:
+  containers:
+  - command: 
+    - sh 
+    - -c 
+    - sleep 1d      
+    image: busybox               
+    name: test                         
+    securityConext:                     
+      allowPrivilegeEscalation: false      <-- like this we can explicitly define to not to allow extra permissions.
+
+----------------------------------------------------------------------------------------------------------
+PodSecurityPolicy:  ( It is depricated, so no need to read it )
+-----------------
+
+Note: We can create a "Pod-Securty-Policy" that a pod is not alloweed to get more premission then its root.
+      e.g  that it will not get more permissions and "allowPrivilegeEscalation: false"  is only alloweed. 
+           And if we put "allowPrivilegeEscalation: true" then with this policy the pod will not be created. 
+
+Step-1)
+> vim /etc/kubernetes/manifests/kube-apiserver.yaml 
+
+spec:
+  containers:
+  - command:
+    - --enable-admission-plugins=NodeRestriction,PodSecurityPolicy 
+
+#################################################################################################
+Microservice Vulnerabilites: mTLS 
+---------------------------------
+
+mTSL means two way authentication, Two parties can authenticate with each other at same time and by this create a secre 
+two way communication.
+
+Q) Create a Service-Mesch sidecar proxy like "istio" that the traffic from a pod goes out and come in through a sidecar proxy container 
+
+vi pod.yaml 
+-----------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: test
+  name: test-pod
+spec:
+  containers:
+  - image: busybox     
+    name: test  
+    command: 
+    - sh 
+    - -c 
+    - "ping google.com"
+    image: busybox     
+    name: test
+  - name: sidecar-proxy 
+    image: ubuntu          
+    command: 
+    - sh 
+    - -c 
+    - 'apt-get update && apt-get install iptables -y && iptables -L && sleep 1d'      <--to enable route traffic through sidecar we need 
+    securityConext:                                                                    to instal "iptables" 
+      capabilities:
+        add: ["NET_ADMIN"]        <-- we need also to add "NET_ADMIN" capabilites, only after that it allows to route traffic through sidecar container 
+
+
+########################################################################################################
+Multistage build:
+-----------------
+
+Note: in this usecase we are having a golang application and we are building a multistage build with Docker 
+
+Step-1)
+
+my-app.go 
+---------
+package main
+
+import {
+     "fmt"
+     "time"
+     "os/user"
+}
+
+func main() {
+  user, err := user.Current()
+  if err != nil {
+               panic(err)
+  }
+
+  for {
+    fmt.Println("user: " + user.Username + " id: " + user.Uid)
+    time.Sleep(1 * time.Second)
+  }
+}
+
+Step-2) 
+> go mod init myapp          <-- like this we are initializing a go project, we must have "go.mod" file 
+
+-----------------------------------------------------------------------------------------------
+Example-1
+-----------
+
+Dockerfile
+----------
+FROM golang:1.21-alpine AS builder
+WORKDIR /test-a
+COPY go.mod .
+COPY myapp.go .
+# COPY . .                         <-- or we can directly copy all in one command 
+RUN go mod download
+RUN go build -o ./my-api
+CMD ["/test-a/my-api"]             <-- like this we create a normal Docker image it is near about "250 MB" 
+                             Note: As we have not defined any "User" so when we run this image then it will run as "root"
+                                             
+
+
+-----------------------------------------------------------------------------------------------
+Example-2
+---------
+
+Dockerfile
+----------
+FROM golang:1.21-alpine AS builder
+WORKDIR /test-a
+COPY go.mod .
+COPY myapp.go .
+# COPY . .                                  <-- or we can directly copy all in one command 
+RUN go mod download
+RUN go build -o ./my-api
+
+FROM alpine 
+WORKDIR /test-b
+COPY --from=builder /test-a/my-api ./my-api         <--"--from=0" it means just copy "build binary" or "build artifact" from the previous stage to new stage 
+CMD ["/test-b/my-api"]                         Note: when we build this then it is only "5 MB" of size.
+
+
+---------------------------------------------------------------------------------------------
+Example-3    ( Securing and Hardining the image) <-- it means reduce veneruabilities.
+---------
+
+Dockerfile
+----------
+FROM golang:1.21-alpine AS builder
+WORKDIR /test-a
+COPY go.mod .
+COPY myapp.go .
+# COPY . .                                  <-- or we can directly copy all in one command   
+RUN go mod download
+RUN go build -o ./my-api
+
+
+FROM alpine:3.14.2                                                            As all the files are stored for user in the "/etc" folder 
+RUN chmod a-w /etc                                                        <-- as below explaine with this command  we can make the "etc" folder readonly 
+RUN addgroup -S sunny-group && adduser -S sunny-user -G sunny-group      <-- like this we can create a new "user" and "Group" so that the image will not use "root" user 
+RUN rm -rf /bin/*                                                         <-- with this we are restricting the "shell" below it is explained.
+WORKDIR /test-b                                                               means we can not go inside the container with "docker exec -it <container-id> sh"
+COPY --from=builder /test-a/my-api ./my-api
+USER sunny-user                                                          <-- here we are switching form "root" user to newely created "user"    
+CMD ["/test-b/my-api"]
+
+
+Testing-1
+--------
+> docker run 
+
+> docker run -d <image-name>                     <-- it will create a continer and return a id 
+dsdsdsdsdsdfg4rr54423                           <-- an output comes like this
+
+> docker exec -it  dsdsdsdsdsdfg4rr54423 sh     <-- we have to put the id that come in output, like this we can go inside 
+                                                    the container with shell command 
+
+> ls -la                   <-- if in the result come "etc" and other folder then it is ok, otherwise do a "cd .." and then "ls -la"
+OR
+> cd ..
+> ls -la 
+
+drwxr-xr-x    1 root     root          4096 Jan 30 15:13 etc       <-- "drw" as we can see that "ohner" has "Write" access also 
+
+
+RUN chmod a-w /etc                      <-- Add this in the second build process in the "Dockerfile"
+
+> ls -la 
+dr-xr-xr-x    1 root     root          4096 Jan 30 15:32 etc      <-- Now we can see "dr-" is showing it means no "w"  Write premission is their 
+
+
+
+Testing-2
+--------
+> docker run -d <image-name>                   <-- it will create a continer and return a id 
+dsdsdsdsdsdfg4rr54423                          <-- an output comes like this
+
+> docker exec -it  dsdsdsdsdsdfg4rr54423 sh         <-- like this we can exec in the docker image
+AND 
+> docker run test-1
+> docker exec -it <container-id> sh            <-- like this we can directly exec in the running contianer 
+
+
+
+
+
+Testing-2
+------
+> docker run test-1                         <-- first we execute a container from a image 
+> docker exec -it aaasad3eee sh             <-- after that we can directly exec in that container, but some time we are not able to run the contianer 
+                                                 so we have to use the above type Testing-1
+
+RUN rm -rf /bin/*                         <-- But if we put this in the second-stage of the Dockerfile then we are not able to "sh" in 
+                                              image and also not in the  runnging container.
+
+
+#########################################################################################################
+Kubesec:
+-------
+
+Scan Type-1)
+------------
+Note: we can directly go to https://kubesec.io and put their the .yaml files and check if their is some veneruabilities or not.
+
+
+Scan Type-2)
+-------------
+
+> docker run -i kubesec/kubesec:512c5e0 scan /dev/stdin < kubesec-test.yaml        <-- this is a example command that we can get from the "kubesec" website 
+
+
+kubesec/kubesec:512c5e0             <-- this we nned to use, we need "docker" to run this command 
+
+
+Step-1)
+> k run my-pod --image=nginx --dry-run=client -oyaml > my-pod.yaml 
+
+Step-2)
+> docker run -i kubesec/kubesec:512c5e0 scan /dev/stdin < my-pod.yaml 
+
+Output:                                                                       <-- like this it will give us a output, we can modify the "my-pod.yaml" file 
+[                                                                                and run this scan again, 
+  {
+    "object": "Pod/test.default",
+    "valid": true,
+    "message": "Passed with a score of 0 points",
+    "score": 0,                                                               <-- As we solve below some veneruabilities then this scome become 1 or 2 or 3 
+    "scoring": {
+      "advise": [
+        {
+          "selector": "containers[] .securityContext .runAsUser -gt 10000",
+          "reason": "Run as a high-UID user to avoid conflicts with the host's user table"
+        },
+        {
+          "selector": ".spec .serviceAccountName",
+          "reason": "Service accounts restrict Kubernetes API access and should be configured with least privilege"
+        },
+        {
+          "selector": "containers[] .securityContext .runAsNonRoot == true",
+          "reason": "Force the running image to run as a non-root user to ensure least privilege"
+        },
+        {
+          "selector": "containers[] .securityContext .capabilities .drop",
+          "reason": "Reducing kernel capabilities available to a container limits its attack surface"
+        },
+        {
+          "selector": ".metadata .annotations .\"container.seccomp.security.alpha.kubernetes.io/pod\"",
+          "reason": "Seccomp profiles set minimum privilege and secure against unknown threats"
+        },
+        {
+          "selector": "containers[] .securityContext .capabilities .drop | index(\"ALL\")",
+          "reason": "Drop all capabilities and add only those required to reduce syscall attack surface"
+        },
+        {
+          "selector": ".metadata .annotations .\"container.apparmor.security.beta.kubernetes.io/nginx\"",
+          "reason": "Well defined AppArmor policies may provide greater protection from unknown threats. WARNING: NOT PRODUCTION READY"
+        },
+        {
+          "selector": "containers[] .securityContext .readOnlyRootFilesystem == true",
+          "reason": "An immutable root filesystem can prevent malicious binaries being added to PATH and increase attack cost"
+        },
+        {
+          "selector": "containers[] .resources .limits .memory",
+          "reason": "Enforcing memory limits prevents DOS via resource exhaustion"
+        },
+        {
+          "selector": "containers[] .resources .requests .cpu",
+          "reason": "Enforcing CPU requests aids a fair balancing of resources across the cluster"
+        },
+        {
+          "selector": "containers[] .resources .limits .cpu",
+          "reason": "Enforcing CPU limits prevents DOS via resource exhaustion"
+        },
+        {
+          "selector": "containers[] .resources .requests .memory",
+          "reason": "Enforcing memory requests aids a fair balancing of resources across the cluster"
+        }
+      ]
+    }
+  }
+]
+
+
+########################################################################################################################
+OPA Conftest:        ( With this we can write test for our kubernetes manifest files )
+-------------
+
+www.conftest.dev 
+
+Installing option:
+
+Option-a)
+------------
+> brew install conftest 
+> conftest test deploy.yaml         <-- put hier your deployment or service or any other resource file for testing 
+
+
+Option-b) 
+----------
+> docker run --rm -v $(pwd):/project openpolicyagent/conftest test deployment.yaml        <-- in this case we are directly running the test in a 
+                                                                                              docker container, so no need to install on ubuntu 
+
+
+
+
+------------------------------------------------
+Testing policy for manifest files
+--------------------------------
+
+Step-1) 
+policy/my-dep-policy.rego            <-- create a "policy" folder and put below test file in it. test file name should be "deployment.rego"    
+----------------------                 it should have .rego  extnstion, name can pbe different, but it mus be inside a "policy" folder 
+package main
+
+deny[msg] {
+  input.kind == "Deployment"                                            <-- here we have to define the "kind: Deployment"
+  not input.spec.template.spec.securityContext.runAsNonRoot
+
+  msg := "Containers must not run as root"
+}
+
+deny[msg] {
+  input.kind == "Deployment"
+  not input.spec.selector.matchLabels.app
+
+  msg := "Containers must provide app label for pod selectors"
+}
+
+---------------------------
+
+Step-2)
+-------
+> k create deploy mydeploy --image=nginx --dry-run=client -oyaml > test-deploy.yaml            <-- create a deployment 
+
+Step-3)
+> docker run --rm -v $(pwd):/project openpolicyagent/conftest test test-deploy.yaml 
+OR
+> conftest test test-deploy.yaml 
+
+
+=============================================================================================
+Testing policy for Dockerfile:
+-----------------------------
+
+Conftest -> Examples -> Dockerfile 
+
+Tesing policy:
+
+
+Step-1)
+-------
+/policy/testing-dockerfile.rego                        <-- always create a policy under the "policy" folder, name can be different 
+-------------------------------
+package main
+
+denylist := ["openjdk"]
+
+deny[msg] {
+	some i
+	input[i].Cmd == "from"
+	val := input[i].Value
+	contains(val[i], denylist[_])
+
+	msg = sprintf("unallowed image found %s", [val])
+}
+
+
+Step-2)
+--------
+
+vi Dockerfile                    <-- it should not be in the "policy" folder 
+---------------
+FROM openjdk:8-jdk-alpine
+VOLUME /tmp
+ARG DEPENDENCY=target/dependency
+COPY ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY ${DEPENDENCY}/META-INF /app/META-INF
+COPY ${DEPENDENCY}/BOOT-INF/classes /app
+RUN apk add --no-cache python3 python3-dev build-base && pip3 install awscli==1.18.1
+ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]
+
+
+Step-3)
+-------
+> conftest test Dockerfile                   <-- like this we can test, if we have installed "conftest" on ubuntu 
+
+OR 
+
+> docker run --rm -v $(pwd):/project openpolicyagent/conftest test Dockerfile     <-- directly the file, with default namespace  
+
+OR
+> docker run --rm -v $(pwd):/project openpolicyagent/conftest test Dockerfile --all-namespaces  <-- here it goes through all the namespaces.
+
+
+##############################################################################################################################
+Trivy    <-- for scaning the images 
+-----
+
+
+
+Installing in two ways :
+---------------
+
+> brew install trivy                    <-- we can directly install it on the ubuntu 
+OR
+> docker run aquasec/trivy             <-- or we can run test on a docker container 
+
+
+
+Step-1) 
+-------
+> trivy image nginx                 <-- like this we can scan directly image with name.
+OR 
+> docker run aquasec/trivy image nginx           <-- like this we can scan image with in docker, without installing trivy on ubuntu.
+
+
+
+#################################################################################################################################
+Image Digest:
+------------
+
+Note: To make sure that a container always uses the same version of an image, you can specify its digest.
+      The digest identifies a specific version of the image, so it is never updated atuomatically by kubernetes.
+
+
+Whitelist Registries with OPA:
+------------------------------
+
+
+
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8strustedimages
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sTrustedImages
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8strustedimages
+        violation[{"msg": msg}] {
+          image := input.review.object.spec.containers[_].image
+          not startswith(image, "docker.io/")
+          not startswith(image, "k8s.gcr.io/")
+          msg := "ONLY DOCKER AND GOOGLE REGISTRY ARE ALLOWED"
+        }
+-------
+
+
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sTrustedImages
+metadata:
+  name: pod-trusted-images
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+
+
+
+#################################################################################################
+################################################################################################
+CKS Update:
+----------
+
+These links are allowwed extra for CKS exam:
+
+https://kubernetes.io/docs/home/ 
+https://github.com/aquasecurity/trivy
+https://docs.sysdig.com/
+https://falco.org/docs/
+https://gitlab.com/apparmor/apparmor/-/wikis/Documentation
+
+
+
+-----------------------------------------------------------
+
+
+
+
+
+
+
+
+Understanding the kubernetes:
+----------------------------
 
 
 
@@ -3476,6 +4396,1259 @@ Note: after making these changes, when ever a new Secret will be created it then
 
 
 
+
+
+
+Test-a)
+Q) What is the user used to execute the sleep process within the ubuntu-sleeper pod?
+
+> kubectl exec ubuntu-sleeper -- whoami
+
+
+Q) Edit the pod ubuntu-sleeper to run the sleep process with user ID 1010.
+
+Note: Only make the necessary changes. Do not modify the name or image of the pod.
+
+
+##############################################################################################
+kube-bench:
+-----------
+
+
+Note:   "kubebench install"      <-- when we put this in google, then it comes a "GitHub" page, just go inside and 
+                                    install it, in the middle of the page is written the test command as shown below. 
+
+
+
+> ./kube-bench --config-dir `pwd`/cfg --config `pwd`/cfg/config.yaml          <-- kube-bench test can be run with this command 
+
+
+################################################################################################
+System Hardening:
+=================
+
+Commands:
+---------
+> id            <-- it givses the info about, uid, gid, groups 
+> id john       <-- like this we can see what is the id of John 
+> who           <-- it give the list of user, who are currently logged in the system 
+> last          <-- it give "last time" when the users were logged in the system. 
+
+Information about user is stored at :
+---------------------------------
+
+> cat /etc/sudoers                  <- under this file all the "Sudo" related information is stored 
+  %admin ALL=(ALL) ALL              <-- any name starts with "%" it means it is a Group 
+  jim ALL=(ALL) ALL                 <-- any name like this it means it is a user. 
+
+
+> /etc/passwd                       <-- here is the name of the users that exists in system 
+> grep -i ^john /etc/passwd         <-- we can see the info about the user 
+
+> /etc/shadow                       <-- under it we can see all the passwords    
+> grep -i ^john /etc/shadow         <-- like this we can see the exact password of John 
+
+> /etc/group                        <-- like this we can see all the defined groups  
+> grep -i  ^john /etc/group         <-- like this we can see all the groups defined for "john" user
+
+
+> usermod -s /bin/nologin john          <-- like this we can deactivate the any active user.  
+> grep -i john /etc/                <-- here we can see "nologin" is added to the user after above command 
+
+
+-------------------------------------------
+> userdel john                      <-- we can delete the user 
+
+> deluser john admin                <-- "admin" is a group, like this we can delete "john" from "admin" group 
+
+> passwd john                       <-- like this we can change the password for "john" user 
+
+
+=====================================================================
+Package command:
+-----------------
+
+> systemctl list-units --type service              <-- it will give list of all services that are running in the server 
+
+> systemctl list-units --all --state inactive      <-- it return all the "inactive" services.
+
+> systemctl stop apache2               <-- like this we can "Stop" a service with name "apache2"
+
+> systemctl disable apache2            <-- like this we can disable a service.
+
+> apt remove apache2                   <-- After disbling the servie we can remove the complete "apache2" package 
+
+> apt list --installed                 <-- it list all the installed packages on system 
+
+> apt list --installed | grep python2-7       <-- it check if the "python2.7" is installed on system or not 
+
+> 
+
+
+
+=======================================================================
+Modules:
+-------
+
+> lsmod                                      <-- to list all the modules loaded in the "Linux kernal"
+
+> modprobe pcspkr                            <-- like this we can manually load a "module" in Linux kernal 
+
+-----------------------------------
+Steps to blacklist the modules:
+--------------------------------
+
+Step-1)
+> cat /etc/modprobe.d/blacklist.conf         <-- In this file we can put a list of "moudle" that are not alloweed to be loded in "Linux Kernal" 
+      blacklist sctp                         <-- in "blacklist.conf" file here we have blacklisted the "sctp" moudle 
+
+Step-2)
+> shutdown -r now                            <-- this command rebote the node 
+
+Step-3)
+> lsmod | grep stcp                          <-- After restaring in this "lsmod" command we will not see any result, as the "sctp" is blacklisted and removed 
+
+=============================================================================
+Disable Open ports 
+------------------
+
+> systemctl status ssh                    <-- like this we can check i
+
+> netstat -an | grep -w LISTEN            <-- like this we can get a list of all the port that are connected (In-use) and listining
+
+
+> cat /etc/services | grep -w <any-port-nr>  
+> cat /etc/services | grep -w 53                   <-- in the file "/etc/services" we have a list of ports and where they are listening.
+
+
+
+
+
+
+Accounts in Linux:
+------------------
+Their are 4 types of account in Linux
+
+1) User Account:  we can create a user for "Developer" or for "Administrator"
+2) Superuser Account:  "UID=0"   with user-id=0  we can create a super-user that has "root" access 
+3) System Accounts: it is created by OS installation, it is used by softeware or services at the time of installation 
+                    theses services should not have "root" permissions, so they use this Account.
+4) Service Account: It is created by the software, e.g for a Nginx service will use a "Service-account" name "nginx"
+
+
+
+Information about user is stored at :
+---------------------------------
+
+> /etc/passwd                       <-- here is the name of the users 
+> grep -i ^john /etc/passwd         <-- we can see the info about the user 
+
+> /etc/shadow                       <-- under it we can see all the passwords    
+> grep -i ^john /etc/shadow         <-- like this we can see the exact password of John 
+
+> /etc/group                        <-- like this we can see all the defined groups  
+> grep -i  ^john /etc/group         <-- like this we can see all the groups defined for "john" user 
+
+
+ 
+Q) We have a user account named mail on controlplane host. What kind of user account is it?
+
+"mail" is a predefined "System Account" user, it is used for "sending mails" 
+
+-----------------------------------------------------------
+Q) We have created a user named john  on controlplane host. What is the uid of this user?
+> id john       <-- like this we can see what is the id of John 
+OR 
+> cat /etc/passwd | grep john   <-- like this we can see the id 
+
+--------------------------------
+Q) How to Set new password for a existing user "John"
+> passwd john                         <-- after this it ask for password and put it new 
+
+------------------------------------
+Q) Delete a user nane John and also from group called devs 
+
+> groupdel john devs        <-- here we are deleting "John" from the group "devs"
+> userdel  john             <-- here we are deleting the user "John" 
+
+------------------------------------------------------------------------
+Q) There is a user named himanshi on the controlplane host. Suspend this user account so 
+   that this user cannot login to the system but make sure not to delete it.
+
+> usermod -s /usr/sbin/nologin himanshi               <-- it will deactivate the user 
+
+-----------------------------------------------------------------------
+Q) Create a user named sam on the controlplane host. 
+   The user's home directory must be /opt/sam. 
+   Login shell must be /bin/bash and uid must be 2328. 
+   Make sam a member of the admin group.
+
+> useradd -d /opt/sam -s /bin/bash -G admin -u 2328 sam
+
+
+
+=====================================================================================
+SSH Hardening:
+------------
+Note:  SSH/port 22   <-- when we want to connect through SSH it uses  port 22 
+
+Commands:
+----------
+> ssh <ip>                           < -- like this we can give the ip address of the node that we want to connect 
+> ssh <hostname>                     <-- like this we can give the hostname of the node that we want to connect 
+
+
+> ssh  user@<hostnme or IP>          <-- like this we can also pass a user with the hostname with it we want to login 
+OR
+> ssh -l <user> <hostname or IP> 
+
+
+-------------------------------------------------------------------
+How ssh login work?
+
+> ssh node01         <-- as i am logged in on my linux-machine with user "sunny" so after this command it ask for 
+                        password that i set for "sunny" 
+OR 
+> ssh sunny@<hostname or ip>       <-- it means we are logging with sunny user on the node or server 
+
+------------------------------------------------------------------------
+Q) How to generate a ssh key on you linux system and transfer to the node or server ?
+
+Step-1)
+> ssh-keygen -t rsa        <-- this command will cretate 
+                             /home/sunny/.ssh/id_rsa.pub        <-- a public-key 
+                             /home/sunny/.ssh/id_rsa            <-- private key 
+
+Step-2)
+> ssh-copy-id -i ~/.ssh/id_rsa.pub sunny@node01     <-- "ssh-copy-id"  when we use this commad first time to login to a node, it will not ask for password 
+                                                    it will directly copy the public key that is generated on the linux maching and copy it to the "node01"
+                                                     After that we no need to endter the password, as our public key is already placed their.
+
+Note: The user public key is stored in the node or server  under the folder  "~/.ssh/authorized_keys"  or "/home/sunny/.ssh/authorized_keys" 
+      At the time of login, system automatically check my public-key with the keys that placed in the above folder of the node. 
+
+-----------------------------------------------------------------------------
+Q) How to restrict a SSH login, so that no one can login as "root" user 
+
+> vi /etc/ssh/sshd_config                     <-- this file is on "Node" and we can add the below values to restrict it 
+  PermitRootLogin no                          <-- like this we can say that no user can login as "root"
+  PasswordAuthentication no                   <-- like this no user can login directly with "password" he must use its private-key and store its public 
+                                                  key on the node, 
+                                              Main.point: as we have already copyied in the above example the key to the node, so now we can do these changes
+
+Step-2)
+> systemctl restart sshd                     <-- we need to restart the "sshd" server, this servise is responsible for SSH login
+OR
+> service sshd restart
+
+
+------------------------------------------------------------------------------
+Q) Create a user named john on node01 host and configure password-less ssh access from 
+   controlplane host (from user root) to node01 host (to user john).
+
+Step-1)
+@controlplane> ssh-keygen -t rsa        <-- this command will cretate 
+                                         /home/sunny/.ssh/id_rsa.pub        <-- a public-key 
+                                         /home/sunny/.ssh/id_rsa            <-- private key 
+
+@controlplane> ssh node01                                          <-- login to node01 from controlplane node 
+@node01>       adduser john                                        <-- create a new user name "john" and create a directory structure with name "john@node01"
+@controlplane> ssh-copy-id -i ~/.ssh/id_rsa.pub john@node01        <-- "ssh-copy-id"  when we use this commad first time to login to a node, it will not ask for password 
+                                                                       This command will create a ".ssh/authorized_keys" folder on john@node01 and copy from local maching the
+                                                                       public-key to the john@node01 when we will try to login 
+                                                                       the local private-key will be used to authenticate and the key that is place under john@authorized_keys 
+                                                                       will be checked and authenticate the user.
+                                                            
+                                                                       
+@controlplane> ssh john@node01                                     <--it will work
+
+------------------------------------------------------------------------------
+@) Change the password of user john to 8DHdjjdk on host node01 and make him a sudo user.
+
+> passwd john               <-- like this we can change the password of John user 
+
+> vi /etc/sudoers 
+  john ALL=(ALL:ALL) ALL       <-- like this we can make user john to use "sudo" command. 
+
+
+-----------------------------------------------------------------------------
+@) We want to update user jim on node01 host so that jim can run sudo commands without entering the sudo password. Please make appropriate changes
+
+> ssh node01 
+
+> vi /etc/sudoers 
+  jim ALL(ALL:ALL) ALL      replace to   ->   jim ALL(ALL) NOPASSWD:ALL 
+
+------------------------------------------------------------------------------
+Q) Add a new user john on node01 host and set password to jid345kjf. 
+   We already have a sudo group i.e admin on this host. 
+   Make user john member of the admin group so that he can become a sudo user. 
+   Do not to add the user directly in the sudoers file.
+
+> ssh node01 
+> adduser john
+
+> usermod john -G admin              <-- like this we can add user john to "admin" group 
+
+---------------------------------------------------------------------------------
+Q) Which of the following commands is used to list all installed packages on an ubuntu system?
+
+> apt list --installed
+
+
+----------------------------------------------------------------------------------
+Q) Check if python2.7 package is installed on the controlplane host
+
+
+> apt list --installed | grep python2.7
+
+
+-----------------------------------------------------------------------------
+Q) Which of the following commands can be used to list only active and deactive services on a system?
+
+> systemctl list-units --all                <-- it return all the active services 
+
+> systemctl list-units --all --state inactive   <-- it return all the deactive services 
+
+
+--------------------------------------------------------------------------------
+Q) Which command can be used to list the kernel modules currently loaded on a system?
+
+> lsmob
+
+
+-----------------------------------------------------------------------------------
+Q) On the controlplane host, we have nginx service running which isn't needed on that system. 
+    Stop the nginx service and remove its service unit file. 
+    Make sure not to remove nginx package from the system.
+
+> systemctl list-units --all | grep nginx
+> systemctl stop nginx
+> systemctl status nginx
+> rm /lib/systemd/system/nginx.service
+
+-----------------------------------------------------------------------------------
+Q) We want to blacklist the evbug kernel module on controlplane host. 
+  Important Note: Do not reboot the node!
+
+> vim /etc/modprobe.d/blacklist.conf            <-- in this file add the below entry to blacklist 
+      blacklist evbug                              
+
+
+-----------------------------------------------------------------------------------
+Q) Remove the nginx package from controlplane host.
+
+
+> apt remove nginx -y
+
+---------------------------------------------------------------------------------
+Q) We have a service running on controlplane host which is listening on port 9090. 
+   Identify the service and stop the same to free the 9090 port.
+
+> netstat -natp  | grep 9090            <-- Identify the service listening on port 9090
+ 
+> systemctl stop apache2                <-- Kill/Stop the service to free the port
+
+
+-----------------------------------------------------------------------------
+Q) We have the wget package version v1.18 installed on the host controlplane. 
+   There were issues reported with the current version of wget. 
+   Please check for updates available for this package and update to the latest version available in the apt repos.
+
+> apt install wget -y             <-- like this it will install the latest version.
+
+
+=====================================================================================================
+Uncomplicated Firewal  ( UFW )
+---------------------
+
+Steps to install UNF 
+---------------------
+
+> apt-get update 
+> apt-get install ufw 
+> systemctl enable ufw 
+> systemctl start ufw 
+> ufw status                     <-- till this step "status = inactive" it shows inactive status, as till this step we have 
+                                     not created firewall rules, After creating firewall rules it will be in active state.
+
+> ufw default allow outgoing     <-- here we are adding "allow" for outgoing, means every port is open for outgoing.
+> ufw default deny incoming      <-- here we are setting "deny" for all incoming ports 
+
+> ufw allow from 172.16.238.5 to any port 22 proto tcp        <-- like this we can open the port 22 for "172.16.238.5" 
+                                                               rest as above "deny" all other ports are blocked.
+
+> ufw allow from 172.16.238.5 to any port 80 proto tcp 
+> ufw allow from 172.16.100.0/28 to any port 80 proto tcp        <-- here we are opening port for these IPs 
+
+> ufw deny 8080                                   <-- here we are blocking the port 8080 so nobody can come through it.
+
+
+> ufw enable                      <-- After adding the rules, at the end enable the firewal.
+
+
+> ufw delete deny 8080             <-- as we have above created the "ufw deny 8080" rule, like this we can delete that rule. 
+
+
+Delete a "ufw" rule by line number:
+----------------------------------
+
+> ufw status                     <-- it will print all the defined "ALLOW" and "DENY" rules 
+
+> ufw delete 5                   <-- in this example we are deleting the rule defined at the "line 5"
+
+
+
+---------------------------------------------------------------------------------
+Q) Which of the following commands can be used to display the rules along with rule numbers next to each rule?
+
+> ufw status numbered                 
+
+---------------------------------------------------------------------------------
+Q) What is the command to allow a tcp port range between 1000 and 2000 in ufw?
+
+> ufw allow 1000:2000/tcp 
+
+-------------------------------------------------------------------------------
+Q) How can you reset ufw rules to their default settings?
+
+
+> ufw reset                       <-- with this we can reset the allow and deny rules to default settings 
+
+----------------------------------------------------------------------------
+Q) On the node01 host, add a rule to allow incoming SSH connections.
+Do not enable the firewall yet.
+
+
+> ufw allow 22 
+
+-------------------------------------------------------------------------------
+Q) We have some services on node01 host, which are running on tcp port 9090 and 9091. 
+   Add ufw rules to allow incoming connection on these ports from IP range 135.22.65.0/24 to any interface on node01.
+   Once this is done, enable the firewall.
+
+
+
+> ufw allow  from 135.22.65.0/24 to any port 9090 proto tcp
+> ufw allow  from 135.22.65.0/24 to any port 9091 proto tcp
+> ufw enable
+
+
+----------------------------------------------------------------------------------
+Q) There is a Lighttpd service running on the node01. Identify which port it is bound to.
+
+> systemctl status lighttpd                      <-- first check if "lighttpd"  service is running 
+> netstat -natulp | grep lighttpd                <-- now we can check on which port "lighttpd" servic is running
+
+--------------------------------------------------------------------------------------
+Q) This service was identified to have several vulnerabilities in it. Disable the port 80 on node01 for ALL incoming requests.
+
+> ufw deny 80
+
+-------------------------------------------------------------------------------------
+Q) We want to temporarily disable ufw firewall on node01 host but later we will enable it 
+   back so make sure to disable the firewall but preserve all rules so that same can be 
+   effective when we enable it back.
+
+> ufw disable
+
+=======================================================================================
+Syscalls:
+--------
+
+execve()
+read()
+write()
+close()
+send()
+revc()
+accept()                                   <-- these are the System-calls that we can make from container -> linux-kernale -> Hardware(CPU, Memory, Devices)
+
+
+
+
+> which strace                  <-- like this we can check if "strace" is installed on the server or not 
+
+> strace touch /tmp/abc.log      <-- if we put "strace" in front of this command, then we can see all the 
+                                    SYS-Calls that this command has made for creating this file inside the "/tmp" folder,
+
+
+====================================================================================
+Seccomp:
+--------
+
+Note: By-default Docker has implemented "Seccomp" so it blocks automatically 60 different types of SYS-Calls by-default.
+
+> docker run r.j3ss.co/amicontained amicontained        <-- like this we can get a list of all the by-default blocked SYS-Calls 
+------------------------------------
+
+
+
+
+
+
+> grep -i seccomp /boot/config-$(uname -r)               
+  CONFIG_SECCOMP=y                                       <-- if the result of the above command come like this it means that 
+                                                            kernel is supported by Seccomp.
+
+Seccomp Modes:
+-------------
+Mode 0                    <-- it means "Seccomp" is disabled  
+Mode 1                    <-- it means "Read()" "Write()" "Exit()" these methods are alloweed
+Mode 2                    <-- it means "Seccomp" is filtring calls, but which calls it is on the configurations.
+
+
+whitelist.json            <-- we can define all the syscalls types that we want to allows, 
+                            Note: only those are alloweed that are defined, rest all will be blocked.
+
+blacklist.json            <-- Only the defined syscall will blocked, rest all will be alloweed.
+
+
+
+======================================================================================
+AppArmor:
+--------
+
+> systemctl status apparmor              <-- like this we can check if the "Apparmor" is installed or not.
+
+> cat /sys/module/apparmor/parameters/enabled   <-- if it print "Y" it means "Apparmor" is installed on the node. 
+
+> cat /sys/kernel/security/apparmor/profiles    <-- if their are any profile is created for "Apparmor" then that will be defined 
+                                                    in this file. This file defines that the application can 
+
+
+How to create a "apparmor" profile on ubuntu.
+------------------------------------
+
+/root/my_data.sh 
+-----------------
+#!/bin/bash                             
+data_directory=/opt/app/data
+mkdir -p ${data_directory}
+echo "=> File created at `date`" | tee {data_directory}/create.log             <-- this whole script create a file at 
+                                                                                  "/opt/app/data/create.log" and wirte in it "File created at date of the day"
+
+Step-1)
+------
+> apt-get install -y apparmor-utils               <-- this will install the package 
+
+> aa-genprof /root/my_data.sh                     <-- "my_data.sh" we have a shell script file, we can execute this file with the  
+                                                      "aa-gebprof" command, with this command the shell script will run from a different window,
+                                                                   and it can scan all the events.
+Step-2)
+> ./my_data.sh                               <-- Now from the seperate window run this bash script, and the                                              
+
+> s                                          <-- at the end press "s" to save 
+> f                                          <-- at the end press "f" to finish   
+
+Step-3) 
+> aa-status                                <-- with this we can get the status of "AppArmor" profile, that is generated.
+
+Step-4) 
+> cat /etc/apparmor.d/root.my_data.sh        <-- at this place our result is stored automatically by the "AppArmor"
+
+----------------------------------------------------
+> apparmor_parser /etc/apparmor.d/root.my_data.sh           <-- with this command we can check if the profile is correctly loaded or not 
+                                                                if after executing nothing is printed, it means profile is correctly loaded.
+
+
+---------------------------------------------------------------
+How to disable a existing AppArmor profile ?
+--------------------------------------------
+> apparmor_parser -R /etc/apparmor.d/root.my_data.sh       <-- "apparmor_parser -R" with this command we can disable a existing loaded profile 
+
+> ln -s /etc/apparmor.d/root.my_data.sh /etc/apparmor.d/disable/    <-- after disabling with above command, it creates a file under this directory.
+
+========================================================================================
+AppArmor in Kubernetes:
+----------------------
+Note: with AppArmor we can restirct a container that what i can do and what it can not do.
+
+
+Requirements for run AppArmor in kubernetes:
+
+- AppArmor kernel Module Enabled 
+- AppArmor Profile Loaded in the Kernel 
+- Container Runtime should be Supported.
+
+
+
+
+
+
+
+
+
+
+
+##########################################################################################
+Minimize Microservice Vulnerabilites:
+-------------------------------------
+
+Q) What is the user used to execute the sleep process within the ubuntu-sleeper pod?
+
+> kubectl exec ubuntu-sleeper -- whoami
+
+
+
+
+
+##############################################################################################
+
+Supply Chain Security:
+---------------------
+
+
+
+
+
+
+
+
+
+
+##########################################################################################
+Monitoring, Logging and Runtime:
+--------------------------------
+
+
+
+
+
+
+#################################################################################################
+Mock Exam-1:
+-----------
+Q-1)
+
+A pod has been created in the omni namespace. However, there are a couple of issues with it.
+
+    The pod has been created with more permissions than it needs.
+    It allows read access in the directory /usr/share/nginx/html/internal causing an Internal Site to be accessed publicly.
+
+    To check this, click on the button called Site (above the terminal) and add /internal/ to the end of the URL.
+    Use the below recommendations to fix this.
+
+    Use the AppArmor profile created at /etc/apparmor.d/frontend to restrict the internal site.
+    There are several service accounts created in the omni namespace. Apply the principle of least privilege 
+    and use the service account with the minimum privileges (excluding the default service account).
+    Once the pod is recreated with the correct service account, delete the other unused service accounts 
+    in omni namespace (excluding the default service account).
+
+    You can recreate the pod but do not create a new service accounts and do not use the default service account.
+
+Answer:
+On the controlplane node, load the AppArmor profile:
+apparmor_parser -q /etc/apparmor.d/frontend
+The profile name used by this file is restricted-frontend (open the /etc/apparmor.d/frontend file to check).
+
+
+To verify that the profile was successfully loaded, use the aa-status command:
+
+root@controlplane:~# aa-status | grep restricted-frontend
+   restricted-frontend
+root@controlplane:~#
+
+The pod should only use the service account called frontend-default as it has the least privileges 
+of all the service accounts in the omni namespace (excluding default)
+The other service accounts, fe and frontend have additional permissions (check the roles and rolebindings associated with these accounts)
+
+Use the below YAML File to re-create the frontend-site pod:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/nginx: localhost/restricted-frontend #Apply profile 'restricted-fronend' on 'nginx' container 
+  labels:
+    run: nginx
+  name: frontend-site
+  namespace: omni
+spec:
+  serviceAccountName: frontend-default #Use the service account with least privileges
+  containers:
+  - image: nginx:alpine
+    name: nginx
+    volumeMounts:
+    - mountPath: /usr/share/nginx/html
+      name: test-volume
+  volumes:
+  - name: test-volume
+    hostPath:
+       path: /data/pages
+       type: Directory
+
+Next, Delete the unused service accounts in the 'omni' namespace.
+
+controlplane$ kubectl -n omni delete sa frontend
+controlplane$ kubectl -n omni delete sa fe
+
+------------------------------------------------------------------------
+Q-2)
+A pod has been created in the orion namespace. It uses secrets as environment variables. 
+Extract the decoded secret for the CONNECTOR_PASSWORD and place it under /root/CKS/secrets/CONNECTOR_PASSWORD.
+
+You are not done, instead of using secrets as an environment variable, mount the secret as a read-only 
+volume at path /mnt/connector/password that can be then used by the application inside.
+
+Answer:
+------
+To extract the secret, run: kubectl -n orion get secrets a-safe-secret -o jsonpath='{.data.CONNECTOR_PASSWORD}' | base64 --decode >/root/CKS/secrets/CONNECTOR_PASSWORD
+One way that is more secure to distribute secrets is to mount it as a read-only volume.
+
+Use the following YAML file to recreate the POD with secret mounted as a volume:
+
+apiVersion: v1
+kind: Pod
+metadata:
+    labels:
+        name: app-xyz
+    name: app-xyz
+    namespace: orion
+spec:
+    containers:
+        -
+            image: nginx
+            name: app-xyz
+            ports:
+            - containerPort: 3306
+            volumeMounts: 
+            - name: secret-volume
+              mountPath: /mnt/connector/password
+              readOnly: true
+    volumes:
+    - name: secret-volume
+      secret:
+        secretName: a-safe-secret
+
+-----------------------------------------------------------------------------
+Q-3)
+A number of pods have been created in the delta namespace. Using the trivy tool, which has 
+been installed on the controlplane, identify and delete pods except the one with least 
+number of CRITICAL level vulnerabilities.
+
+Note: Do not modify the objects in anyway other than deleting the ones that have critical vulnerabilities.
+
+Answer:
+------
+First, get all the images of pods running in the delta namespace:
+
+$ kubectl -n delta get pods -o json | jq -r '.items[].spec.containers[].image'
+
+Next, scan each image using trivy image command. For example:
+
+$ trivy image --severity CRITICAL kodekloud/webapp-delayed-start
+
+Don't delete the associated pod which image has a least number of CRITICAL vulnerabilities as compared to others.
+
+For example, if kodekloud/webapp-delayed-start, httpd and nginx:1.16 have these vulnerabilities:
+
+$ kubectl -n delta delete pod simple-webapp-1
+$ kubectl -n delta delete pod simple-webapp-3
+$ kubectl -n delta delete pod simple-webapp-4
+
+Ignore pods which use images of lower severity such as HIGH, MEDIUM, LOW e.t.c
+
+---------------------------------------------------------------------------------
+Q-4)
+Create a new pod called audit-nginx in the default namespace using the nginx image. 
+Secure the syscalls that this pod can use by using the audit.json seccomp profile in the pod's security context.
+
+The audit.json is provided at /root/CKS directory. Make sure to move it under the profiles 
+directory inside the default seccomp directory before creating the pod
+
+Answer:
+-------
+Copy the audit.json seccomp profile to /var/lib/kubelet/seccomp/profiles on the controlplane node:
+
+controlplane$ mv /root/CKS/audit.json /var/lib/kubelet/seccomp/profiles
+
+Next, recreate the pod using the below YAML File
+
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: nginx
+  name: audit-nginx
+spec:
+  securityContext:
+    seccompProfile:
+      type: Localhost
+      localhostProfile: profiles/audit.json
+  containers:
+  - image: nginx
+    name: nginx
+
+---------------------------------------------------------------------------------------
+Q-5)
+The CIS Benchmark report for the Controller Manager and Scheduler is available at the tab called CIS Report 1.
+Inspect this report and fix the issues reported as FAIL.
+
+Answer:
+------
+The fixes are mentioned in the same report. Update the Controller Manager and Scheduler static pod definition file as per the recommendations.
+1. Make sure that the --profiling=false parameter is set. 
+
+-------------------------------------------------------------------------------------
+Q-6) 
+There is something suspicious happening with one of the pods running an httpd image in this cluster.
+The Falco service shows frequent alerts that start with: File below a known binary directory opened for writing.
+
+Identify the rule causing this alert and update it as per the below requirements:
+
+    Output should be displayed as: CRITICAL File below a known binary directory opened for writing (user_id=user_id file_updated=file_name command=command_that_was_run)
+    Alerts are logged to /opt/security_incidents/alerts.log
+
+Do not update the default rules file directly. Rather use the falco_rules.local.yaml file to override.
+Note: Once the alert has been updated, you may have to wait for up to a minute for the alerts to be written to the new log location.
+
+Answer:
+-------
+Enable file_output in /etc/falco/falco.yaml on the controlplane node:
+
+file_output:
+  enabled: true
+  keep_alive: false
+  filename: /opt/security_incidents/alerts.log
+
+Next, add the updated rule under the /etc/falco/falco_rules.local.yaml and hot reload the Falco service:
+
+- rule: Write below binary dir
+  desc: an attempt to write to any file below a set of binary directories
+  condition: >
+    bin_dir and evt.dir = < and open_write
+    and not package_mgmt_procs
+    and not exe_running_docker_save
+    and not python_running_get_pip
+    and not python_running_ms_oms
+    and not user_known_write_below_binary_dir_activities
+  output: >
+    File below a known binary directory opened for writing (user_id=%user.uid file_updated=%fd.name command=%proc.cmdline)
+  priority: CRITICAL
+  tags: [filesystem, mitre_persistence]
+
+To perform hot-reload falco use 'kill -1 /SIGHUP':
+
+$ kill -1 $(cat /var/run/falco.pid)
+
+Alternatively, you can also restart the falco service by running:
+
+$ systemctl restart falco
+
+----------------------------------------------------------------------------------------
+Q-7)
+A pod called busy-rx100 has been created in the production namespace. Secure the pod by recreating 
+it using the runtimeClass called gvisor. You may delete and recreate the pod.
+
+Answer:
+------
+Use the below YAML file to create the pod with the gvisor runtime class:
+
+apiVersion: v1
+kind: Pod
+metadata:
+    labels:
+        run: busy-rx100
+    name: busy-rx100
+    namespace: production
+spec:
+    runtimeClassName: gvisor
+    containers:
+        -
+            image: nginx
+            name: busy-rx100
+
+----------------------------------------------------------------------------------------
+Q-8) 
+We need to make sure that when pods are created in this cluster, they cannot use the 
+latest image tag, irrespective of the repository being used.
+
+To achieve this, a simple Admission Webhook Server has been developed and deployed. 
+A service called image-bouncer-webhook is exposed in the cluster internally. 
+This Webhook server ensures that the developers of the team cannot use the latest image tag. 
+Make use of the following specs to integrate it with the cluster using an ImagePolicyWebhook:
+
+    Create a new admission configuration file at /etc/admission-controllers/admission-configuration.yaml
+    The kubeconfig file with the credentials to connect to the webhook server is located at /root/CKS/ImagePolicy/admission-kubeconfig.yaml. Note: The directory /root/CKS/ImagePolicy/ has already been mounted on the kube-apiserver at path /etc/admission-controllers so use this path to reference the admission configuration.
+    Make sure that if the latest tag is used, the request must be rejected at all times.
+    Enable the Admission Controller.
+
+Finally, delete the existing pod in the magnum namespace that is in violation of the 
+policy and recreate it, ensuring the same image but using the tag 1.27.
+
+    NOTE: If the kube-apiserver becomes unresponsive, this can affect the validation of this exam. 
+    In such a case, please restore the kube-apiserver using the backup file 
+    created at: /root/backup/kube-apiserver.yaml, wait for the API to be available again and proceed.
+
+
+Answer:
+-------
+Create the below admission-configuration inside /root/CKS/ImagePolicy directory in the controlplane node:
+
+apiVersion: apiserver.config.k8s.io/v1
+kind: AdmissionConfiguration
+plugins:
+- name: ImagePolicyWebhook
+  configuration:
+    imagePolicy:
+      kubeConfigFile: /etc/admission-controllers/admission-kubeconfig.yaml
+      allowTTL: 50
+      denyTTL: 50
+      retryBackoff: 500
+      defaultAllow: false
+
+The /root/CKS/ImagePolicy is mounted at the path /etc/admission-controllers directory in the kube-apiserver. So, you can directly place the files under /root/CKS/ImagePolicy.
+
+Here is a snippet of the volume and volumeMounts (already added to apiserver config):
+
+  containers:
+  .
+  .
+  .
+  volumeMounts:
+  - mountPath: /etc/admission-controllers
+      name: admission-controllers
+      readOnly: true
+
+  volumes:
+  - hostPath:
+      path: /root/CKS/ImagePolicy/
+      type: DirectoryOrCreate
+    name: admission-controllers
+
+Next, update the kube-apiserver command flags and add ImagePolicyWebhook to the enable-admission-plugins flag. 
+Use the configuration file that was created in the previous step as the value of admission-control-config-file.
+
+Note: Remember, this command will be run inside the kube-apiserver container, so the path 
+must be /etc/admission-controllers/admission-configuration.yaml (mounted from /root/CKS/ImagePolicy in controlplane).
+
+    - --admission-control-config-file=/etc/admission-controllers/admission-configuration.yaml
+    - --enable-admission-plugins=NodeRestriction,ImagePolicyWebhook
+
+In case we mess up while solving the question, API server could become unresponsive.
+
+For example:
+
+The connection to the server controlplane:6443 was refused - did you specify the right host or port?
+
+In such case scenario restore kube-apiserver to it's default state using the backup provided at /root/backup/kube-apiserver.yaml
+
+Run the below command to restore the kube-apiserver initial state:
+
+cp -v /root/backup/kube-apiserver.yaml /etc/kubernetes/manifests
+
+
+##########################################################################################################
+Mock Exam-2)
+--------------
+Q-1)
+A pod called redis-backend has been created in the prod-x12cs namespace. It has been exposed as a service of type ClusterIP.
+ Using a network policy called allow-redis-access, lock down access to this pod only to the following:
+1. Any pod in the same namespace with the label backend=prod-x12cs.
+2. All pods in the prod-yx13cs namespace.
+All other incoming connections should be blocked.
+
+Use the existing labels when creating the network policy.
+
+Answer:
+-------
+Create a network policy using the YAML below:
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-redis-access
+  namespace: prod-x12cs
+spec:
+  podSelector:
+    matchLabels:
+      run: redis-backend
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          access: redis
+    - podSelector:
+        matchLabels:
+          backend: prod-x12cs
+    ports:
+    - protocol: TCP
+      port: 6379
+
+
+----------------------------------------------------------------------------------------
+Q-2)
+A few pods have been deployed in the apps-xyz namespace. There is a pod called redis-backend which serves as 
+the backend for the apps app1 and app2. The pod called app3 on the other hand, does not need access to this redis-backend pod. 
+Create a network policy called allow-app1-app2 that will only allow incoming traffic from app1 and app2 to the redis-pod.
+
+Make sure that all the available labels are used correctly to target the correct pods. Do not make any other changes to these objects.
+
+Answer:
+-------
+Create a new network policy using the sample YAML file below:
+
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-app1-app2
+  namespace: apps-xyz
+spec:
+  podSelector:
+    matchLabels:
+      tier: backend
+      role: db
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          name: app1
+          tier: frontend
+    - podSelector:
+        matchLabels:
+          name: app2
+          tier: frontend
+-----------------------------------------------------------------------------------------
+Q-3)
+A pod has been created in the gamma namespace using a service account called cluster-view. 
+This service account has been granted additional permissions as compared to the default service 
+account and can view resources cluster-wide on this Kubernetes cluster. While these permissions 
+are important for the application in this pod to work, the secret token is still mounted on this pod.
+
+Secure the pod in such a way that the secret token is no longer mounted on this pod. You may delete and recreate the pod.
+
+Answer:
+-------
+Update the Pod to use the field automountServiceAccountToken: false
+
+Using this option makes sure that the service account token secret is not mounted in the pod at the location /var/run/secrets/kubernetes.io/serviceaccount
+
+Sample YAML shown below:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: apps-cluster-dash
+  name: apps-cluster-dash
+  namespace: gamma
+spec:
+  containers:
+  - image: nginx
+    name: apps-cluster-dash
+  serviceAccountName: cluster-view
+  automountServiceAccountToken: false
+
+---------------------------------------------------------------------------------------
+Q-4)
+A pod in the sahara namespace has generated alerts that a shell was opened inside the container.
+
+To recognize such alerts, set the priority to ALERT and change the format of the output so that it looks like the below:
+
+ALERT timestamp of the event without nanoseconds,User ID,the container id,the container image repository
+Make sure to update the rule in such a way that the changes will persists across Falco updates.
+
+You can refer the falco documentation Here
+
+Answer:
+------
+Add the below rule to /etc/falco/falco_rules.local.yaml and restart the falco service to override the current rule.
+
+- rule: Terminal shell in container
+  desc: A shell was used as the entrypoint/exec point into a container with an attached terminal.
+  condition: >
+    spawned_process and container
+    and shell_procs and proc.tty != 0
+    and container_entrypoint
+    and not user_expected_terminal_shell_in_container_conditions
+  output: >
+    %evt.time.s,%user.uid,%container.id,%container.image.repository
+  priority: ALERT
+  tags: [container, shell, mitre_execution]
+
+
+Use the falco documentation to use the correct sysdig filters in the output.
+
+For example, the evt.time.s filter prints the timestamp for the event without nano seconds. 
+This is clearly described in the falco documentation here - https://falco.org/docs/rules/supported-fields/#evt-field-class
+
+--------------------------------------------------------------------------------------
+Q-5)
+martin is a developer who needs access to work on the dev-a, dev-b and dev-z namespace. He should have 
+the ability to carry out any operation on any pod in dev-a and dev-b namespaces. However, on the dev-z namespace, 
+he should only have the permission to get and list the pods.
+
+The current set-up is too permissive and violates the above condition. Use the above requirement and secure
+ martin's access in the cluster. You may re-create objects, however, make sure to use the same name as the ones in effect currently.
+
+Answer:
+-------
+The role called dev-user-access has been created for all three namespaces: dev-a, dev-b and dev-z. However, 
+the role in the dev-z namespace grants martin access to all operation on all pods. To fix this, delete 
+and re-create the role using the following YAML:
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: dev-user-access
+    namespace: dev-z
+rules:
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    verbs:
+    - get
+    - list
+
+-----------------------------------------------------------------------------------------
+Q-6)
+On the controlplane node, an unknown process is bound to the port 8088. Identify the process and prevent 
+it from running again by stopping and disabling any associated services. Finally, remove the package that was responsible for starting this process.
+
+
+Answer:
+------
+Check the process which is bound to port 8088 on this node using netstat:
+
+controlplane $ netstat -natulp | grep 8088
+
+This shows that the the process openlitespeed is the one which is using this port.
+Check if any service is running with the same name:
+
+controlplane $ systemctl list-units  -t service --state active | grep -i openlitespeed
+lshttpd.service                    loaded active running OpenLiteSpeed HTTP Server
+
+This shows that a service called openlitespeed is managed by lshttpd.service which is currently active.
+
+Next, stop the service and disable it:
+
+controlplane $ systemctl stop lshttpd
+controlplane $ systemctl disable lshttpd
+
+Finally, check for the package by the same name:
+
+controlplane $ apt list --installed | grep openlitespeed
+
+Uninstall the package:
+
+controlplane $ apt remove openlitespeed -y
+
+-------------------------------------------------------------------------------------------
+Q-7)
+A pod has been created in the omega namespace using the pod definition file located 
+at /root/CKS/omega-app.yaml. However, there is something wrong with it and the pod is not in a running state.
+
+We have used a custom seccomp profile located at /var/lib/kubelet/seccomp/custom-profile.json to 
+ensure that this pod can only make use of limited syscalls to the Linux Kernel of the host operating
+ system. However, it appears the profile does not allow the read and write syscalls. 
+ Fix this by adding it to the profile and use it to start the pod.
+
+Answer:
+-------
+The path to the seccomp profile is incorrectly specified for the omega-app pod.
+As per the question, the profile is created at /var/lib/kubelet/seccomp/custom-profiles.json
+
+controlplane $ kubectl -n omega describe po omega-app
+.
+.
+.
+Events:
+  Type     Reason  Age              From             Message
+  ----     ------  ----             ----             -------
+  Normal   Pulled  5s (x3 over 7s)  kubelet, node01  Container image "hashicorp/http-echo:0.2.3" already present on machine
+  Warning  Failed  5s (x3 over 7s)  kubelet, node01  Error: failed to generate security options for container "test-container": failed to generate seccomp security options for container: cannot load seccomp profile "/var/lib/kubelet/seccomp/profiles/custom-profile.json": open /var/lib/kubelet/seccomp/profiles/custom-profile.json: no such file or directory
+
+
+Fix the seccomp profile path in the POD Definition file:
+
+securityContext:
+      seccompProfile:
+        localhostProfile: custom-profile.json
+        type: Localhost
+
+
+Next, update the custom-profile.json to allow 'read' and 'write' syscalls.
+Once done, you should see an output similar to below:
+
+controlplane $ cat /var/lib/kubelet/seccomp/custom-profile.json | jq -r '.syscalls[].names[]' | grep -w write
+write
+
+controlplane $ cat /var/lib/kubelet/seccomp/custom-profile.json | jq -r '.syscalls[].names[]' | grep -w read 
+read
+
+
+Finally, re-create the pod
+
+controlplane $ kubectl replace -f /root/CKS/omega-app.yaml --force
+
+
+The POD should now run successfully.
+
+NOTE: It may still run even if the above two syscalls are not added. However, adding the syscalls is required to successfully complete this question.
+
+--------------------------------------------------------------------------------------
+Q-8)
+A pod definition file has been created at /root/CKS/simple-pod.yaml . Using the kubesec tool, 
+generate a report for this pod definition file and fix the major issues so that the subsequent scan report no longer fails.
+
+Once done, generate the report again and save it to the file /root/CKS/kubesec-report.txt
+
+
+Answer:
+-------
+Remove the SYS_ADMIN capability from the container for the simple-webapp-1 pod in the POD definition file and re-run the scan.
+
+controlplane $ kubesec scan /root/CKS/simple-pod.yaml > /root/CKS/kubesec-report.txt
+
+The fixed report should PASS with a message like this:
+
+[
+  {
+    "object": "Pod/simple-webapp-1.default",
+    "valid": true,
+    "fileName": "simple-pod.yaml",
+    "message": "Passed with a score of 0 points",
+    "score": 0,
+  },
+.
+.
+.
+
+--------------------------------------------------------------------------------------------
+Q-9)
+Create a new pod called secure-nginx-pod in the seth namespace. Use one of the images from the below which has a least number of CRITICAL vulnerabilities.
+
+    rancher/alpine-git:1.0.4
+    nginx:1.19
+    nginx:1.17
+    nginx:1.20
+    gcr.io/google-containers/nginx
+    bitnami/jenkins:latest
+
+Answer:
+-------
+Run trivy image scan on all of the images and check which one has the least number of CRITICAL vulnerabilities.
+
+root@controlplane:~# trivy image --severity CRITICAL gcr.io/google-containers/nginx 
+2022-01-25T20:36:08.878Z        WARN    You should avoid using the :latest tag as it is cached. You need to specify '--clear-cache' option when :latest image is changed
+2022-01-25T20:36:08.881Z        INFO    Need to update DB
+2022-01-25T20:36:08.882Z        INFO    Downloading DB...
+25.67 MiB / 25.67 MiB [----------------------------------------------------------------] 100.00% 13.68 MiB p/s 2s
+2022-01-25T20:36:11.357Z        INFO    Detecting Ubuntu vulnerabilities...
+2022-01-25T20:36:11.372Z        INFO    Trivy skips scanning programming language libraries because no supported file was detected
+
+gcr.io/google-containers/nginx (ubuntu 14.04)
+=============================================
+Total: 1 (CRITICAL: 1)
+
+Next, use this image to create the pod
+
+controlplane $ kubectl -n seth run secure-nginx-pod --image gcr.io/google-containers/nginx 
 
 
 
