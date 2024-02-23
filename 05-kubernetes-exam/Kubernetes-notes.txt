@@ -108,7 +108,7 @@ should be placed, if a "Pod" is in a pending state, then first check "kube-sched
 Tesing Pod:
 ----------
 
--) k run test-pod alpine/curl --rm -it  -- sh                 <-- like this we can create a test pod fastly just for executing curl commands, "-rm" it will remove the pod 
+-) k run test-pod --image=alpine/curl --rm -it  -- sh                 <-- like this we can create a test pod fastly just for executing curl commands, "-rm" it will remove the pod 
                                                                   after executin this command, or after exit.
 
 -) k run pod --image=busybox -it --rm --restart=Never -- sh -c 'echo aaaaaa vvvv'              <-- Main point is when using "busybox" then must use "sh -c" or "/bin/sh -c"
@@ -131,9 +131,6 @@ OR
 
 
 -) k create job --image=busybox:1.28 $do > aa.yaml -- sh -c "sleep 2 && echo done"        <-- like this we can create a direct job 
-
-
-
 
 ------------------
 1) k run my-pod --image=busybox:1.28 --command sleep 3600         <--here we are creating a new pod, just for running "nslookup" command as pre given in the question 
@@ -166,12 +163,18 @@ OR
 Step-2)
 # nslookup <service-name>.<namespace>.svc.cluster.local                
 
+----------------------------------------------------------------------------
+1) k exec my-pod -it -- bash                   <-- like this we can exec a existing pod  
+
+2) k exec -it my-pod -- nslookup green-service               <-- first check if the output is correct 
+
 
 
 
 
 ######################################################################################################
--) systemctl status kubelet   
+Systemctl commands:
+------------------
 
 -) systemctl start kubelet 
 
@@ -188,8 +191,6 @@ or
 7) systemctl daemon-reload 
 
 8) systemctl restart kubelet 
-
---------------------------------------------------------------------
 
 -) systemctl restart etcd 
 
